@@ -1,0 +1,27 @@
+{
+  "name": "vue-django",
+  "version": "0.0.1",
+  "description": "personal experiment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/szuprefix/vue-django.git"
+  },
+  "keywords": [
+    "vue",
+    "django",
+    "model",
+    "search",
+    "CRUT",
+    "tables"
+  ],
+  "author": "szuprefix@126.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/szuprefix/vue-django/issues"
+  },
+  "homepage": "https://github.com/szuprefix/vue-django#readme"
+}
