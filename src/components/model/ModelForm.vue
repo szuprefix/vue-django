@@ -45,7 +45,7 @@
     </div>
 </template>
 <script>
-    import server_response from '~/mixins/server_response'
+    import server_response from '../../mixins/server_response'
     import Qs from 'qs'
     import moment from 'moment'
     export default{
@@ -58,7 +58,7 @@
             }
         },
         components: {
-            InfoPopover: require("~/components/InfoPopover.vue")
+            InfoPopover: require("../layout/InfoPopover.vue")
         },
         mixins: [server_response],
         created (){

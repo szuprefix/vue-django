@@ -2,7 +2,7 @@
     <model-form :url="`${appName}/${modelName}/${id}/update/`" @loaded="setTitle" :options="{inline:true}"></model-form>
 </template>
 <script>
-    import model_view from '~/mixins/model_view'
+    import model_view from '../../mixins/model_view'
     export default{
         mixins: [model_view],
         created () {

@@ -28,7 +28,7 @@
 </template>
 <script>
     import Qs from 'qs'
-    import server_response from '~/mixins/server_response'
+    import server_response from '../../mixins/server_response'
     export default{
         props: {
             url: String,

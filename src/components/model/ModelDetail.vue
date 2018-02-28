@@ -6,7 +6,7 @@
     </el-form>
 </template>
 <script>
-    import server_response from '~/mixins/server_response'
+    import server_response from '../../mixins/server_response'
     export default{
         props: {
             url: String
