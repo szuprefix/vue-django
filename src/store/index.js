@@ -15,7 +15,8 @@ var store = new Vuex.Store({
     state: state,
     mutations: {
         setUser(state, payload){
-            state.user = payload.user
+            console.log(payload)
+            state.user = payload
         },
         clearUser(state){
             state.user = {}

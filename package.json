@@ -1,6 +1,6 @@
 {
   "name": "vue-django",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "personal experiment",
   "main": "index.js",
   "files": [
@@ -29,7 +29,7 @@
   "homepage": "https://github.com/szuprefix/vue-django#readme",
   "dependencies": {
     "axios": "^0.16.2",
-    "element-ui": "^1.1.2",
+    "element-ui": "^2.2.0",
     "qs": "^6.4.0",
     "moment": "^2.18.1",
     "vue": "^2.1.8",

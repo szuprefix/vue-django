@@ -25,37 +25,48 @@ function formatDates(data) {
 }
 
 export default  {
+    props: {
+        restStyle: {
+            type: Boolean,
+            default: true
+        }
+    },
     data (){
         return {
-            loading: false
+            loading: false,
+
         }
     },
     methods: {
 
-        formPost: function (url, data, callback, errorCallback) {
+        submitData: function (url, data, successMsg, isCreate) {
             this.loading = true
             this.errors = {}
-            this.$http.post(url, Qs.stringify(formatDates(data), {indices: false})).then(({data}) => {
+            let action = isCreate ? this.$http.post : this.$http.put
+            let dt = this.restStyle ? data : Qs.stringify(formatDates(data))
+            let promise = action(url, dt).then(({data}) => {
                 this.loading = false
-                if (data.code === 0) {
-                    this.$message('提交成功')
-                    if (callback) {
-                        callback(data)
-                    }
-                } else {
-                    this.$message({message: data.msg, type: 'error'})
-                    if (errorCallback) {
-                        errorCallback(data)
-                    } else {
-                        this.errors = joinErrors(data.data.errors)
-                    }
+                if (!this.restStyle && data.code != 0) {
+                    return Promise.reject({code: 400, msg: data.data.errors})
                 }
+                this.$message({message: successMsg || '提交成功', type: 'success'})
+                return data
             }).catch(this.onServerResponseError)
+            return promise
         },
         onServerResponseError: function (error) {
             this.loading = false
             console.log(error)
-            this.$message({message: `系统异常: ${error.code} ${error.msg}`, type: 'error'})
+            if (error.code === 400) {
+                this.errors = joinErrors(error.msg)
+            } else if (error.code === 401) {
+                // this.$router.replace('/auth/login/')
+            } else {
+                const h = this.$createElement;
+                this.$message({
+                    message: `${error.code}错误:${error.msg}`, type: 'error'
+                })
+            }
         }
     }
 }
