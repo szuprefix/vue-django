@@ -25,17 +25,13 @@ var store = new Vuex.Store({
     },
     actions: {
         getUserInfo (context){
-            Vue.http.post("get_user_info/").then(({data}) => {
-                if (data.code === 0) {
-                    context.commit("setUser", data.data)
-                }
+            return Vue.http.get("/saas/worker/current/").then(({data}) => {
+                context.commit("setUser", data)
             })
         },
         logout (context){
-            Vue.http.post("logout/").then(({data}) => {
-                if (data.code === 0) {
-                    context.commit("clearUser")
-                }
+            return Vue.http.post("/auth/user/logout/").then(({data}) => {
+                context.commit("clearUser")
             })
         }
     },

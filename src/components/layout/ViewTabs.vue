@@ -16,12 +16,14 @@
         created (){
             this.curTab = this.$route.path
             this.changeRoute(this.$route)
-            this.$store.state.bus.$on("user-logout", () => {
-                this.tabs = []
-            })
+            this.$store.state.bus.$on("user-logout", this.clearTabs)
         },
         components: {},
         methods: {
+            clearTabs(){
+                this.curTab = '/'
+                this.tabs = [this.tabs.find((tab) => tab.name == this.curTab)]
+            },
             tabRemove(name){
                 let targetName = name
                 if (this.curTab === targetName) {
@@ -47,7 +49,9 @@
                 let to = newVal
                 let view = to.matched[0]
                 if (view === undefined) {
-                    this.$message({message: `找不到该路径:${to.path}`, type: 'error'})
+                    if (to.path != '/') {
+                        this.$message({message: `找不到该路径:${to.path}`, type: 'error'})
+                    }
                     return
                 }
 

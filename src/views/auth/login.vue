@@ -1,7 +1,7 @@
 <template>
-    <el-dialog title="登录" :visible="$store.state.user.id === undefined" :show-close="false"
+    <el-dialog title="登录" :visible="$store.state.user.party === undefined" :show-close="false"
                :close-on-click-modal="false">
-        <rest-form  url="/auth/user/login/" :form="form" :fieldItems="fieldItems"
+        <rest-form  url="/auth/user/login/" :values="form" :fieldItems="fieldItems"
                    :options="{'labelWidth':'20%','submitButtonText':'登录'}" @form-posted="done"></rest-form>
     </el-dialog>
 
@@ -20,7 +20,7 @@
         },
         methods: {
             done(data){
-                this.$store.commit("setUser", data)
+                this.$store.dispatch("getUserInfo")
             }
         },
         computed: {}

@@ -1,55 +1,18 @@
 <template>
-    <div class="model-form" v-loading="loading">
-        <el-alert :title="errors.__all__" type="error" v-if="errors.__all__" :closable="false"></el-alert>
-        <el-form ref="form" :inline="options.inline" v-loading="loading" :rules="rules" :model="values"
-                 label-position="right" :label-width="options.labelWidth || '120px'">
-            <el-form-item label=" " v-if="fieldItems" class="flex-right">
-                <el-button type="primary" @click="onSubmit">{{submitName}}</el-button>
-            </el-form-item>
-            <el-form-item :prop="f.name" :required="f.required" :label="f.label" :error="errors[f.name]"
-                          :key="f.name" v-if="f.widget !== 'hidden'"
-                          :ref="f.name" v-for="f in fieldItems" :style="options.itemStyle || {minWidth:'350px'}">
-                <template slot="label">{{f.label}}
-                    <info-popover v-if="f.help_text" :info="f.help_text">
-                    </info-popover>
-                </template>
-                <template>
-                    <el-radio-group v-model="values[f.name]" v-if="f.widget === 'radio'">
-                        <el-radio-button :label="c[0]" v-for="c in f.choices" :key="c[0]">{{ c[1] }}
-                        </el-radio-button>
-                    </el-radio-group>
-                    <el-select v-model="values[f.name]" :multiple="f.multiple" filterable
-                               v-else-if="f.widget === 'select'">
-                        <el-option :label="c[1]" :value="c[0]" v-for="c in f.choices" :key="c[0]"></el-option>
-                    </el-select>
-                    <el-switch v-model="values[f.name]" on-text="开" off-text="关"
-                               v-else-if="f.widget === 'checkbox'">
-                    </el-switch>
-                    <el-input-number v-model="values[f.name]" v-else-if="f.widget === 'number'">
-                    </el-input-number>
-                    <el-date-picker v-model="values[f.name]" :type="f.widget"
-                                    v-else-if="f.widget in ['date','datetime']">
-                    </el-date-picker>
-                    <el-input v-model="values[f.name]" :autosize="options.textAreaSize || { minRows: 4, maxRows: 8}"
-                              type="textarea"
-                              v-else-if="f.widget === 'textarea'"></el-input>
-                    <dimensions-input v-model="values[f.name]"
-                                      v-else-if="f.widget === 'dimensions'"></dimensions-input>
-                    <el-input v-else v-model="values[f.name]"
-                              :type="f.widget in ['password', 'textarea']?f.widget:'text'"></el-input>
-                </template>
-            </el-form-item>
-            <!--{{fieldItems}}-->
-        </el-form>
+    <div>
+        <div v-if="fieldItems" class="flex-right">
+            <el-button type="primary" @click="onSubmit"><i class="fa fa-save"></i></el-button>
+        </div>
+        <r-form :url="url" :fieldItems="fieldItems" :options="options" :values="values"
+                :extraWidgets="extraWidgets" :method="isCreate?'post':'put'"></r-form>
     </div>
 </template>
 <script>
-    import InfoPopover from '../InfoPopover.vue'
     import server_response from '../../mixins/server_response'
-    import DimensionsInput from '../forecast/DimensionsInput.vue'
+    import RForm from './Form.vue'
     export default{
         mixins: [
-            server_response
+            RForm
         ],
         props: {
             appModel: Object,
@@ -61,11 +24,6 @@
             fieldOptions: {
                 type: Object,
                 default: {}
-            },
-            options: {
-                type: Object, default(){
-                    return {}
-                }
             }
         },
         data () {
@@ -85,8 +43,8 @@
                 this.loading = false
             }).catch(this.onServerResponseError)
             if (!this.isCreate) {
+//                console.log('detail url:' + this.detailUrl)
                 this.$http.get(this.detailUrl).then(({data}) => {
-//                    console.log(data)
                     this.values = data
                     this.$emit('model-loaded', data)
                     this.loading = false
@@ -94,8 +52,7 @@
             }
         },
         components: {
-            InfoPopover,
-            DimensionsInput
+            RForm
         },
         methods: {
 
@@ -132,10 +89,13 @@
                 return this.id === 'create'
             },
             postUrl () {
-                return this.appModel.listUrl
+                return this.appModel.listUrl()
             },
             detailUrl () {
                 return this.appModel.detailUrl(this.id)
+            },
+            url (){
+                return this.isCreate ? this.postUrl : this.detailUrl
             },
             rules () {
                 let d = {}
