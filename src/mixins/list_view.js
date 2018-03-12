@@ -11,6 +11,7 @@ export default{
             queries: {},
             table: [],
             page: 1,
+            pageSize: 20,
             count: 0
         }
     },
@@ -33,6 +34,7 @@ export default{
         loadData (page) {
             let d = this.queries
             d.page = page
+            d.page_size = this.pageSize
             this.$http.get(`${this.url}?${Qs.stringify(d)}`).then(({data}) => {
                 this.table = data.results
                 this.count = data.count
