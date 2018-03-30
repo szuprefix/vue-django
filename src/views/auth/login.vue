@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="登录" :visible="$store.state.user.party === undefined" :show-close="false"
+    <el-dialog title="登录" :visible="!(user.id>0)" :show-close="false"
                :close-on-click-modal="false">
         <rest-form  url="/auth/user/login/" :values="form" :fieldItems="fieldItems"
                    :options="{'labelWidth':'20%','submitButtonText':'登录'}" @form-posted="done"></rest-form>
@@ -7,6 +7,7 @@
 
 </template>
 <script>
+    import {mapState} from 'vuex'
     import RestForm from '../../components/rest/Form.vue'
     export default{
         data () {
@@ -23,7 +24,7 @@
                 this.$store.dispatch("getUserInfo")
             }
         },
-        computed: {}
+        computed: mapState(['user'])
     }
 </script>
 <style scoped>

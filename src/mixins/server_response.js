@@ -56,7 +56,13 @@ export default  {
         },
         onServerResponseError: function (error) {
             this.loading = false
+            if(error == 'cancel'){  // confirm dialog cancel ?
+               return
+            }
             console.log(error)
+            if (error.code === 404 && error.msg.detail) {
+                error.msg = error.msg.detail
+            }
             if (error.code === 400) {
                 this.errors = joinErrors(error.msg)
             } else if (error.code === 401) {

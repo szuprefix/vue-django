@@ -1,7 +1,7 @@
 <template>
-
     <el-form ref="form" :inline="options.inline" :rules="rules" :model="values" v-if="values"
-             label-position="right" :label-width="options.labelWidth || '160px'">
+             label-position="right" :label-width="options.labelWidth || '160px'" v-loading="loading"
+             :element-loading-text="loading">
         <el-form-item :prop="f.name" :required="f.required" :label="f.label" :error="errors[f.name]"
                       :key="f.name" v-if="f.widget !== 'hidden'"
                       :ref="f.name" v-for="f in fieldItems" :style="options.itemStyle || {minWidth:'350px'}">
@@ -37,9 +37,11 @@
                           :type="['password', 'textarea'].includes(f.widget)?f.widget:'text'"></el-input>
             </template>
         </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click="onSubmit">{{submitName}}</el-button>
-        </el-form-item>
+        <slot name="submit">
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">{{submitName}}</el-button>
+            </el-form-item>
+        </slot>
     </el-form>
 </template>
 <script>

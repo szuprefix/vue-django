@@ -17,6 +17,7 @@ var store = new Vuex.Store({
         setUser(state, payload){
             // console.log(payload)
             state.user = payload
+            state.bus.$emit("get-user-info", payload)
         },
         clearUser(state){
             state.user = {}
@@ -25,13 +26,15 @@ var store = new Vuex.Store({
     },
     actions: {
         getUserInfo (context){
-            return Vue.http.get("/saas/worker/current/").then(({data}) => {
+            return Vue.http.get("/auth/user/current/").then(({data}) => {
                 context.commit("setUser", data)
+                return data
             })
         },
         logout (context){
             return Vue.http.post("/auth/user/logout/").then(({data}) => {
                 context.commit("clearUser")
+                return data
             })
         }
     },

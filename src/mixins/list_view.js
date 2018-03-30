@@ -4,7 +4,11 @@
 import Qs from 'qs'
 import filters from '../utils/filters'
 import server_response from './server_response'
+import {Register} from '../utils/app_model'
 export default{
+    props: {
+        tab: Object
+    },
     data () {
         return {
             url: null,
@@ -12,24 +16,29 @@ export default{
             table: [],
             page: 1,
             pageSize: 20,
-            count: 0
+            count: 0,
+            model: {},
+            appModelName:null
         }
     },
     mixins: [server_response],
     filters: filters,
     created () {
+        this.model = Register.get(this.appModelName)
+        this.url = this.model.listUrl
         this.loadData(this.page)
         this.$store.state.bus.$on('model-posted', this.onModelPosted)
+        // console.log(this.$store)
     },
     beforeDestroy () {
         this.$store.state.bus.$off('model-posted', this.onModelPosted)
     },
     components: {},
     methods: {
-        onModelPosted(payload){
-//                if (payload.model === this.model || this.modelDependents.indexOf(payload.model) >= 0) {
-            this.loadData()
-//                }
+        onModelPosted({model}){
+            if (model.fullName === this.model.fullName || this.model.dependents.indexOf(model.fullName) >= 0) {
+                this.loadData()
+            }
         },
         loadData (page) {
             let d = this.queries

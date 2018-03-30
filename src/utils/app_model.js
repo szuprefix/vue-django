@@ -3,23 +3,24 @@
  */
 import axios from '../configs/axios'
 import store from '../store'
-function joinErrors(errors) {
+export function joinErrors(errors) {
     let es = {}
     for (let n in errors) {
         es[n] = errors[n].join("")
     }
     return es
 }
-export default function (name, verboseName, id) {
+
+export function AppModel(config) {
     return {
-        name,
-        verboseName,
-        id,
-        listUrl(){
-            return this.name.replace('.', '/') + '/'
-        },
+        name: config.name,
+        fullName: `${config.app}.${config.name}`,
+        verboseName: config.verbose_name,
+        id: 'create',
+        title_field: config.title_field || 'name',
+        listUrl: `${config.app}/${config.name}/`,
         detailUrl(){
-            return this.name.replace('.', '/') + '/' + this.id + '/'
+            return this.listUrl + this.id + '/'
         },
         errors: {},
         loadData () {
@@ -32,12 +33,23 @@ export default function (name, verboseName, id) {
             }
         },
         loadFormConfig(){
-            return axios.options(this.listUrl()).then(({data}) => {
+            return axios.options(this.listUrl).then(({data}) => {
                 return data
             })
         },
+        genEmptyDataFromRestOptions(m){
+            let r = {}
+            Object.keys(m).forEach((k) => {
+                let f = m[k]
+                r[k] = f.type === 'boolean' ? true : f.type === 'string' ? '' : null
+            })
+            return r
+        },
         load() {
             return axios.all([this.loadData(), this.loadFormConfig()]).then(axios.spread((data, rest_options) => {
+                if(!this.id){
+                    data = this.genEmptyDataFromRestOptions(rest_options.actions.POST)
+                }
                 this.data = data
                 this.rest_options = rest_options
                 return this
@@ -46,14 +58,14 @@ export default function (name, verboseName, id) {
         save(){
             let promise
             if (!this.id) {
-                promise = axios.post(this.listUrl(), this.data)
+                promise = axios.post(this.listUrl, this.data)
             } else {
                 promise = axios.put(this.detailUrl(), this.data)
             }
             return promise.then(({data}) => {
                 this.id = data.id
-
-                store.state.bus.$emit('model-posted', {model: this.name, data: data})
+                this.data = data
+                store.state.bus.$emit('model-posted', {model: this})
                 return data
             })//.catch((error) => this.onErrors(error))
         },
@@ -62,6 +74,34 @@ export default function (name, verboseName, id) {
                 this.errors = joinErrors(error.msg)
             }
             return Promise.reject(error)
+        },
+        getTitle(){
+            return !this.id && `新增${this.verboseName}` || this.data[this.title_field]
         }
     }
 }
+
+export var Register = {
+    configs: {},
+    register(apps){
+        let cs = this.configs
+        Object.keys(apps).forEach((a) => {
+            let app = apps[a]
+            Object.keys(app.models).forEach((m) => {
+                let model = app.models[m]
+                let config = Object.assign({app: a, name: m}, model)
+                // let amodel = AppModel(config)
+                cs[`${config.app}.${config.name}`] = config
+            })
+        })
+    },
+    get(fullName){
+        let config = this.configs[fullName]
+        if (!config) {
+            console.error(`model ${fullName} not found!`)
+        } else {
+            return AppModel(config)
+        }
+    }
+}
+export default Register

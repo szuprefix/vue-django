@@ -1,25 +1,46 @@
 <template>
-    <div v-loading="loading" :element-loading-text="loading">
-        <div v-if="fieldItems" class="flex-right">
-            <el-button type="primary" @click="onSubmit"><i class="fa fa-save"></i></el-button>
-        </div>
-        <r-form :url="url" :fieldItems="fieldItems" :options="options" :values="values"
-                :extraWidgets="extraWidgets" :method="isCreate?'post':'put'"></r-form>
+    <div>
+        <el-row type="flex" justify="space-between" style="padding-bottom: 20px;">
+            <el-col :span="20">
+                <slot name="actions"></slot>
+            </el-col>
+            <el-col :span="4" class="flex-right">
+                <el-button type="primary" @click="onSubmit" :title="submitName">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                </el-button>
+            </el-col>
+        </el-row>
+        <r-form :url="url" :fieldItems="fieldItems" :options="options" :values="form" ref="form"
+                :extraWidgets="extraWidgets" :method="isCreate?'post':'put'" @form-posted="formPosted" :submit="submit"
+                v-if="value.data">
+            <span slot="submit"></span>
+        </r-form>
     </div>
 </template>
 <script>
     import RForm from './Form.vue'
-    import form from '../../mixins/form'
+    //    import form from '../../mixins/form'
     export default{
         mixins: [
-            form
+//            form
         ],
         props: {
-            appModel: Object,
-            id: [String, Number],
+            value: {
+                type: Object, default: null
+            },
             fields: {
                 type: Array,
                 default: []
+            },
+            options: {
+                type: Object, default(){
+                    return {}
+                }
+            },
+            extraWidgets: {
+                type: Object, default(){
+                    return {}
+                }
             },
             fieldOptions: {
                 type: Object,
@@ -28,66 +49,52 @@
         },
         data () {
             return {
-                rest_options: {},
-                values: {},
-            }
-        },
-        created () {
-            this.loading = '加载中'
-            this.$http.options(this.postUrl).then(({data}) => {
-                this.rest_options = data
-                this.loading = false
-            }).catch(this.onServerResponseError)
-            if (!this.isCreate) {
-                this.$http.get(this.detailUrl).then(({data}) => {
-                    this.values = data
-                    this.$emit('model-loaded', data)
-                    this.loading = false
-                }).catch(this.onServerResponseError)
+//                rest_options: {}
             }
         },
         components: {
             RForm
         },
         methods: {
-
+            submit(){
+                return this.value.save()
+            },
             getWidget (f) {
+                if (['field', 'choice'].includes(f.type) && f.choices) {
+                    return 'select'
+                }
                 return f.type == 'boolean' ? 'checkbox' : 'text'
             },
-            submit () {
-                let url = this.isCreate ? this.postUrl : this.detailUrl
-                this.$emit('beforesubmit', this.values)
-                this.submitData(url, this.values, `${this.submitName}成功`, this.isCreate).then((data) => {
-                    this.$store.state.bus.$emit("model-posted", {model: this.appModel, data: data})
-                    this.id = data.id
-                    this.$emit("form-posted", data)
-                    return data
-                }).catch((e) => {
-                    console.log(e)
-                })
-
+            formPosted(data){
+//                this.value.data = Object.assign({}, data)
+//                this.id = this.value.id = data.id
+//                this.$store.state.bus.$emit("model-posted", {model: this.value})
+                this.$emit("form-posted", {model: this.value})
+            },
+            onSubmit(){
+                this.$refs.form.onSubmit()
+            },
+            formatChoices(cs){
+                if (cs.length < 1 || cs[0] instanceof Array) {
+                    return cs
+                }
+                return cs.map((a) => [a.value, a.display_name])
             }
 
         },
         computed: {
             isCreate () {
-                return this.id === 'create'
-            },
-            postUrl () {
-                return this.appModel.listUrl()
-            },
-            detailUrl () {
-                return this.appModel.detailUrl(this.id)
+                return !this.value.id
             },
             url (){
-                return this.isCreate ? this.postUrl : this.detailUrl
+                return this.isCreate ? this.value.listUrl : this.value.detailUrl()
             },
             fieldItems (){
-                if (!this.rest_options.actions) {
+                if (!this.value.rest_options) {
                     return []
                 }
-                let ff = this.rest_options.actions.POST
-                let vs = {}
+//                console.log(this.value.rest_options)
+                let ff = this.value.rest_options.actions.POST
                 let fis = this.fields.map((f) => {
                     let r = {name: f}
                     Object.assign(r, ff[f])
@@ -95,16 +102,19 @@
                     if (r.widget === undefined) {
                         r.widget = this.getWidget(r)
                     }
-                    if (this.isCreate) {
-                        vs[f] = r.type === 'boolean' ? true : r.type === 'string' ? '' : null
+
+                    if (r.choices) {
+                        r.choices = this.formatChoices(r.choices)
                     }
                     return r
                 })
-                if (this.id === 'create') {
-                    this.values = vs
-                }
-//                console.log(fis)
+//                if (this.isCreate) {
+//                    this.model.data = vs
+//                }
                 return fis
+            },
+            form(){
+                return this.value.data
             }
         }
     }
