@@ -59,7 +59,6 @@ export default  {
             if(error == 'cancel'){  // confirm dialog cancel ?
                return
             }
-            console.log(error)
             if (error.code === 404 && error.msg.detail) {
                 error.msg = error.msg.detail
             }

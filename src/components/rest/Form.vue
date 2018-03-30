@@ -2,6 +2,8 @@
     <el-form ref="form" :inline="options.inline" :rules="rules" :model="values" v-if="values"
              label-position="right" :label-width="options.labelWidth || '160px'" v-loading="loading"
              :element-loading-text="loading">
+
+        <el-alert :title="errors.non_field_errors" type="error" v-if="errors.non_field_errors" :closable="false"></el-alert>
         <el-form-item :prop="f.name" :required="f.required" :label="f.label" :error="errors[f.name]"
                       :key="f.name" v-if="f.widget !== 'hidden'"
                       :ref="f.name" v-for="f in fieldItems" :style="options.itemStyle || {minWidth:'350px'}">

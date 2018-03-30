@@ -50,6 +50,7 @@
                 let view = to.matched[0]
                 if (view === undefined) {
                     if (to.path != '/') {
+                        console.log(to.path)
                         this.$message({message: `找不到该路径:${to.path}`, type: 'error'})
                     }
                     return

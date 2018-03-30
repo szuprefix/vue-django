@@ -13,7 +13,7 @@
         data () {
             return {
                 form: {username: '', password: ''},
-                fieldItems: [{name: 'username', label: '帐号'}, {name: 'password', label: '密码', widget: 'password'}]
+                fieldItems: [{name: 'username', required:true, label: '帐号'}, {name: 'password',required:true,  label: '密码', widget: 'password'}]
             }
         },
         components: {

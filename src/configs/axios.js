@@ -25,5 +25,5 @@ axios.interceptors.response.use(function (response) {
 
 import Vue from 'vue'
 Vue.prototype.$http = Vue.http = axios
-axios.get('/auth/csrf_token/')
+axios.get('/csrf_token/')
 export default axios

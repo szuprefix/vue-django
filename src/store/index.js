@@ -41,5 +41,5 @@ var store = new Vuex.Store({
     plugins: []
 })
 // Vue.prototype.$store = Vue.store =store
-store.dispatch("getUserInfo")
+store.dispatch("getUserInfo").catch((e) => {console.error(e)})
 export default store

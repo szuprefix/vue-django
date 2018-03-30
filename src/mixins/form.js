@@ -111,7 +111,7 @@ export default{
                 let f = this.fieldItems[i]
                 let n = f.name
                 let dt = {"CheckboxInput": Boolean}
-                let rs = d[n] = []
+                let rs = d[n] = f.rules || []
                 if (f.required) {
                     rs.push({
                         type: this.getRuleType(f),
