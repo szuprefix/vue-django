@@ -1,0 +1,18 @@
+.flex-right{
+    display: flex;
+    justify-content:flex-end;
+}
+
+.hover-show {
+    visibility: hidden;
+}
+
+.el-table__row:hover .hover-show {
+    visibility: visible;
+    cursor: pointer;
+    font-size: 18px;
+}
+.table-row-actions .fa{
+    /*margin: 10px 0;*/
+   /*display: block;*/
+}

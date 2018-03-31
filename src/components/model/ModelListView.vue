@@ -39,14 +39,14 @@
         methods: {
             onModelPosted(payload){
                 if (payload.model === this.model || this.modelDependents.indexOf(payload.model) >= 0) {
-                    this.$refs.table.loadData()
+                    this.$refs.table.load()
                 }
             },
             routeFunc (row){
                 return {path: `${row.id}/update/`}
             },
             search(values){
-                this.$refs.table.loadData()
+                this.$refs.table.load()
             },
             onLoaded (data) {
                 this.searchOptions = data.data.search_form || {}

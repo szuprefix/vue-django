@@ -26,7 +26,7 @@ export default{
     created () {
         this.model = Register.get(this.appModelName)
         this.url = this.model.listUrl
-        this.loadData(this.page)
+        this.load(this.page)
         this.$store.state.bus.$on('model-posted', this.onModelPosted)
         // console.log(this.$store)
     },
@@ -37,10 +37,10 @@ export default{
     methods: {
         onModelPosted({model}){
             if (model.fullName === this.model.fullName || this.model.dependents.indexOf(model.fullName) >= 0) {
-                this.loadData()
+                this.load()
             }
         },
-        loadData (page) {
+        load (page) {
             let d = this.queries
             d.page = page
             d.page_size = this.pageSize
@@ -50,18 +50,17 @@ export default{
                 this.$emit("loaded", data)
             }).catch(this.onServerResponseError)
         },
-        onRowClick (row, column, cell, event){
-            this.$router.replace(`${row.id}`)
+        toEditModel (row, column, cell, event){
+            this.$router.replace(`${row.id}/`)
         },
-        handleCurrentChange (val) {
-            console.log(val)
+        onPageChanged (val) {
             this.page = val
         }
     },
     computed: {},
     watch: {
         page(newVal, oldVal){
-            this.loadData(newVal)
+            this.load(newVal)
         }
     }
 }

@@ -57,14 +57,14 @@
             }
         },
         created (){
-            this.loadData()
+            this.load()
         },
         components: {},
         methods: {
             handleCurrentChange (val) {
-                this.loadData(val)
+                this.load(val)
             },
-            loadData (page) {
+            load (page) {
                 let d = this.queries
                 d.page = page || 1
                 this.$http.get(`${this.url}?${Qs.stringify(d)}`).then(({data}) => {

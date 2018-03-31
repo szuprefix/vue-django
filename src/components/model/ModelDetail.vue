@@ -13,7 +13,7 @@
         },
         mixins: [server_response],
         created (){
-            this.loadData()
+            this.load()
         },
         data () {
             return {
@@ -22,7 +22,7 @@
         },
         components: {},
         methods: {
-            loadData (){
+            load (){
                 this.$http.get(this.url).then(({data}) => {
                     this.object = data.data.object
                     this.$emit('loaded', data.data)
