@@ -44,7 +44,7 @@ export default{
     methods: {
 
         getWidget (f) {
-            return f.type == 'boolean' ? 'checkbox' : 'text'
+            return f.type == 'boolean' ? 'checkbox' :( f.type == 'decimal'? 'number' : 'text')
         },
         _submit () {
             this.$emit('beforesubmit', this.values)
@@ -98,7 +98,7 @@ export default{
             if (f.choices && f.choices.length>0) {
                 return typeof f.choices[0][0]
             }
-            return f.type == 'field' ? 'string' : f.type
+            return f.type == 'field' ? 'string' :(f.type == 'decimal'? 'number': f.type)
         }
 
     },

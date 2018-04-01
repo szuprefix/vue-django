@@ -14,11 +14,10 @@ export default{
             url: null,
             queries: {},
             table: [],
-            page: 1,
             pageSize: 20,
             count: 0,
             model: {},
-            appModelName:null
+            appModelName: null
         }
     },
     mixins: [server_response],
@@ -26,7 +25,7 @@ export default{
     created () {
         this.model = Register.get(this.appModelName)
         this.url = this.model.listUrl
-        this.load(this.page)
+        this.updateQueries({page: 1, page_size: this.pageSize, search: ''})
         this.$store.state.bus.$on('model-posted', this.onModelPosted)
         // console.log(this.$store)
     },
@@ -36,19 +35,25 @@ export default{
     components: {},
     methods: {
         onModelPosted({model}){
-            if (model.fullName === this.model.fullName || this.model.dependents.indexOf(model.fullName) >= 0) {
+            if (model.fullName === this.model.fullName || this.model.dependents && this.model.dependents.indexOf(model.fullName) >= 0) {
                 this.load()
             }
         },
-        load (page) {
+        updateQueries(d){
+            this.queries = Object.assign({}, this.queries, d)
+        },
+        load () {
             let d = this.queries
-            d.page = page
-            d.page_size = this.pageSize
+            this.loading = '查询中'
             this.$http.get(`${this.url}?${Qs.stringify(d)}`).then(({data}) => {
                 this.table = data.results
                 this.count = data.count
+                this.loading = false
                 this.$emit("loaded", data)
             }).catch(this.onServerResponseError)
+        },
+        onSearch(){
+            this.updateQueries({})
         },
         toEditModel (row, column, cell, event){
             this.$router.replace(`${row.id}/`)
@@ -60,7 +65,13 @@ export default{
     computed: {},
     watch: {
         page(newVal, oldVal){
-            this.load(newVal)
+            this.updateQueries({page: newVal})
+        },
+        pageSize(newVal, oldVal){
+            this.updateQueries({page_size: newVal})
+        },
+        queries(newVal, oldVal){
+            this.load()
         }
     }
 }

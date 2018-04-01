@@ -63,7 +63,7 @@
                 if (['field', 'choice'].includes(f.type) && f.choices) {
                     return 'select'
                 }
-                return f.type == 'boolean' ? 'checkbox' : 'text'
+                return f.type == 'boolean' ? 'checkbox' : ( f.type == 'decimal'? 'number' : 'text')
             },
             formPosted(data){
 //                this.value.data = Object.assign({}, data)
