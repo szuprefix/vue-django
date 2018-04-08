@@ -1,10 +1,11 @@
 <template>
-    <i class="el-icon-check" v-if="value"></i>
+    <i class="el-icon-check" v-if="value[prop]"></i>
 </template>
 <script>
     export default{
         props: {
-            value: Boolean
+            value: Object,
+            prop:String
         }
     }
 </script>

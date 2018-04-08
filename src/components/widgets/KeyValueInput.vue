@@ -21,6 +21,9 @@
 
             },
             dict2str(d){
+                if(!d){
+                    return ""
+                }
                 return Object.keys(d).map((k) => `${k}:${d[k]}`).join('\n')
             },
             str2dict(s){

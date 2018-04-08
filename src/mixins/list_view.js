@@ -15,6 +15,7 @@ export default{
             queries: {},
             table: [],
             pageSize: 20,
+            page: 1,
             count: 0,
             model: {},
             appModelName: null
@@ -24,7 +25,9 @@ export default{
     filters: filters,
     created () {
         this.model = Register.get(this.appModelName)
-        this.url = this.model.listUrl
+        if (this.url == null) {
+            this.url = this.model.listUrl
+        }
         this.updateQueries({page: 1, page_size: this.pageSize, search: ''})
         this.$store.state.bus.$on('model-posted', this.onModelPosted)
         // console.log(this.$store)
@@ -55,11 +58,20 @@ export default{
         onSearch(){
             this.updateQueries({})
         },
+        onRowSelect(row, column, cell, event){
+            this.toEditModel(row, column, cell, event)
+        },
         toEditModel (row, column, cell, event){
             this.$router.replace(`${row.id}/`)
         },
+        toCreateModel(){
+            this.$router.push('create')
+        },
         onPageChanged (val) {
             this.page = val
+        },
+        onPageSizeChanged (val){
+            this.pageSize = val
         }
     },
     computed: {},
