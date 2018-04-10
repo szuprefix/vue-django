@@ -10,7 +10,8 @@ const state = {
     bus: new Vue(),
     user: {},
     apps,
-    menus
+    menus,
+    system_name: ''
 }
 
 var store = new Vuex.Store({

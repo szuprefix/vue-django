@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <el-menu class="el-menu-demo" mode="horizontal" router>
-            <el-menu-item index="/" class="brand"><img src="./assets/logo.png" height="31"><b v-if="user.as_saas_worker">{{user.as_saas_worker.party}}</b>在线测试系统</el-menu-item>
+            <el-menu-item index="/" class="brand"><img src="./assets/logo.png" height="31"><b v-if="user.as_saas_worker">{{user.as_saas_worker.party}}</b>{{system_name}}</el-menu-item>
             <el-submenu index="2" style="float:right">
                 <template slot="title">{{user.name}}</template>
                 <el-menu-item index="/" @click="$store.dispatch('logout')">退出登录</el-menu-item>
@@ -35,7 +35,7 @@
             ViewTabs,
             LoginView,
         },
-        computed: mapState(['user']),
+        computed: mapState(['user', 'system_name']),
         methods: {}
     }
 </script>
