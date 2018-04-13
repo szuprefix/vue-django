@@ -22,7 +22,7 @@ export default  {
             let promise = new Promise((resolve, reject) => {
 
                 this.loading = this.asyncStatusMap(task.status)
-                let url = `ws://${location.host}/api/async_result/?task_id=${task.id}`
+                let url = `ws://${location.host}/api/common/async_result/${task.id}/`
                 console.log(url)
                 this.ws = new WebSocket(url)
                 this.ws.onload = function (e) {
@@ -55,7 +55,7 @@ export default  {
     },
     computed: {
         asyncResultUrl(){
-            return `ws://${location.host}/api/async_result/?task_id=\$\{task_id\}`
+            return `ws://${location.host}/api/common/async_result/\$\{task_id\}/`
         },
     }
 }

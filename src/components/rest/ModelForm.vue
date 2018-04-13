@@ -5,7 +5,7 @@
                 <slot name="actions"></slot>
             </el-col>
             <el-col :span="4" class="flex-right">
-                <el-button type="primary" @click="onSubmit" :title="submitName">
+                <el-button type="primary" @click="onSubmit" :title="options.submitName || '保存'">
                     <i class="fa fa-floppy-o" aria-hidden="true"></i>
                 </el-button>
             </el-col>

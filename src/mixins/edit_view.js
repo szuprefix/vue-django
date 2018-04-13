@@ -18,11 +18,8 @@ export  default {
     },
     mixins:[server_response],
     created () {
-        // console.log("this.appModelName "+this.appModelName)
-
         this.model = Register.get(this.appModelName)
         this.model.id = this.id = this.$route.params.id === 'create' ? undefined : this.$route.params.id
-        // this.model.id = this.id === 'create' ? undefined : this.id
         this.load().catch(this.onServerResponseError)
     },
     components: {
