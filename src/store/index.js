@@ -11,7 +11,8 @@ const state = {
     user: {},
     apps,
     menus,
-    system_name: ''
+    system_name: '',
+    logo:require('../assets/logo.png'),
 }
 
 var store = new Vuex.Store({
