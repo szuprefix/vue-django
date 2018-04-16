@@ -44,7 +44,7 @@ export default{
     methods: {
 
         getWidget (f) {
-            return f.type == 'boolean' ? 'checkbox' :( f.type == 'decimal'? 'number' : 'text')
+            return f.type == 'boolean' ? 'checkbox' : ( f.type == 'decimal' ? 'number' : 'text')
         },
         _submit () {
             this.$emit('beforesubmit', this.values)
@@ -95,10 +95,13 @@ export default{
             // this.$refs['form'].validate()
         },
         getRuleType(f){
-            if (f.choices && f.choices.length>0) {
+            if (f.multiple) {
+                return 'array'
+            }
+            if (f.choices && f.choices.length > 0) {
                 return typeof f.choices[0][0]
             }
-            return f.type == 'field' ? 'string' :(f.type == 'decimal'? 'number': f.type)
+            return f.type == 'field' ? 'string' : (f.type == 'decimal' ? 'number' : f.type)
         }
 
     },

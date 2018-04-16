@@ -23,7 +23,7 @@ export default{
     },
     mixins: [server_response],
     filters: filters,
-    created () {
+    mounted () {
         this.model = Register.get(this.appModelName)
         if (this.url == null) {
             this.url = this.model.listUrl
@@ -65,7 +65,9 @@ export default{
             this.$router.replace(`${row.id}/`)
         },
         toCreateModel(){
-            this.$router.push('create')
+            let url = `/${this.model.listUrl}create/?${this.model.title_field}=${this.queries.search}`
+            console.log(url)
+            this.$router.push(url)
         },
         onPageChanged (val) {
             this.page = val

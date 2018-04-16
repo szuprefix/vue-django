@@ -11,7 +11,7 @@
             </el-col>
         </el-row>
         <r-form :url="url" :fieldItems="fieldItems" :options="options" :values="form" ref="form"
-                :extraWidgets="extraWidgets" :method="isCreate?'post':'put'" @form-posted="formPosted" :submit="submit"
+                :extraWidgets="_extraWidgets" :method="isCreate?'post':'put'" @form-posted="formPosted" :submit="submit"
                 v-if="value.data">
             <span slot="submit"></span>
         </r-form>
@@ -19,6 +19,7 @@
 </template>
 <script>
     import RForm from './Form.vue'
+    import RelatedSelect from './RelatedSelect.vue'
     //    import form from '../../mixins/form'
     export default{
         mixins: [
@@ -60,10 +61,13 @@
                 return this.value.save()
             },
             getWidget (f) {
+                if (f.type == 'field' && f.model) {
+                    return 'RelatedSelect'
+                }
                 if (['field', 'choice'].includes(f.type) && f.choices) {
                     return 'select'
                 }
-                return f.type == 'boolean' ? 'checkbox' : ( f.type == 'decimal'? 'number' : 'text')
+                return f.type == 'boolean' ? 'checkbox' : ( f.type == 'decimal' ? 'number' : 'text')
             },
             formPosted(data){
 //                this.value.data = Object.assign({}, data)
@@ -115,6 +119,12 @@
             },
             form(){
                 return this.value.data
+            },
+
+            _extraWidgets(){
+                let ws = {RelatedSelect}
+                Object.assign(ws, this.extraWidgets)
+                return ws
             }
         }
     }

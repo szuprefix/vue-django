@@ -2,6 +2,27 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 Vue.use(Router)
+// Router.prototype.registerAppModelRoutes= function(apps, routes){
+//     Object.keys(apps).forEach((a) => {
+//         let models = apps[a].models
+//         Object.keys(models).forEach((m) => {
+//             let model = models[m]
+//             let mname = model.verbose_name
+//             routes.push({
+//                 name: `/${a}/${m}/`,
+//                 path: `/${a}/${m}/`,
+//                 meta: {title: `${mname}列表`},
+//                 component: resolve => require([`../views/${a}/${m}/list.vue`], resolve)
+//             })
+//             routes.push({
+//                 name: `/${a}/${m}/edit/`,
+//                 path: `/${a}/${m}/:id/`,
+//                 meta: {title: `编辑${mname}`},
+//                 component: resolve => require([`../views/${a}/${m}/edit.vue`], resolve)
+//             })
+//         })
+//     })
+// }
 let router = new Router({
     routes: [
         {

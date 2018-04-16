@@ -41,7 +41,7 @@ export function AppModel(config) {
             let r = {}
             Object.keys(m).forEach((k) => {
                 let f = m[k]
-                r[k] = f.type === 'boolean' ? true : f.type === 'string' ? '' : null
+                r[k] = f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null
             })
             return r
         },
@@ -76,7 +76,7 @@ export function AppModel(config) {
             return Promise.reject(error)
         },
         getTitle(){
-            return !this.id && `新增${this.verboseName}` || this.data[this.title_field]
+            return !this.id && `新增${this.verboseName}` || this.data['__str__'] || this.data[this.title_field]
         }
     }
 }

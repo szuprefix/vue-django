@@ -73,7 +73,11 @@
         props: {
             appModelName: String,
             pageSize: {type: Number, default: 20},
-            fields: Array,
+            fields: {
+                type: Array, default: function () {
+                    return [{name: '__str__', label:'名称'}]
+                }
+            },
             extraActions: {
                 type: Object, default: function () {
                     return {}
@@ -92,7 +96,7 @@
             },
         },
         created (){
-            if (this.dataUrl!=null) {
+            if (this.dataUrl != null) {
                 this.url = this.dataUrl
             }
         },
