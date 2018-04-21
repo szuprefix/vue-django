@@ -19,6 +19,7 @@ export function AppModel(config) {
         id: 'create',
         title_field: config.title_field || 'name',
         listUrl: `${config.app}/${config.name}/`,
+        config,
         detailUrl(){
             return this.listUrl + this.id + '/'
         },
@@ -33,7 +34,11 @@ export function AppModel(config) {
             }
         },
         loadFormConfig(){
+            if (config.rest_options) {
+                return Promise.resolve(config.rest_options)
+            }
             return axios.options(this.listUrl).then(({data}) => {
+                config = Object.assign({}, config, {rest_options: data})
                 return data
             })
         },
@@ -47,7 +52,7 @@ export function AppModel(config) {
         },
         load() {
             return axios.all([this.loadData(), this.loadFormConfig()]).then(axios.spread((data, rest_options) => {
-                if(!this.id){
+                if (!this.id) {
                     data = this.genEmptyDataFromRestOptions(rest_options.actions.POST)
                 }
                 this.data = data
@@ -98,10 +103,18 @@ export var Register = {
     get(fullName){
         let config = this.configs[fullName]
         if (!config) {
-            console.error(`model ${fullName} not found!`)
+            throw `model ${fullName} not found!`
         } else {
             return AppModel(config)
         }
+    },
+    getConfig(fullName){
+        let config = this.configs[fullName]
+        if (!config) {
+            throw `model ${fullName} not found!`
+        } else {
+            return config
+        }
     }
 }
-export default Register
+export default AppModel

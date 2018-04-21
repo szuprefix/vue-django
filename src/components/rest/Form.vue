@@ -7,9 +7,11 @@
 
         <el-alert :title="errors.non_field_errors" type="error" v-if="errors.non_field_errors"
                   :closable="false"></el-alert>
+        <el-row>
+        <el-col :span="f.span || 8" v-for="f in fieldItems" :key="f.name" v-if="f.widget !== 'hidden'">
         <el-form-item :prop="f.name" :required="f.required" :label="f.label" :error="errors[f.name]"
-                      :key="f.name" v-if="f.widget !== 'hidden'"
-                      :ref="f.name" v-for="f in fieldItems"
+
+                      :ref="f.name"
                       :style="options.noLabel && {} || options.itemStyle || {minWidth:'350px'}">
             <template slot="label" v-if="!options.noLabel">{{f.label}}
                 <el-tooltip placement="top" v-if="f.help_text">
@@ -43,6 +45,7 @@
                           :type="['password', 'textarea'].includes(f.widget)?f.widget:'text'"></el-input>
             </template>
         </el-form-item>
+        </el-col></el-row>
         <slot name="submit">
             <el-form-item>
                 <el-button type="primary" @click="onSubmit">{{submitName}}</el-button>

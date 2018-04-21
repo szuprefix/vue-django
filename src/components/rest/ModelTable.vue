@@ -4,21 +4,32 @@
             <el-col :span="16">
                 <el-input
                         :placeholder="`搜索${searchFieldNames}`"
-                        prefix-icon="el-icon-search"
                         v-model="queries.search"
                         @keyup.enter.native="onSearch" :style="`width:${100+20*searchFieldNames.length}px`"
                         v-if="search_fields.length>0">
                 </el-input>
-                <el-select v-for="f in filterFields" multiple collapse-tags v-model="queries[f.name]"
-                           :key="f.name" :placeholder="`请选择${f.label}`" style="width:150px">
-                    <el-option
-                            v-for="item in f.choices"
-                            :key="item.value"
-                            :label="item.display_name"
-                            :value="item.value">
-                    </el-option>
-                </el-select>
-                &nbsp;
+                <template v-for="f in filterFields">
+                    <el-checkbox v-model="queries[f.name]" :active-text="f.label" :inactive-value="null"
+                                 @change="updateQueries({})" v-if="f.type=='boolean'">{{f.label}}
+                    </el-checkbox>
+                    <!--<el-select v-model="queries[f.name]" v-if="f.type=='boolean'"-->
+                    <!--:placeholder="`请选择${f.label}`" style="width:150px">-->
+                    <!--<el-option  label="是" :value="true"></el-option>-->
+                    <!--<el-option label="否" :value="false"></el-option>-->
+                    <!--<el-option label="忽略" :value="null"></el-option>-->
+                    <!--</el-select>-->
+                    <el-select multiple collapse-tags v-model="queries[f.name]" v-else
+                               :placeholder="`请选择${f.label}`" style="width:150px">
+                        <el-option
+                                v-for="item in f.choices"
+                                :key="item.value"
+                                :label="item.display_name"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                    &nbsp;
+                </template>
+                <el-button><i class="fa fa-search"></i></el-button>
             </el-col>
             <el-col :span="8">
                 <div class="flex-right">
@@ -37,12 +48,12 @@
         <el-table :data="table" @row-dblclick="onRowSelect" @sort-change="onSortChange"
                   @filter-change="onFilterChanged" v-loading="loading" :element-loading-text="loading">
             <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
-                             :sortable="ordering_fields.includes(f.name) && 'custom'"
-                             :type="f.type" :filters="filters[f.name]" v-for="f in fields" :key="f.name">
+                             :sortable="ordering_fields.includes(f.name) && 'custom'" :class-name="f.type"
+                             :type="f.type" :filters="filters[f.name]" v-for="f in _fields" :key="f.name">
                 <template slot-scope="{row}">
                     <component :is="f.widget" v-model="row" :prop="f.name"
                                v-if="f.widget && typeof f.widget == 'object'"></component>
-                    <span v-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
+                    <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
                     <template v-else>{{row[f.name]}}</template>
                 </template>
             </el-table-column>
@@ -69,13 +80,16 @@
 </template>
 <script>
     import list_view from '../../mixins/list_view'
+    import TrueFlag from '../widgets/TrueFlag.vue'
+    import Date2Now from '../widgets/Date2Now.vue'
     export default{
+        mixins: [list_view],
         props: {
             appModelName: String,
             pageSize: {type: Number, default: 20},
             fields: {
                 type: Array, default: function () {
-                    return [{name: '__str__', label:'名称'}]
+                    return [{name: '__str__', label: '名称'}]
                 }
             },
             extraActions: {
@@ -141,6 +155,30 @@
             searchFieldNames () {
                 return this.search_fields.join(',')
             },
+            fieldMetas(){
+                let fm = {}
+                if (this.rest_options.actions) {
+                    let m = this.rest_options.actions.POST
+                    Object.keys(m).forEach((k) => {
+                        fm[k] = m[k]
+                    })
+                }
+                return fm
+            },
+            _fields(){
+                let fm = this.fieldMetas
+                return this.fields.map((f) => {
+                    if (typeof f == 'string') {
+                        let d = fm[f]
+                        if (d) {
+                            return {name: f, label: d.label, type: d.type, widget: this.getWidget(d.type)}
+                        } else {
+                            return {name: f, label: f}
+                        }
+                    }
+                    return f
+                })
+            },
             filterFields () {
                 let actions = this.rest_options.actions
                 if (!actions) {
@@ -170,6 +208,9 @@
                     d.name = a
                     return d
                 })
+            },
+            getWidget(type){
+                return type == 'boolean' ? TrueFlag : ( type == 'datetime' ? Date2Now : undefined)
             },
             choices2selectOptions(choices){
                 return choices.map((a) => {
@@ -201,6 +242,5 @@
                 this.updateQueries({ordering: (payLoad.order == 'descending' ? '-' : '') + payLoad.prop})
             }
         },
-        mixins: [list_view]
     }
 </script>

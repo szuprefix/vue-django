@@ -25,12 +25,6 @@ function formatDates(data) {
 }
 
 export default  {
-    props: {
-        restStyle: {
-            type: Boolean,
-            default: true
-        }
-    },
     data (){
         return {
             loading: false,
@@ -63,7 +57,7 @@ export default  {
                 error.msg = error.msg.detail
             }
             if (error.code === 400) {
-                this.errors = joinErrors(error.msg)
+                this.errors = this.formErrors = joinErrors(error.msg)
             } else if (error.code === 401) {
                 // this.$router.replace('/auth/login/')
             } else {
