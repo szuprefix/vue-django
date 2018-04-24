@@ -101,7 +101,7 @@ export default{
             if (f.choices && f.choices.length > 0) {
                 return typeof f.choices[0][0]
             }
-            return f.type == 'field' ? 'string' : (f.type == 'decimal' ? 'number' : f.type)
+            return f.model ? 'number' : (f.type == 'field' ? 'string' : (f.type == 'decimal' ? 'number' : f.type))
         }
 
     },

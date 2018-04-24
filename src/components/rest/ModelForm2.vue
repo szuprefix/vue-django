@@ -10,106 +10,52 @@
                 </el-button>
             </el-col>
         </el-row>
-        <r-form :url="url" :formItems="formItems" v-model="value" ref="form"
-                :formWidgets="_extraWidgets" :formMethod="isCreate?'post':'put'" @form-posted="formPosted" :submit="submit"
-                v-if="value.data">
+        <r-form :formUrl="isCreate?modelListUrl:modelDetailUrl" :formItems="_formItems" v-model="formValue" ref="form"
+                :formMethod="isCreate?'post':'put'" @form-posted="formPosted" :formSubmit="submit">
             <span slot="submit"></span>
         </r-form>
-        {{_formItems}}
     </div>
 </template>
 <script>
-    import RForm from './Form.vue'
-    import RelatedSelect from './RelatedSelect.vue'
-    import form_view from '../../mixins/form_view'
-    import model_view from '../../mixins/model_view'
+    import RForm from './Form2.vue'
+    import model_form from '../../mixins/model_form'
     export default{
         mixins: [
-            model_view, form_view
+            model_form
         ],
         props: {
-            value: {
-                type: Object, default: null
-            },
-            modelFormFields: {
-                type: Array,
-                default: []
-            }
+            appModelName: String,
+            value:Object
         },
         data () {
-            return {
-//                rest_options: {}
-            }
+            return {}
         },
         components: {
             RForm
         },
+        created(){
+            console.log("modelForm2.created")
+            this.modelInit()
+            this.modelLoad().then(() => {
+                this.formValue = Object.assign({}, this.modelData)
+            })
+        },
         methods: {
-            submit(){
-                return this.value.save()
-            },
-            getWidget (f) {
-                if (f.type == 'field' && f.model) {
-                    return 'RelatedSelect'
-                }
-                if (['field', 'choice'].includes(f.type) && f.choices) {
-                    return 'select'
-                }
-                return f.type == 'boolean' ? 'checkbox' : ( f.type == 'decimal' ? 'number' : 'text')
-            },
+
             formPosted(data){
                 this.$emit("form-posted", {model: this.value})
             },
             onSubmit(){
                 this.$refs.form.onSubmit()
-            },
-            formatChoices(cs){
-                if (cs.length < 1 || cs[0] instanceof Array) {
-                    return cs
-                }
-                return cs.map((a) => [a.value, a.display_name])
             }
 
         },
         computed: {
             isCreate () {
-                return !this.value.id
+                return !this.modelId
             },
-            url (){
-                return this.isCreate ? this.value.listUrl : this.value.detailUrl()
-            },
-            fieldItems (){
-                if (!this.value.rest_options) {
-                    return []
-                }
-//                console.log(this.value.rest_options)
-                let ff = this.value.rest_options.actions.POST
-                let fis = this.fields.map((f) => {
-                    let r = {name: f}
-                    Object.assign(r, ff[f])
-                    Object.assign(r, this.fieldOptions[f] || {})
-                    if (r.widget === undefined) {
-                        r.widget = this.getWidget(r)
-                    }
-
-                    if (r.choices) {
-                        r.choices = this.formatChoices(r.choices)
-                    }
-                    return r
-                })
-//                if (this.isCreate) {
-//                    this.model.data = vs
-//                }
-                return fis
-            },
-            form(){
-                return this.value.data
-            },
-
-            _extraWidgets(){
-                let ws = {RelatedSelect}
-                Object.assign(ws, this.extraWidgets)
-                return ws
+            _formItems() {
+                return this.formNormalizeItems(this.modelFormItems(this.formItems))
             }
         }
     }

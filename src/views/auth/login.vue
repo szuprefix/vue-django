@@ -1,7 +1,7 @@
 <template>
     <el-dialog title="登录" :visible="!(user.id>0)" :show-close="false"
                :close-on-click-modal="false">
-        <rest-form  url="/auth/user/login/" :values="form" :fieldItems="fieldItems"
+        <rest-form url="/auth/user/login/" :values="form" :fieldItems="fieldItems"
                    :options="{'labelWidth':'20%','submitButtonText':'登录'}" @form-posted="done"></rest-form>
     </el-dialog>
 
@@ -13,7 +13,16 @@
         data () {
             return {
                 form: {username: '', password: ''},
-                fieldItems: [{name: 'username', required:true, label: '帐号'}, {name: 'password',required:true,  label: '密码', widget: 'password'}]
+                fieldItems: [
+                    {
+                        name: 'username', required: true, label: '帐号', span: 24
+                    },
+                    {
+                        name: 'password',
+                        required: true,
+                        label: '密码',
+                        widget: 'password', span: 24
+                    }]
             }
         },
         components: {

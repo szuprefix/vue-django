@@ -23,13 +23,15 @@ export default{
     },
     mixins: [server_response],
     filters: filters,
+    created(){
+        this.$store.state.bus.$on('model-posted', this.onModelPosted)
+    },
     mounted () {
         this.model = Register.get(this.appModelName)
         if (this.url == null) {
             this.url = this.model.listUrl
         }
         this.updateQueries({page: 1, page_size: this.pageSize, search: ''})
-        this.$store.state.bus.$on('model-posted', this.onModelPosted)
         // console.log(this.$store)
     },
     beforeDestroy () {

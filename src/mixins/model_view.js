@@ -14,8 +14,8 @@ export function joinErrors(errors) {
 
 export default {
     props: {
-        appModelName: '',
-        tab: Object
+        // appModelName: String,
+        // tab: Object
     },
     data () {
         return {
@@ -24,14 +24,21 @@ export default {
             modelFieldConfigs: {},
             modelOptions: {},
             modelErrors: {},
-            modelData: {}
+            modelData: {},
+            appModelName: null
         }
     },
-    created (){
-        this.modelConfig = Register.getConfig(this.appModelName)
-    },
+    // created (){
+    //     console.log("model_view. created.")
+    //     this.modelInit(this.appModelName)
+    //
+    // },
 
     methods: {
+        modelInit(){
+            this.modelConfig = Register.getConfig(this.appModelName)
+
+        },
         modelLoadData () {
             if (!this.modelId) {
                 return Promise.resolve({})
@@ -43,20 +50,18 @@ export default {
         },
         modelLoadOptions(){
             if (this.modelConfig.rest_options) {
+                this.modelCacheOptions(this.modelConfig.rest_options)
                 return Promise.resolve(this.modelConfig.rest_options)
             }
             return axios.options(this.modelListUrl).then(({data}) => {
                 this.modelConfig.rest_options = data
+                this.modelCacheOptions(this.modelConfig.rest_options)
                 return data
             })
         },
-        modelEmptyDataFromOptions(m){
-            let r = {}
-            Object.keys(m).forEach((k) => {
-                let f = m[k]
-                r[k] = f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null
-            })
-            return r
+        modelCacheOptions(options){
+            this.modelOptions = Object.assign({}, this.modelOptions, options)
+            this.modelFieldConfigs = Object.assign({}, this.modelFieldConfigs, options.actions.POST)
         },
         modelLoad() {
             return axios.all([this.modelLoadData(), this.modelLoadOptions()]).then(axios.spread((data, rest_options) => {
@@ -64,9 +69,7 @@ export default {
                     data = this.modelEmptyDataFromOptions(rest_options.actions.POST)
                 }
                 this.modelData = Object.assign({}, this.modelData, data)
-                this.modelOptions = Object.assign({}, this.modelOptions, rest_options)
-                this.modelFieldConfigs = Object.assign({}, this.modelFieldConfigs, rest_options.actions.POST)
-                return this
+                return [data, rest_options]
             }))
         },
         modelSave(data){
@@ -90,9 +93,10 @@ export default {
             }
             return Promise.reject(error)
         },
-        getTitle(){
+        modelTitle(){
             return !this.modelId && `新增${this.modelConfig.verboseName}` || this.modelData['__str__']
-        }
+        },
+
     },
     computed: {
         modelListUrl(){
@@ -101,17 +105,6 @@ export default {
         modelDetailUrl(){
             return `${this.modelListUrl}${this.modelId}/`
         },
-        _formItems() {
-            return this.formItems.map((i) => {
-                console.log(`>>>${i}`)
-                let a
-                if (typeof i == 'string') {
-                    a = Object.assign({}, this.modelFieldConfigs[i])
-                } else {
-                    a = Object.assign({}, i)
-                }
 
-            })
-        }
     },
 }

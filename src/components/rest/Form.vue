@@ -8,7 +8,7 @@
         <el-alert :title="errors.non_field_errors" type="error" v-if="errors.non_field_errors"
                   :closable="false"></el-alert>
         <el-row>
-        <el-col :span="f.span || 8" v-for="f in fieldItems" :key="f.name" v-if="f.widget !== 'hidden'">
+        <el-col :span="f.span || 24" v-for="f in fieldItems" :key="f.name" v-if="f.widget !== 'hidden'">
         <el-form-item :prop="f.name" :required="f.required" :label="f.label" :error="errors[f.name]"
 
                       :ref="f.name"

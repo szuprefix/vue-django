@@ -15,11 +15,6 @@ export default{
             default: []
         },
         formUrl: String,
-        formWidgets: {
-            type: Object, default(){
-                return {}
-            }
-        },
         formMethod: {
             type: String, default: 'post'
         },
@@ -27,13 +22,13 @@ export default{
         formSubmitName: {
             type: String, default: '提交'
         },
-        formInline:{
+        formInline: {
             type: Boolean, default: false
         },
-        formSize:{
+        formSize: {
             type: String, default: null
         },
-        formLabelWidth:{
+        formLabelWidth: {
             type: String, default: '160px'
         },
         formTextareaSize: {
@@ -43,7 +38,7 @@ export default{
         },
         formItemStyle: {
             type: Object, default(){
-                return {minWidth:'350px'}
+                return {minWidth: '350px'}
             }
         }
     },
@@ -52,9 +47,6 @@ export default{
             formErrors: {},
             formValue: {},
         }
-    },
-    created () {
-        console.log(this.formItems)
     },
     components: {},
     methods: {
@@ -105,7 +97,7 @@ export default{
 
         },
         formDefaultWidget (f) {
-            return f.type == 'boolean' ? 'checkbox' : ( f.type == 'decimal' ? 'number' : 'text')
+            return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime'].includes(f.type) ? f.type : ( f.type == 'decimal' ? 'number' : 'text'))
         },
         formDefaultRuleType(f){
             if (f.multiple) {
@@ -135,6 +127,17 @@ export default{
                 rs.push({max: f.max_length, message: `长度最大为${f.max_length}`})
             }
             return rs
+        },
+        formNormalizeItems(formItems){
+            return formItems.map((i) => {
+                let a = Object.assign({}, i)
+                a.label = a.label || a.name
+                a.rules = a.rules || this.formDefaultRules(a)
+                a.widget = a.widget || this.formDefaultWidget(a)
+                a.span = a.span || {}
+                a.span = Object.assign({}, this.formDefaultSpan(a), a.span)
+                return a
+            })
         }
 
     },
@@ -153,15 +156,7 @@ export default{
 
         },
         _formItems() {
-            return this.formItems.map((i) => {
-                let a = Object.assign({}, i)
-                a.label = a.label || a.name
-                a.rules = a.rules || this.formDefaultRules(a)
-                a.widget = a.widget || this.formDefaultWidget(a)
-                a.span = a.span || {}
-                a.span = Object.assign({}, this.formDefaultSpan(a), a.span)
-                return a
-            })
+            return this.formNormalizeItems(this.formItems)
         }
     }
 }
