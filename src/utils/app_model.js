@@ -94,7 +94,7 @@ export var Register = {
             let app = apps[a]
             Object.keys(app.models).forEach((m) => {
                 let model = app.models[m]
-                let config = Object.assign({app: a, name: m}, model)
+                let config = Object.assign({app: a, name: m, fullName:`${a}.${m}`}, model)
                 // let amodel = AppModel(config)
                 cs[`${config.app}.${config.name}`] = config
             })

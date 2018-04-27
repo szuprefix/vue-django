@@ -3,24 +3,18 @@
         <el-row :gutter="20">
             <el-col :span="16">
                 <el-input
-                        :placeholder="`搜索${searchFieldNames}`"
+                        :placeholder="`搜索${modelTableSearchFieldNames}`"
                         v-model="tableQueries.search"
-                        @keyup.enter.native="tableUpdateQueries({})" :style="`width:${100+20*searchFieldNames.length}px`"
-                        v-if="search_fields.length>0">
+                        @keyup.enter.native="tableUpdateQueries({})"
+                        :style="`width:${50+15*modelTableSearchFieldNames.length}px`"
+                        v-if="modelTableSearchFields.length>0">
                 </el-input>
-                <template v-for="f in filterFields">
+                <template v-for="f in modelTableFilterFields">
                     <el-checkbox v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"
                                  @change="tableUpdateQueries({})" v-if="f.type=='boolean'">{{f.label}}
                     </el-checkbox>
-                    <el-select multiple collapse-tags v-model="queries[f.name]" v-else
-                               :placeholder="`请选择${f.label}`" style="width:150px">
-                        <el-option
-                                v-for="item in f.choices"
-                                :key="item.value"
-                                :label="item.display_name"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
+                    <related-select :field="f" v-model="tableQueries[f.name]"
+                                    style="width: 120px" :showCreate="false" v-else></related-select>
                     &nbsp;
                 </template>
                 <el-button><i class="fa fa-search"></i></el-button>
@@ -38,11 +32,12 @@
                 </div>
             </el-col>
         </el-row>
-        <el-table :data="tableData" @row-dblclick="onRowSelect" @sort-change="onSortChange"
+        <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange"
                   @filter-change="onFilterChanged" v-loading="loading" :element-loading-text="loading">
             <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
-                             :sortable="ordering_fields.includes(f.name) && 'custom'" :class-name="f.type"
-                             :type="f.type" :filters="filters[f.name]" v-for="f in tableItems" :key="f.name">
+                             :sortable="modelTableOrderingFields.includes(f.name) && 'custom'" :class-name="f.type"
+                             :type="f.type" :filters="modelTableFilters[f.name]" v-for="f in modelTableItems"
+                             :key="f.name">
                 <template slot-scope="{row}">
                     <component :is="f.widget" v-model="row" :prop="f.name"
                                v-if="f.widget && typeof f.widget == 'object'"></component>
@@ -64,20 +59,18 @@
         <el-pagination
                 background
                 layout="total, sizes, prev, pager, next, jumper"
-                :page-size="pageSize"
-                :current-page.sync="page"
-                @size-change="onPageSizeChanged"
-                :total="count">
+                :page-size="tablePageSize"
+                :current-page.sync="tablePage"
+                @size-change="tableOnPageSizeChanged"
+                :total="tableCount">
         </el-pagination>
     </div>
 </template>
 <script>
-    import model_view from '../../mixins/model_view'
-    import table_view from '../../mixins/table_view'
-    import TrueFlag from '../widgets/TrueFlag.vue'
-    import Date2Now from '../widgets/Date2Now.vue'
+    import model_table from '../../mixins/model_table'
+    import RelatedSelect from './RelatedSelect2.vue'
     export default{
-        mixins: [model_view, table_view],
+        mixins: [model_table],
         props: {
             appModelName: String,
             tableItems: {
@@ -102,57 +95,14 @@
                 }
             },
         },
-        mounted (){
-            this.modelInit()
-            if (!this.tableUrl) {
-                this.tableUrl = this.modelListUrl
-            }
-            this.tableLoad()
-            this.modelLoadOptions().then((data) => {
-                let search = this.modelOptions.actions.SEARCH
-                this.ordering_fields = search.ordering_fields
-                this.search_fields = search.search_fields
-                this.filter_fields = search.filter_fields
-                Object.assign(this.filters, this.getFilters())
-                this.tableItems = Object.assign({}, this.tableNormalizeItems(this.tableItems))
-            })
+        components: {
+            RelatedSelect
         },
-//        mounted (){
-//            Object.assign(this.avairable_actions, this.extraActions)
-////            this.modelLoadFormConfig().then((data) => {
-////
-////
-////            })
-//        },
-        data () {
-            return {
-                filters: {},
-                ordering_fields: [],
-                filter_fields: [],
-                search_fields: [],
-                avairable_actions: {
-                    'refresh': {
-                        icon: 'refresh',
-                        title: '刷新',
-                        do: this.load
-                    },
-                    'create': {
-                        icon: 'plus',
-                        title: '创建',
-                        do: this.toCreateModel
-                    },
-                    'edit': {
-                        icon: 'pencil',
-                        title: '编辑',
-                        do: this.toEditModel
-                    }
-                }
-            }
+        mounted (){
+            this.modelTableInit()
         },
         computed: {
-            searchFieldNames () {
-                return this.search_fields.join(',')
-            },
+
             filterFields () {
                 let actions = this.modelOptions.actions
                 if (!actions) {
@@ -178,32 +128,12 @@
         methods: {
             get_actions(action_list){
                 return action_list.map((a) => {
-                    let d = this.avairable_actions[a]
+                    let d = this.modelTableAvairableActions[a]
                     d.name = a
                     return d
                 })
             },
 
-            tableDefaultWidget(type){
-                return type == 'boolean' ? TrueFlag : ( type == 'datetime' ? Date2Now : undefined)
-            },
-            choices2selectOptions(choices){
-                return choices.map((a) => {
-                    return {text: a.display_name, value: a.value}
-                })
-            },
-            getFilters(){
-                let postFields = this.modelOptions.actions.POST
-                let filters = {}
-
-                Object.keys(postFields).forEach((k) => {
-                    let f = postFields[k]
-                    if (f.choices) {
-                        filters[`${k}_name`] = filters[k] = this.choices2selectOptions(f.choices)
-                    }
-                })
-                return filters
-            },
             filterHandler(value, row, column) {
                 console.log(column)
 //                const property = column['property']
@@ -217,5 +147,11 @@
                 this.updateQueries({ordering: (payLoad.order == 'descending' ? '-' : '') + payLoad.prop})
             }
         },
+        watch: {
+            tableData(val){
+                this.$emit("input", val)
+
+            }
+        }
     }
 </script>

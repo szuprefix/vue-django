@@ -13,10 +13,6 @@ export function joinErrors(errors) {
 }
 
 export default {
-    props: {
-        // appModelName: String,
-        // tab: Object
-    },
     data () {
         return {
             modelConfig: {},
@@ -28,11 +24,6 @@ export default {
             appModelName: null
         }
     },
-    // created (){
-    //     console.log("model_view. created.")
-    //     this.modelInit(this.appModelName)
-    //
-    // },
 
     methods: {
         modelInit(){
@@ -62,6 +53,17 @@ export default {
         modelCacheOptions(options){
             this.modelOptions = Object.assign({}, this.modelOptions, options)
             this.modelFieldConfigs = Object.assign({}, this.modelFieldConfigs, options.actions.POST)
+            Object.keys(this.modelFieldConfigs).forEach((a) => {
+                this.modelFieldConfigs[a].name = a
+            })
+        },
+        modelEmptyDataFromOptions(m){
+            let r = {}
+            Object.keys(m).forEach((k) => {
+                let f = m[k]
+                r[k] = f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null
+            })
+            return r
         },
         modelLoad() {
             return axios.all([this.modelLoadData(), this.modelLoadOptions()]).then(axios.spread((data, rest_options) => {
@@ -75,7 +77,7 @@ export default {
         modelSave(data){
             let d = data || this.modelData
             let promise
-            if (!this.id) {
+            if (!this.modelId) {
                 promise = axios.post(this.modelListUrl, d)
             } else {
                 promise = axios.put(this.modelDetailUrl, d)
@@ -106,5 +108,5 @@ export default {
             return `${this.modelListUrl}${this.modelId}/`
         },
 
-    },
+    }
 }

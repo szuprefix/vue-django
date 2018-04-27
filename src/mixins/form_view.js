@@ -106,7 +106,7 @@ export default{
             if (f.choices && f.choices.length > 0) {
                 return typeof f.choices[0][0]
             }
-            return f.type == 'field' ? 'string' : (f.type == 'decimal' ? 'number' : f.type)
+            return f.model ? 'number': (f.type == 'field' ? 'string' : (f.type == 'decimal' ? 'number' : f.type))
         },
         formDefaultSpan(f){
             return f.widget == 'textarea' ? {xs: 24, sm: 24, md: 24, xl: 24} : {xs: 24, sm: 12, md: 8, xl: 6}
@@ -130,6 +130,7 @@ export default{
         },
         formNormalizeItems(formItems){
             return formItems.map((i) => {
+                // console.log(i)
                 let a = Object.assign({}, i)
                 a.label = a.label || a.name
                 a.rules = a.rules || this.formDefaultRules(a)

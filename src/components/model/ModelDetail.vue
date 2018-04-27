@@ -29,7 +29,7 @@
                 }).catch(this.onServerResponseError)
             }
         },
-        filters: {
+        modelTableFilters: {
             display (val){
                 return val === true ? '是' : val === false ? '否' : val
             }

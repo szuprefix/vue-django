@@ -1,15 +1,15 @@
 <template>
-    <div>
+    <span>
         <el-select v-model="value" :multiple="field.multiple" filterable @change="changed" remote
-                   :remote-method="onFilter"
-                   :loading="loading" :loading-text="loading" :placeholder="field.placeholder">
+                   :remote-method="onFilter" class="related-select"
+                   :loading="loading" :loading-text="loading" :placeholder="field.placeholder || `请选择${field.label}`">
             <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
                        v-for="c,i in tableData" :key="i"></el-option>
         </el-select>
-        <el-button @click="tableToCreateModel" size="mini">
+        <el-button @click="tableToCreateModel" size="mini" v-if="showCreate">
             <i class="fa fa-plus" :title="`新增${field.label}`"></i>
         </el-button>
-    </div>
+    </span>
 </template>
 <script>
     import model_view from '../../mixins/model_view'
@@ -19,6 +19,7 @@
         props: {
             placeholder: String,
             field: Object,
+            showCreate: {type:Boolean, default:true},
             value: [String, Number, Array]
         },
         data () {
@@ -51,4 +52,8 @@
         }
     }
 </script>
-<style scoped></style>
+<style>
+    .related-select{
+        width:180px;
+    }
+</style>

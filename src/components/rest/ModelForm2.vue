@@ -10,8 +10,8 @@
                 </el-button>
             </el-col>
         </el-row>
-        <r-form :formUrl="isCreate?modelListUrl:modelDetailUrl" :formItems="_formItems" v-model="formValue" ref="form"
-                :formMethod="isCreate?'post':'put'" @form-posted="formPosted" :formSubmit="submit">
+        <r-form :formUrl="formUrl" :formItems="modelFormItems" v-model="formValue" ref="form"
+                :formMethod="formMethod" @form-posted="modelFormOnPosted" :formSubmit="modelFormSubmit" :formTextareaSize="formTextareaSize">
             <span slot="submit"></span>
         </r-form>
     </div>
@@ -25,7 +25,8 @@
         ],
         props: {
             appModelName: String,
-            value:Object
+            value: Object,
+            id:[Number,String]
         },
         data () {
             return {}
@@ -34,28 +35,19 @@
             RForm
         },
         created(){
-            console.log("modelForm2.created")
-            this.modelInit()
-            this.modelLoad().then(() => {
-                this.formValue = Object.assign({}, this.modelData)
-            })
+            this.modelFormInit()
         },
         methods: {
 
-            formPosted(data){
-                this.$emit("form-posted", {model: this.value})
-            },
             onSubmit(){
                 this.$refs.form.onSubmit()
             }
 
         },
-        computed: {
-            isCreate () {
-                return !this.modelId
-            },
-            _formItems() {
-                return this.formNormalizeItems(this.modelFormItems(this.formItems))
+        watch: {
+            modelData(val){
+               this.$emit("input", val)
+
             }
         }
     }

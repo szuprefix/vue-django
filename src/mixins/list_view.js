@@ -22,7 +22,7 @@ export default{
         }
     },
     mixins: [server_response],
-    filters: filters,
+    modelTableFilters: filters,
     created(){
         this.$store.state.bus.$on('model-posted', this.onModelPosted)
     },

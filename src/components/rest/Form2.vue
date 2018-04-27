@@ -20,7 +20,7 @@
                         </template>
                         <template slot="label" v-else><span></span></template>
                         <template>
-                            <form-widget v-model="formValue" :field="f"></form-widget>
+                            <form-widget v-model="formValue" :field="f" :textareaSize="formTextareaSize"></form-widget>
                         </template>
                     </el-form-item>
                 </el-col>

@@ -25,22 +25,15 @@ export default{
         }
     },
     mixins: [server_response],
-    filters: filters,
+    modelTableFilters: filters,
     // mounted () {
     //     this.tableUpdateQueries({page: 1, page_size: this.pageSize, search: ''})
     //     // this.$store.state.bus.$on('model-posted', this.onModelPosted)
     //     // console.log(this.$store)
     // },
-    beforeDestroy () {
-        // this.$store.state.bus.$off('model-posted', this.onModelPosted)
-    },
     components: {},
     methods: {
-        // onModelPosted({model}){
-        //     if (model.fullName === this.model.fullName || this.model.dependents && this.model.dependents.indexOf(model.fullName) >= 0) {
-        //         this.load()
-        //     }
-        // },
+
 
         _fields(){
             let fm = this.fieldMetas
@@ -98,10 +91,10 @@ export default{
                 let a, field
                 if (typeof i == 'string') {
                     field = this.modelFieldConfigs[i]
-                    a = {name: i, label: field.label, type: field.type}
+                    a = {name: i, label: field.label || field.name, type: field.type, model: field.model}
                 } else {
                     field = this.modelFieldConfigs[i.name]
-                    a = Object.assign({}, {label: field.verboseName, type: field.type}, i)
+                    a = Object.assign({}, {label: field.label || field.name, type: field.type, model: field.model}, i)
                 }
 
                 a.widget = a.widget || this.tableDefaultWidget(a)

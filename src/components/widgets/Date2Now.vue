@@ -8,7 +8,7 @@
             value: Object,
             prop:String
         },
-        filters:{
+        modelTableFilters:{
             date2now
         }
     }
