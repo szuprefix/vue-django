@@ -9,6 +9,30 @@ import Date2Now from '../components/widgets/Date2Now.vue'
 import ForeignKey from '../components/widgets/ForeignKey.vue'
 export default {
     mixins: [model_view, table_view],
+    props: {
+        appModelName: String,
+        tableItems: {
+            type: Array, default: function () {
+                return [{name: '__str__', label: '名称'}]
+            }
+        },
+        extraActions: {
+            type: Object, default: function () {
+                return {}
+            }
+        },
+        modelTableUrl: String,
+        topActionList: {
+            type: Array, default: function () {
+                return ['refresh', 'create']
+            }
+        },
+        rowActionList: {
+            type: Array, default: function () {
+                return ['edit']
+            }
+        },
+    },
     data () {
         return {
             modelTableFilters: {},
@@ -45,9 +69,7 @@ export default {
     methods: {
         modelTableInit(){
             this.modelInit()
-            if (!this.tableUrl) {
-                this.tableUrl = this.modelListUrl
-            }
+            this.tableUrl = this.modelTableUrl || this.modelListUrl
             this.tableLoad()
             this.modelLoadOptions().then((data) => {
                 let search = this.modelOptions.actions.SEARCH

@@ -5,19 +5,23 @@
                 <el-input
                         :placeholder="`搜索${modelTableSearchFieldNames}`"
                         v-model="tableQueries.search"
-                        @keyup.enter.native="tableUpdateQueries({})"
-                        :style="`width:${50+15*modelTableSearchFieldNames.length}px`"
+                        suffix-icon="el-icon-search"
+                        @keyup.enter.native="tableLoad"
+                        @change="tableLoad"
+                        clearable
+                        :style="`width:${80+15*modelTableSearchFieldNames.length}px`"
                         v-if="modelTableSearchFields.length>0">
                 </el-input>
                 <template v-for="f in modelTableFilterFields">
                     <el-checkbox v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"
-                                 @change="tableUpdateQueries({})" v-if="f.type=='boolean'">{{f.label}}
+                                 @change="tableLoad" v-if="f.type=='boolean'">{{f.label}}
                     </el-checkbox>
                     <related-select :field="f" v-model="tableQueries[f.name]"
                                     style="width: 120px" :showCreate="false" v-else></related-select>
                     &nbsp;
                 </template>
-                <el-button><i class="fa fa-search"></i></el-button>
+                <!--<el-button @click="tableLoad"-->
+                           <!--v-if="modelTableSearchFields.length>0"><i class="fa fa-search"></i></el-button>-->
             </el-col>
             <el-col :span="8">
                 <div class="flex-right">
@@ -71,30 +75,7 @@
     import RelatedSelect from './RelatedSelect2.vue'
     export default{
         mixins: [model_table],
-        props: {
-            appModelName: String,
-            tableItems: {
-                type: Array, default: function () {
-                    return [{name: '__str__', label: '名称'}]
-                }
-            },
-            extraActions: {
-                type: Object, default: function () {
-                    return {}
-                }
-            },
-            tableUrl: String,
-            topActionList: {
-                type: Array, default: function () {
-                    return ['refresh', 'create']
-                }
-            },
-            rowActionList: {
-                type: Array, default: function () {
-                    return ['edit']
-                }
-            },
-        },
+
         components: {
             RelatedSelect
         },
