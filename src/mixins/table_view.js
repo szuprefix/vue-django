@@ -34,21 +34,6 @@ export default{
     components: {},
     methods: {
 
-
-        _fields(){
-            let fm = this.fieldMetas
-            return this.fields.map((f) => {
-                if (typeof f == 'string') {
-                    let d = fm[f]
-                    if (d) {
-                        return {name: f, label: d.label, type: d.type, widget: this.getWidget(d.type)}
-                    } else {
-                        return {name: f, label: f}
-                    }
-                }
-                return f
-            })
-        },
         tableUpdateQueries(d){
             this.tableQueries = Object.assign({}, this.tableQueries, d)
         },
