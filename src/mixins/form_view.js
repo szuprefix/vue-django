@@ -57,6 +57,7 @@ export default{
             if (this.formSubmit) {
                 return this.formSubmit().then(this._formSubmitSuccess)
             } else {
+                console.log(this.formMethod)
                 let action = this.formMethod === 'post' ? this.$http.post : this.$http.put
                 return action(this.formUrl, this.formValue).then(({data}) => {
                     return this._formSubmitSuccess(data)

@@ -14,11 +14,13 @@ export default {
     methods: {
         modelFormInit(){
             this.modelInit()
-            this.modelId = this.value && this.value.id || ( this.$route.params.id === 'create' ? undefined : this.$route.params.id)
+            let id = this.value && this.value.id || this.$route.params.id
+            // console.log(this.value)
+            this.modelId = id === 'create' ? undefined : id
             this.modelLoad().then((data, options) => {
                 this.formMethod = this.modelId ? "put" : "post"
                 this.formUrl = this.modelId ? this.modelDetailUrl : this.modelListUrl
-                this.modelFormItems = this.modelFormNormalizeItems(this.formItems)
+                this.modelFormItems = this.formNormalizeItems(this.modelFormNormalizeItems(this.formItems))
             })
         },
         modelFormDefaultWidget (f) {
@@ -50,7 +52,8 @@ export default {
             return this.modelSave(this.formValue)
         },
         modelFormOnPosted(data){
-            this.$emit("form-posted", {model: this.modelConfig, data})
+            let payLoad = {model: this.modelConfig, data}
+            this.$emit("form-posted", payLoad)
         }
     },
     computed: {

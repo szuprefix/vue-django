@@ -26,7 +26,8 @@
         props: {
             appModelName: String,
             value: Object,
-            id:[Number,String]
+            id:[Number,String],
+            onFormPosted: Function
         },
         data () {
             return {}

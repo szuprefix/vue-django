@@ -16,6 +16,26 @@ export  default {
     components: {
         ModelForm
     },
+    mounted(){
+
+        this.$refs.form.$on("form-posted", this.redirectToEdit)
+
+    },
+    methods: {
+        redirectToEdit(payLoad){
+            let form = this.$refs.form
+            if (this.$route.params.id === 'create') {
+                let p = form.modelDetailUrl
+                this.tab.name = p
+                this.$router.replace(p)
+            } else {
+                this.setTitle()
+            }
+        },
+        setTitle(){
+            this.tab.title = this.$refs.form.modelFormTitle
+        }
+    },
     computed: {
         modelDetailUrl(){
             return this.$refs.form.modelDetailUrl
@@ -24,7 +44,7 @@ export  default {
     watch: {
 
         modelData (val) {
-            this.tab.title = this.$refs.form.modelFormTitle
+            this.setTitle()
         },
 
     }

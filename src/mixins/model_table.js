@@ -87,6 +87,23 @@ export default {
                 this.tableLoad()
             }
         },
+        tableNormalizeItems(tableItems){
+            return tableItems.map((i) => {
+                let a, field
+                if (typeof i == 'string') {
+                    field = this.modelFieldConfigs[i]
+                    a = {name: i, label: field.label || field.name, type: field.type, model: field.model}
+                } else {
+                    field = this.modelFieldConfigs[i.name]
+                    a = Object.assign({}, {label: field.label || field.name, type: field.type, model: field.model}, i)
+                }
+
+                a.widget = a.widget || this.tableDefaultWidget(a)
+                // console.log(a)
+                return a
+            })
+        },
+
         tableDefaultWidget(f){
             // console.log(f)
             return f.model ? ForeignKey : (f.type == 'boolean' ? TrueFlag : ( f.type == 'datetime' ? Date2Now : undefined))
