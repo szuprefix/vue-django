@@ -22,7 +22,8 @@ export default  {
             let promise = new Promise((resolve, reject) => {
 
                 this.loading = this.asyncStatusMap(task.status)
-                let url = `ws://${location.host}/api/common/async_result/${task.id}/`
+                let protocal = location.protocol == "https:" ? "wss" : "ws"
+                let url = `${protocal}://${location.host}/api/common/async_result/${task.id}/`
                 console.log(url)
                 this.ws = new WebSocket(url)
                 this.ws.onload = function (e) {

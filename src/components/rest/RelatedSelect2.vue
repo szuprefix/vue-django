@@ -30,6 +30,7 @@
             this.appModelName=this.field.model
             this.modelInit()
             this.tableUrl = this.modelListUrl
+            this.tablePageSize = 200
             this.tableLoad()
         },
         methods: {

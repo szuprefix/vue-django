@@ -5,6 +5,7 @@
 import Qs from 'qs'
 import filters from '../utils/filters'
 import server_response from './server_response'
+let DEFAULT_PAGE_SIZE = 20
 export default{
     props: {
         // tableItems: {
@@ -14,9 +15,9 @@ export default{
     },
     data () {
         return {
-            tableQueries: {},
+            tableQueries: {page_size: DEFAULT_PAGE_SIZE},
             tableData: [],
-            tablePageSize: 20,
+            tablePageSize: DEFAULT_PAGE_SIZE,
             tablePage: 1,
             tableCount: 0,
             tableUrl: "",
@@ -80,10 +81,10 @@ export default{
     },
     watch: {
         tablePage(newVal, oldVal){
-            this.updateQueries({page: newVal})
+            this.tableUpdateQueries({page: newVal})
         },
         tablePageSize(newVal, oldVal){
-            this.updateQueries({page_size: newVal})
+            this.tableUpdateQueries({page_size: newVal})
         },
         tableQueries(newVal, oldVal){
             this.tableLoad()

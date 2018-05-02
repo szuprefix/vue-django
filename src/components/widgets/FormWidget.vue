@@ -1,6 +1,5 @@
 <template>
     <div>
-        {{formTextareaSize}}
         <el-radio-group v-model="value[field.name]" v-if="field.widget === 'radio'">
             <el-radio-button :label="c[0]" v-for="c in field.choices" :key="c[0]">{{ c[1] }}
             </el-radio-button>
@@ -12,7 +11,7 @@
         <el-switch v-model="value[field.name]" on-text="开" off-text="关"
                    v-else-if="field.widget === 'checkbox'">
         </el-switch>
-        <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'">
+        <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'" @change="field.onChanged">
         </el-input-number>
         <el-date-picker v-model="value[field.name]" :type="field.widget"
                         :placeholder="field.label" v-else-if="['date','datetime'].includes(field.widget) ">

@@ -125,7 +125,7 @@
                 console.log(filters)
             },
             onSortChange(payLoad){
-                this.updateQueries({ordering: (payLoad.order == 'descending' ? '-' : '') + payLoad.prop})
+                this.tableUpdateQueries({ordering: (payLoad.order == 'descending' ? '-' : '') + payLoad.prop})
             }
         },
         watch: {
