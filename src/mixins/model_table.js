@@ -106,7 +106,7 @@ export default {
 
         tableDefaultWidget(f){
             // console.log(f)
-            return f.model ? ForeignKey : (f.type == 'boolean' ? TrueFlag : ( f.type == 'datetime' ? Date2Now : undefined))
+            return f.model ? ForeignKey : (f.type == 'boolean' ? TrueFlag : ( ['datetime', 'date'].includes(f.type) ? Date2Now : undefined))
         },
         choices2selectOptions(choices){
             return choices.map((a) => {

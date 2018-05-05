@@ -11,7 +11,7 @@
         <el-switch v-model="value[field.name]" on-text="开" off-text="关"
                    v-else-if="field.widget === 'checkbox'">
         </el-switch>
-        <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'" @change="field.onChanged">
+        <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'" @change="fieldValueChanged">
         </el-input-number>
         <el-date-picker v-model="value[field.name]" :type="field.widget"
                         :placeholder="field.label" v-else-if="['date','datetime'].includes(field.widget) ">
@@ -44,7 +44,13 @@
 //           console.log(this.field)
         },
         components: {},
-        methods: {},
+        methods: {
+            fieldValueChanged(value){
+                if(this.field.onChanged){
+                    this.field.onChanged({form:this.value,field:this.field,value})
+                }
+            }
+        },
         computed: {}
     }
 </script>

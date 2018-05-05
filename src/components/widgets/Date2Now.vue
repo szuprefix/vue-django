@@ -1,15 +1,19 @@
 <template>
-    <span>{{value[prop]|date2now}}</span>
+    <span>{{now}}</span>
 </template>
 <script>
-    import {date2now} from '../../utils/filters'
+    import {formatTime} from '../../utils/filters'
     export default{
         props: {
             value: Object,
             prop:String
         },
-        modelTableFilters:{
-            date2now
+        computed:{
+            now(){
+                let s = this.value[this.prop]
+                console.log(s)
+                return formatTime(new Date(s))
+            }
         }
     }
 </script>
