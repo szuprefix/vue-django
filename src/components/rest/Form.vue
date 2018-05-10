@@ -34,7 +34,7 @@
                 </el-switch>
                 <el-input-number v-model="values[f.name]" v-else-if="f.widget === 'number'">
                 </el-input-number>
-                <el-date-picker v-model="values[f.name]" :type="f.widget"
+                <el-date-picker v-model="values[f.name]" :type="f.widget" value-format="yyyy-MM-ddTHH:mm:ssZ" format="yyyy-MM-ddTHH:mm:ssZ"
                                 :placeholder="f.label" v-else-if="['date','datetime'].includes(f.widget) ">
                 </el-date-picker>
                 <el-input v-model="values[f.name]" :autosize="options.textAreaSize || { minRows: 4, maxRows: 8}"
