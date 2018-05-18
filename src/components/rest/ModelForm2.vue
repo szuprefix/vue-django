@@ -10,7 +10,7 @@
                 </el-button>
             </el-col>
         </el-row>
-        <r-form :formUrl="formUrl" :formItems="modelFormItems" v-model="formValue" ref="form"
+        <r-form :formUrl="formUrl" :formItems="modelFormItems" v-model="formValue" ref="form" @beforesubmit="onBeforeSubmit" :formInline="formInline"
                 :formMethod="formMethod" @form-posted="modelFormOnPosted" :formSubmit="modelFormSubmit" :formTextareaSize="formTextareaSize">
             <span slot="submit"></span>
         </r-form>
@@ -39,7 +39,9 @@
             this.modelFormInit()
         },
         methods: {
-
+            onBeforeSubmit(values){
+               this.$emit("beforesubmit", values)
+            },
             onSubmit(){
                 this.$refs.form.onSubmit()
             }

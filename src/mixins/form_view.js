@@ -10,10 +10,7 @@ export default{
         server_response
     ],
     props: {
-        formItems: {
-            type: Array,
-            default: []
-        },
+        formItems: Array,
         formUrl: String,
         formMethod: {
             type: String, default: 'post'
@@ -57,7 +54,6 @@ export default{
             if (this.formSubmit) {
                 return this.formSubmit().then(this._formSubmitSuccess)
             } else {
-                console.log(this.formMethod)
                 let action = this.formMethod === 'post' ? this.$http.post : this.$http.put
                 return action(this.formUrl, this.formValue).then(({data}) => {
                     return this._formSubmitSuccess(data)
@@ -85,11 +81,17 @@ export default{
             if (formValid) {
                 formValid(procedure)
             } else {
-                let validator = new schema(this.rules)
-                validator.validate(this.values, (errors, fields) => {
+                let validator = new schema(this.formRules)
+                validator.validate(this.formValue, (errors, fields) => {
                     let valid = true
                     if (errors) {
                         this.formErrors = errors
+                        var fs = this.$refs
+                        errors.forEach((f)=> {
+                            let v = fs[f.field][0]
+                            // v.focus() && v.blur()
+                            v.onBlur()
+                        })
                         valid = false
                     }
                     procedure(valid)
@@ -147,8 +149,8 @@ export default{
         formRules () {
             let d = {}
             let self = this
-            Object.keys(this.formItems).forEach((i) => {
-                let f = this.formItems[i]
+            Object.keys(this._formItems).forEach((i) => {
+                let f = this._formItems[i]
                 let n = f.name
                 let rs = d[n] = f.rules || []
                 rs.concat(this.formDefaultRules(f))

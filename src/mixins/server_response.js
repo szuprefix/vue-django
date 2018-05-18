@@ -53,7 +53,7 @@ export default  {
             if(error == 'cancel'){  // confirm dialog cancel ?
                return
             }
-            if (error.code === 404 && error.msg.detail) {
+            if ([404,403].includes(error.code) && error.msg.detail) {
                 error.msg = error.msg.detail
             }
             if (error.code === 400) {

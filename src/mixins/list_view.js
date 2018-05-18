@@ -55,7 +55,12 @@ export default{
                 this.count = data.count
                 this.loading = false
                 this.$emit("loaded", data)
+                this.onLoaded(data)
             }).catch(this.onServerResponseError)
+        },
+        onLoaded(data){
+            console.log("onLoaded")
+
         },
         onSearch(){
             this.updateQueries({})
