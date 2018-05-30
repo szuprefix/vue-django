@@ -61,7 +61,6 @@ export default  {
             } else if (error.code === 401) {
                 // this.$router.replace('/auth/login/')
             } else {
-                const h = this.$createElement;
                 this.$message({
                     message: `${error.code}错误:${error.msg}`, type: 'error'
                 })

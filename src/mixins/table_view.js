@@ -15,7 +15,7 @@ export default{
     },
     data () {
         return {
-            tableQueries: {page_size: DEFAULT_PAGE_SIZE},
+            tableQueries: {page_size: DEFAULT_PAGE_SIZE,search:''},
             tableData: [],
             tablePageSize: DEFAULT_PAGE_SIZE,
             tablePage: 1,
@@ -38,8 +38,8 @@ export default{
         tableUpdateQueries(d){
             this.tableQueries = Object.assign({}, this.tableQueries, d)
         },
-        tableLoad () {
-            let d = this.tableQueries
+        tableLoad (queris) {
+            let d = queris || this.tableQueries
             this.loading = '查询中'
             // console.log(this.tableUrl)
             this.$http.get(`${this.tableUrl}?${Qs.stringify(d)}`).then(({data}) => {
@@ -50,7 +50,7 @@ export default{
             }).catch(this.onServerResponseError)
         },
         tableOnSearch(){
-            this.tableUpdateQueries({})
+            this.tableUpdateQueries({page:1})
         },
         tableOnRowSelect(row, column, cell, event){
             this.tableToEditModel(row, column, cell, event)
@@ -87,7 +87,7 @@ export default{
             this.tableUpdateQueries({page_size: newVal})
         },
         tableQueries(newVal, oldVal){
-            this.tableLoad()
+            this.tableLoad(newVal)
         }
     }
 }

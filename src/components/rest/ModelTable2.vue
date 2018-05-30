@@ -6,8 +6,7 @@
                         :placeholder="`搜索${modelTableSearchFieldNames}`"
                         v-model="tableQueries.search"
                         suffix-icon="el-icon-search"
-                        @keyup.enter.native="tableLoad"
-                        @change="tableLoad"
+                        @change="tableOnSearch"
                         clearable
                         :style="`width:${80+15*modelTableSearchFieldNames.length}px`"
                         v-if="modelTableSearchFields.length>0">
