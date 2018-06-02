@@ -8,10 +8,10 @@ import server_response from './server_response'
 let DEFAULT_PAGE_SIZE = 20
 export default{
     props: {
-        // tableItems: {
-        //     type: Array,
-        //     default: []
-        // },
+        tableBaseQueries: {
+            type:Object,
+            default: {}
+        },
     },
     data () {
         return {
@@ -36,7 +36,7 @@ export default{
     methods: {
 
         tableUpdateQueries(d){
-            this.tableQueries = Object.assign({}, this.tableQueries, d)
+            this.tableQueries = Object.assign({}, this.tableBaseQueries, this.tableQueries, d)
         },
         tableLoad (queris) {
             let d = queris || this.tableQueries

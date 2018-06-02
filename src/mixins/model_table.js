@@ -32,6 +32,16 @@ export default {
                 return ['edit']
             }
         },
+        showTopBar:{
+            type:Boolean, default:function(){
+                return true
+            }
+        },
+        showPagger:{
+            type:Boolean, default:function(){
+                return true
+            }
+        }
     },
     data () {
         return {
@@ -70,7 +80,7 @@ export default {
         modelTableInit(){
             this.modelInit()
             this.tableUrl = this.modelTableUrl || this.modelListUrl
-            this.tableLoad()
+            this.tableUpdateQueries({})
             this.modelLoadOptions().then((data) => {
                 let search = this.modelOptions.actions.SEARCH
                 this.modelTableOrderingFields = search.ordering_fields
@@ -92,6 +102,9 @@ export default {
                 let a, field
                 if (typeof i == 'string') {
                     field = this.modelFieldConfigs[i]
+                    if(!field){
+                        console.error(`field ${i} not found`)
+                    }
                     a = {name: i, label: field.label || field.name, type: field.type, model: field.model}
                 } else {
                     field = this.modelFieldConfigs[i.name]

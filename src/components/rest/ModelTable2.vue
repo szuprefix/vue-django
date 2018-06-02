@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-row :gutter="20">
+        <el-row :gutter="20" v-if="showTopBar">
             <el-col :span="16">
                 <el-input
                         :placeholder="`搜索${modelTableSearchFieldNames}`"
@@ -59,7 +59,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination
+        <el-pagination v-if="showPagger"
                 background
                 layout="total, sizes, prev, pager, next, jumper"
                 :page-size="tablePageSize"
