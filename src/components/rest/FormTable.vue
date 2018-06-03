@@ -5,10 +5,10 @@
                              :class-name="`${f.type} field_${f.name}`" v-for="f in modelTableItems"
                              :key="f.name" :type="f.columnType || undefined">
                 <template slot-scope="{row}">
-                <component :is="f.widget" v-model="row" :prop="f.name"
-                v-if="f.widget && typeof f.widget == 'object'"></component>
-                <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
-                <template v-else>{{row[f.name]}}</template>
+                    <component :is="f.widget" v-model="row" :prop="f.name" :field="f.field"
+                               v-if="f.widget && typeof f.widget == 'object'"></component>
+                    <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
+                    <template v-else>{{row[f.name]}}</template>
                 </template>
             </el-table-column>
             <el-table-column label="">
@@ -59,7 +59,7 @@
         },
         data () {
             return {
-                modelData: {id:'create'},
+                modelData: {id: 'create'},
                 value: {},
                 dialogVisible: false
             }
@@ -81,9 +81,24 @@
             },
             formDefaultSpan(f){
                 return {xs: 24, sm: 24, md: 24, xl: 24}
+            },
+            formTableNormalizeItems(){
+                if (this.modelTableItems.length>0) {
+                    this.modelTableItems.forEach((i) => {
+                        i.field = this.modelFormItems.find((a) => a.name === i.name)
+                    })
+                }
             }
         },
-        computed: {}
+        computed: {},
+        watch: {
+            modelFormItems(val, oldVal){
+                this.formTableNormalizeItems()
+            },
+            modelTableItems(val, oldVal){
+                this.formTableNormalizeItems()
+            }
+        }
     }
 </script>
 <style scoped></style>

@@ -105,10 +105,10 @@ export default {
                     if(!field){
                         console.error(`field ${i} not found`)
                     }
-                    a = {name: i, label: field.label || field.name, type: field.type, model: field.model}
+                    a = {name: i, label: field.label || field.name, type: field.type, model: field.model, field}
                 } else {
                     field = this.modelFieldConfigs[i.name]
-                    a = Object.assign({}, {label: field.label || field.name, type: field.type, model: field.model}, i)
+                    a = Object.assign({}, {label: field.label || field.name, type: field.type, model: field.model, field}, i)
                 }
 
                 a.widget = a.widget || this.tableDefaultWidget(a)

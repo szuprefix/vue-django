@@ -42,7 +42,7 @@
                              :type="f.type" :filters="modelTableFilters[f.name]" v-for="f in modelTableItems"
                              :key="f.name">
                 <template slot-scope="{row}">
-                    <component :is="f.widget" v-model="row" :prop="f.name"
+                    <component :is="f.widget" v-model="row" :prop="f.name" :field="f.field"
                                v-if="f.widget && typeof f.widget == 'object'"></component>
                     <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
                     <template v-else>{{row[f.name]}}</template>
