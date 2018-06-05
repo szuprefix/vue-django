@@ -32,13 +32,13 @@ export default {
                 return ['edit']
             }
         },
-        showTopBar:{
-            type:Boolean, default:function(){
+        showTopBar: {
+            type: Boolean, default: function () {
                 return true
             }
         },
-        showPagger:{
-            type:Boolean, default:function(){
+        showPagger: {
+            type: Boolean, default: function () {
                 return true
             }
         }
@@ -89,7 +89,7 @@ export default {
                     return Object.assign({multiple: false}, this.modelFieldConfigs[a])
                 })
                 Object.assign(this.modelTableFilters, this.getFilters())
-                this.modelTableItems = Object.assign({}, this.tableNormalizeItems(this.tableItems))
+                this.modelTableItems = this.tableNormalizeItems(this.tableItems)
             })
         },
         modelTableOnModelPosted({model}){
@@ -97,18 +97,36 @@ export default {
                 this.tableLoad()
             }
         },
+        tableOnRowSelect(row, column, cell, event){
+            if (this.rowActionList.includes('edit')) {
+                this.tableToEditModel(row, column, cell, event)
+            }
+        },
+        tableToEditModel (row, column, cell, event){
+            this.$router.replace(`${row.id}/`)
+        },
+        tableToCreateModel(){
+            let url = `${this.modelListUrl}create/?${this.modelConfig.title_field}=${this.tableQueries.search}`
+            console.log(url)
+            this.$router.push(url)
+        },
         tableNormalizeItems(tableItems){
             return tableItems.map((i) => {
                 let a, field
                 if (typeof i == 'string') {
                     field = this.modelFieldConfigs[i]
-                    if(!field){
+                    if (!field) {
                         console.error(`field ${i} not found`)
                     }
                     a = {name: i, label: field.label || field.name, type: field.type, model: field.model, field}
                 } else {
                     field = this.modelFieldConfigs[i.name]
-                    a = Object.assign({}, {label: field.label || field.name, type: field.type, model: field.model, field}, i)
+                    a = Object.assign({}, {
+                        label: field.label || field.name,
+                        type: field.type,
+                        model: field.model,
+                        field
+                    }, i)
                 }
 
                 a.widget = a.widget || this.tableDefaultWidget(a)

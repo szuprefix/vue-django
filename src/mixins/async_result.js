@@ -4,7 +4,7 @@
 export default  {
     methods: {
         asyncStatusMap(status){
-            return {
+            let a = {
                 'PENDING': '排队中',
                 'STARTED': '开始执行',
                 'RETRY': '重试',
@@ -17,6 +17,7 @@ export default  {
                 'READ_TABLE': '读取数据表',
                 'SAVE_TABLE': '保存数据到表'
             }[status]
+            return a || status
         },
         monitorAsyncResult(task){
             let promise = new Promise((resolve, reject) => {

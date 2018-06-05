@@ -52,17 +52,6 @@ export default{
         tableOnSearch(){
             this.tableUpdateQueries({page:1})
         },
-        tableOnRowSelect(row, column, cell, event){
-            this.tableToEditModel(row, column, cell, event)
-        },
-        tableToEditModel (row, column, cell, event){
-            this.$router.replace(`${row.id}/`)
-        },
-        tableToCreateModel(){
-            let url = `${this.modelListUrl}create/?${this.modelConfig.title_field}=${this.tableQueries.search}`
-            console.log(url)
-            this.$router.push(url)
-        },
         tableOnPageChanged (val) {
             this.tablePage = val
         },

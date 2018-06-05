@@ -1,5 +1,6 @@
 <template>
     <div>
+        <!--{{field}}-->
         <template v-if="field.widget === 'readonly'">
           {{value[field.name]}}
         </template>

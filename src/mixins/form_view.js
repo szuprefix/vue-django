@@ -87,7 +87,7 @@ export default{
                     if (errors) {
                         this.formErrors = errors
                         var fs = this.$refs
-                        errors.forEach((f)=> {
+                        errors.forEach((f) => {
                             let v = fs[f.field][0]
                             // v.focus() && v.blur()
                             v.onBlur()
@@ -100,7 +100,7 @@ export default{
 
         },
         formDefaultWidget (f) {
-            return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime'].includes(f.type) ? f.type : ( f.type == 'decimal' ? 'number' : 'text'))
+            return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime'].includes(f.type) ? f.type : ( ['integer', 'decimal'].includes(f.type) ? 'number' : 'text'))
         },
         formDefaultRuleType(f){
             if (f.multiple) {
@@ -109,7 +109,7 @@ export default{
             if (f.choices && f.choices.length > 0) {
                 return typeof f.choices[0][0]
             }
-            return f.model ? 'number': (f.type == 'field' ? 'string' : (f.type == 'decimal' ? 'number' : f.type))
+            return f.model ? 'number' : (f.type == 'field' ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
         },
         formDefaultSpan(f){
             return f.widget == 'textarea' ? {xs: 24, sm: 24, md: 24, xl: 24} : {xs: 24, sm: 12, md: 8, xl: 6}
@@ -131,16 +131,18 @@ export default{
             }
             return rs
         },
+        formNormalizeItem(i){
+            let a = Object.assign({}, i)
+            a.label = a.label || a.name
+            a.rules = a.rules || this.formDefaultRules(a)
+            a.widget = a.widget || this.formDefaultWidget(a)
+            a.span = a.span || {}
+            a.span = Object.assign({}, this.formDefaultSpan(a), a.span)
+            return a
+        },
         formNormalizeItems(formItems){
             return formItems.map((i) => {
-                // console.log(i)
-                let a = Object.assign({}, i)
-                a.label = a.label || a.name
-                a.rules = a.rules || this.formDefaultRules(a)
-                a.widget = a.widget || this.formDefaultWidget(a)
-                a.span = a.span || {}
-                a.span = Object.assign({}, this.formDefaultSpan(a), a.span)
-                return a
+                return this.formNormalizeItem(i)
             })
         }
 

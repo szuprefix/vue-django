@@ -83,14 +83,27 @@
                 return {xs: 24, sm: 24, md: 24, xl: 24}
             },
             formTableNormalizeItems(){
-                if (this.modelTableItems.length>0) {
+                if (this.modelTableItems.length > 0) {
+                    console.log(this.modelFormItems)
                     this.modelTableItems.forEach((i) => {
                         i.field = this.modelFormItems.find((a) => a.name === i.name)
+                        i.field = this.formNormalizeItem(i.field)
                     })
                 }
             }
         },
-        computed: {},
+        computed: {
+//            _modelTableItems(){
+//                let its = this.modelTableItems.map((i) => {
+//                    let field = this._formItems.find((a) => a.name === i.name) || {}
+////                        f.widget = this.formDefaultWidget(f)
+//                    return Object.assign({}, i, {field})
+//                })
+//                console.log(its)
+//                return its
+//            }
+        }
+        ,
         watch: {
             modelFormItems(val, oldVal){
                 this.formTableNormalizeItems()
