@@ -8,7 +8,14 @@ export default {
     mixins: [model_view, form_view],
     data(){
         return {
-            modelFormItems: []
+            modelFormItems: [],
+            modelFormAvairableActions: {
+                'save': {
+                    icon: 'floppy-o',
+                    title: '保存',
+                    do: this.onSubmit
+                }
+            },
         }
     },
     methods: {
@@ -50,13 +57,11 @@ export default {
                 return cs
             }
             return cs.map((a) => [a.value, a.display_name])
-        }
-        ,
+        },
         modelFormSubmit()
         {
             return this.modelSave(this.formValue)
-        }
-        ,
+        },
         modelFormOnPosted(data)
         {
             let payLoad = {model: this.modelConfig, data}
@@ -68,8 +73,7 @@ export default {
         {
             return !this.modelId && `新增${this.modelConfig.verbose_name}` || this.modelData['__str__'] || this.modelData[this.modelConfig.title_field]
         }
-    }
-    ,
+    },
     watch: {
         modelData(val)
         {

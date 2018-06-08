@@ -16,8 +16,11 @@
                     <el-button><i class="fa fa-plus"></i>产品 </el-button>
                 </template>
                 <template slot-scope="{row}">
-                    <el-button title="编辑" size="mini" @click="showEditForm(row)">
-                        <i :class="`fa fa-pencil`"></i>
+                    <!--<el-button title="编辑" size="mini" @click="showEditForm(row)">-->
+                        <!--<i :class="`fa fa-pencil`"></i>-->
+                    <!--</el-button>-->
+                    <el-button title="保存" size="mini" @click="saveRow(row)">
+                        <i :class="`fa fa-save`"></i>
                     </el-button>
                 </template>
             </el-table-column>
@@ -28,7 +31,7 @@
             </el-button>
         </div>
         <el-dialog :visible.sync="dialogVisible">
-            <r-form :formUrl="formUrl" :formItems="modelFormItems" v-model="formValue" ref="form"
+            <r-form :formUrl="formUrl" :formItems="formTableFormItems" v-model="formValue" ref="form"
                     :formMethod="formMethod" @form-posted="formTableOnFormPosted" :formSubmit="modelFormSubmit"
                     :formTextareaSize="formTextareaSize">
             </r-form>
@@ -50,18 +53,30 @@
                     return {}
                 }
             },
-            dataUrl: String
+            dataUrl: String,
+            editFields: {
+                type: Array, default: function () {
+                    return []
+                }
+            },
+            createFields: {
+                type: Array, default: function () {
+                    return []
+                }
+            }
         },
         mounted (){
 //            console.log(this.value)
             this.modelTableInit()
             this.modelFormInit()
+//            console.log(this.editFields)
         },
         data () {
             return {
                 modelData: {id: 'create'},
                 value: {},
-                dialogVisible: false
+                dialogVisible: false,
+                formTableFormItems: []
             }
         },
         components: {FormWidget, RForm},
@@ -69,11 +84,20 @@
             showEditForm(row){
                 if (!row) {
                     this.modelData = Object.assign({}, this.modelEmptyDataFromOptions(this.modelFieldConfigs), this.defaultCreateValue)
+                    this.formTableFormItems = this.formCreateItems
                 } else {
                     this.modelData = Object.assign({}, row)
+                    this.formTableFormItems = this.formEditItems
                 }
                 this.modelId = this.modelData.id
                 this.dialogVisible = true
+            },
+            saveRow(row){
+                this.showEditForm(row)
+                this.$nextTick(() => {
+                    this.$refs.form.onSubmit()
+                })
+
             },
             formTableOnFormPosted(data){
                 this.dialogVisible = false
@@ -84,7 +108,7 @@
             },
             formTableNormalizeItems(){
                 if (this.modelTableItems.length > 0) {
-                    console.log(this.modelFormItems)
+                    //console.log(this.modelFormItems)
                     this.modelTableItems.forEach((i) => {
                         i.field = this.modelFormItems.find((a) => a.name === i.name)
                         i.field = this.formNormalizeItem(i.field)
@@ -93,6 +117,21 @@
             }
         },
         computed: {
+            formCreateItems(){
+//                console.log(this.createFields)
+                if (this.createFields.length == 0) {
+                    return this.modelFormItems
+                }
+                return this.modelFormItems.filter((a) => this.createFields.includes(a.name))
+            },
+            formEditItems(){
+//                console.log(this.editFields)
+                if (this.editFields.length == 0) {
+                    return this.modelFormItems
+                }
+                return this.modelFormItems.filter((a) => this.editFields.includes(a.name))
+
+            }
 //            _modelTableItems(){
 //                let its = this.modelTableItems.map((i) => {
 //                    let field = this._formItems.find((a) => a.name === i.name) || {}

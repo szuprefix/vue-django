@@ -5,13 +5,21 @@
                 <slot name="actions"></slot>
             </el-col>
             <el-col :span="4" class="flex-right">
-                <el-button type="primary" @click="onSubmit" :title="formSubmitName || '保存'">
-                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                </el-button>
+                <slot name="actions">
+                    <el-button-group>
+                        <el-button type="primary" :title="a.title" @click="a.do" v-for="a in top_actions"
+                                   :key="a.name">
+                            <i :class="`fa fa-${a.icon}`"></i>
+                        </el-button>
+                    </el-button-group>
+                </slot>
+
             </el-col>
         </el-row>
-        <r-form :formUrl="formUrl" :formItems="modelFormItems" v-model="formValue" ref="form" @beforesubmit="onBeforeSubmit" :formInline="formInline"
-                :formMethod="formMethod" @form-posted="modelFormOnPosted" :formSubmit="modelFormSubmit" :formTextareaSize="formTextareaSize">
+        <r-form :formUrl="formUrl" :formItems="modelFormItems" v-model="formValue" ref="form"
+                @beforesubmit="onBeforeSubmit" :formInline="formInline"
+                :formMethod="formMethod" @form-posted="modelFormOnPosted" :formSubmit="modelFormSubmit"
+                :formTextareaSize="formTextareaSize">
             <span slot="submit"></span>
         </r-form>
     </div>
@@ -26,8 +34,13 @@
         props: {
             appModelName: String,
             value: Object,
-            id:[Number,String],
-            onFormPosted: Function
+            id: [Number, String],
+            onFormPosted: Function,
+            topActionList: {
+                type: Array, default: function () {
+                    return ['save']
+                }
+            }
         },
         data () {
             return {}
@@ -40,16 +53,30 @@
         },
         methods: {
             onBeforeSubmit(values){
-               this.$emit("beforesubmit", values)
+                this.$emit("beforesubmit", values)
             },
             onSubmit(){
                 this.$refs.form.onSubmit()
-            }
+            },
 
+            get_actions(action_list){
+                return action_list.map((a) => {
+                    let d = this.modelFormAvairableActions[a]
+                    d.name = a
+                    return d
+                })
+            },
+
+
+        },
+        computed: {
+            top_actions(){
+                return this.get_actions(this.topActionList)
+            }
         },
         watch: {
             modelData(val){
-               this.$emit("input", val)
+                this.$emit("input", val)
 
             }
         }
