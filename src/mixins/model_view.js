@@ -85,9 +85,12 @@ export default {
             return promise.then(({data}) => {
                 this.modelId = data.id
                 this.modelData = Object.assign({}, this.modelData, data)
-                store.state.bus.$emit('model-posted', {model: this.modelConfig})
+                this.modelEmitPosted()
                 return data
             })//.catch((error) => this.onErrors(error))
+        },
+        modelEmitPosted(){
+            store.state.bus.$emit('model-posted', {model: this.modelConfig})
         },
         onErrors(error){
             if (error.code === 400) {

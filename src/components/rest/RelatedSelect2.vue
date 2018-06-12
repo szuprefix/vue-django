@@ -1,10 +1,10 @@
 <template>
     <span>
         <el-select v-model="value" :multiple="field.multiple" filterable @change="changed" remote
-                   :remote-method="onFilter" class="related-select"
+                   :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
                    :loading="loading" :loading-text="loading" :placeholder="field.placeholder || `请选择${field.label}`">
             <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
-                       v-for="c,i in tableData" :key="i"></el-option>
+                       v-for="c,i in tableData" :key="c.id || c.pk || c.url || c.name"></el-option>
         </el-select>
         <el-button @click="tableToCreateModel" size="mini" v-if="showCreate">
             <i class="fa fa-plus" :title="`新增${field.label}`"></i>
@@ -15,19 +15,21 @@
     import model_view from '../../mixins/model_view'
     import table_view from '../../mixins/table_view'
     export default{
-        mixins:[model_view, table_view],
+        mixins: [model_view, table_view],
         props: {
             placeholder: String,
             field: Object,
-            showCreate: {type:Boolean, default:true},
+            showCreate: {type: Boolean, default: true},
             value: [String, Number, Array]
         },
         data () {
-            return {
-            }
+            return {}
         },
         created(){
-            this.appModelName=this.field.model
+            if (this.field.queries) {
+                this.tableUpdateQueries(this.field.queries)
+            }
+            this.appModelName = this.field.model
             this.modelInit()
             this.tableUrl = this.modelListUrl
             this.tablePageSize = 200
@@ -54,7 +56,7 @@
     }
 </script>
 <style>
-    .related-select{
-        width:180px;
+    .related-select {
+        width: 180px;
     }
 </style>
