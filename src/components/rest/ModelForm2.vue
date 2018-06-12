@@ -7,9 +7,9 @@
             <el-col :span="4" class="flex-right">
                 <slot name="actions">
                     <el-button-group>
-                        <el-button type="primary" :title="a.title" @click="a.do" v-for="a in top_actions"
+                        <el-button :type="a.type" :title="a.title" @click="a.do" v-for="a in top_actions"
                                    :key="a.name">
-                            <i :class="`fa fa-${a.icon}`"></i>
+                            <i :class="`fa fa-${a.icon}`"></i>{{a.label}}
                         </el-button>
                     </el-button-group>
                 </slot>
@@ -61,9 +61,12 @@
 
             get_actions(action_list){
                 return action_list.map((a) => {
-                    let d = this.modelFormAvairableActions[a]
-                    d.name = a
-                    return d
+                    if (typeof a == 'string' || a instanceof String) {
+                        let d = this.modelFormAvairableActions[a]
+                        d.name = a
+                        return d
+                    }
+                    return a
                 })
             },
 

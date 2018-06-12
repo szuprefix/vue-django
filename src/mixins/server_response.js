@@ -32,7 +32,7 @@ export default  {
         }
     },
     methods: {
-
+        joinErrors,
         submitData: function (url, data, successMsg, isCreate) {
             this.loading = true
             this.errors = {}
@@ -48,6 +48,12 @@ export default  {
             }).catch(this.onServerResponseError)
             return promise
         },
+        alertError(error){
+            this.$message({
+                message: `${error.code}错误:${error.msg}`, type: 'error'
+            })
+
+        },
         onServerResponseError: function (error) {
             this.loading = false
             if(error == 'cancel'){  // confirm dialog cancel ?
@@ -61,9 +67,7 @@ export default  {
             } else if (error.code === 401) {
                 // this.$router.replace('/auth/login/')
             } else {
-                this.$message({
-                    message: `${error.code}错误:${error.msg}`, type: 'error'
-                })
+                this.alertError(error)
             }
         }
     }

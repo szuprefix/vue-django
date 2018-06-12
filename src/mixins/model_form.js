@@ -13,7 +13,9 @@ export default {
                 'save': {
                     icon: 'floppy-o',
                     title: '保存',
-                    do: this.onSubmit
+                    label: '',
+                    do: this.onSubmit,
+                    type: 'primary'
                 }
             },
         }

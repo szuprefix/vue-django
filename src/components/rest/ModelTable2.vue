@@ -38,6 +38,7 @@
         <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange"
                   @filter-change="onFilterChanged" v-loading="loading" :element-loading-text="loading">
             <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
+                             :min-width="f.min_width" :width="f.width"
                              :sortable="modelTableOrderingFields.includes(f.name) && 'custom'" :class-name="f.type"
                              :type="f.type" :filters="modelTableFilters[f.name]" v-for="f in modelTableItems"
                              :key="f.name">
