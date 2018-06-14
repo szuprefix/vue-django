@@ -103,7 +103,7 @@ export default {
             }
         },
         tableToEditModel (row, column, cell, event){
-            this.$router.replace(`${row.id}/`)
+            this.$router.replace(`/${this.appModelName.replace('.','/')}/${row.id}/`)
         },
         tableToCreateModel(){
             let url = `${this.modelListUrl}create/?${this.modelConfig.title_field}=${this.tableQueries.search}`

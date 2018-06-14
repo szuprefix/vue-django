@@ -16,6 +16,13 @@ export default {
                     label: '',
                     do: this.onSubmit,
                     type: 'primary'
+                },
+                'refresh': {
+                    icon: 'refresh',
+                    title: '刷新',
+                    label: '',
+                    do: this.modelLoad,
+                    type: 'default'
                 }
             },
         }

@@ -11,7 +11,9 @@
         computed:{
             now(){
                 let s = this.value[this.prop]
-//                console.log(s)
+                if(s == null){
+                    return ""
+                }
                 return formatTime(new Date(s))
             }
         }
