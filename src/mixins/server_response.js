@@ -66,6 +66,8 @@ export default  {
                 this.errors = this.formErrors = joinErrors(error.msg)
             } else if (error.code === 401) {
                 // this.$router.replace('/auth/login/')
+            } else if (error.code === 502){
+                this.alertError("网关错误")
             } else {
                 this.alertError(error)
             }

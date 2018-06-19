@@ -13,10 +13,10 @@
                 </el-input>
                 <template v-for="f in modelTableFilterFields">
                     <el-checkbox v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"
-                                 @change="tableLoad" v-if="f.type=='boolean'">{{f.label}}
+                                 @change="tableUpdateQueries" v-if="f.type=='boolean'">{{f.label}}
                     </el-checkbox>
-                    <related-select :field="f" v-model="tableQueries[f.name]"
-                                    style="width: 120px" :showCreate="false" v-else></related-select>
+                    <related-select :field="f" v-model="tableQueries[f.name]"  @input="tableUpdateQueries"
+                                    style="width: 120px" :showCreate="false" v-if="f.model"></related-select>
                     &nbsp;
                 </template>
                 <!--<el-button @click="tableLoad"-->
@@ -123,6 +123,7 @@
             },
             onFilterChanged(filters){
                 console.log(filters)
+                this.tableUpdateQueries(filters)
             },
             onSortChange(payLoad){
                 this.tableUpdateQueries({ordering: (payLoad.order == 'descending' ? '-' : '') + payLoad.prop})

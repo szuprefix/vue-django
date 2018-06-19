@@ -17,16 +17,16 @@
                 </template>
                 <template slot-scope="{row}">
                     <!--<el-button title="编辑" size="mini" @click="showEditForm(row)">-->
-                        <!--<i :class="`fa fa-pencil`"></i>-->
+                    <!--<i :class="`fa fa-pencil`"></i>-->
                     <!--</el-button>-->
-                    <el-button title="保存" size="mini" @click="saveRow(row)">
+                    <el-button title="保存" size="mini" @click="saveRow(row)" v-if="readOnly == false">
                         <i :class="`fa fa-save`"></i>
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
         <div class="flex-right">
-            <el-button title="新增" size="small" @click="showEditForm()">
+            <el-button title="新增" size="small" @click="showEditForm()" v-if="readOnly == false">
                 <i class="fa fa-plus"></i>
             </el-button>
         </div>
@@ -63,6 +63,9 @@
                 type: Array, default: function () {
                     return []
                 }
+            },
+            readOnly:{
+                type: Boolean, default: false
             }
         },
         mounted (){
@@ -127,7 +130,7 @@
             formEditItems(){
 //                console.log(this.editFields)
                 if (this.editFields.length == 0) {
-                    return this.modelFormItems
+                    return [] //this.modelFormItems
                 }
                 return this.modelFormItems.filter((a) => this.editFields.includes(a.name))
 

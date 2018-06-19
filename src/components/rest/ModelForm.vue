@@ -1,10 +1,10 @@
 <template>
     <div>
         <el-row type="flex" justify="space-between" style="padding-bottom: 20px;">
-            <el-col :span="20">
+            <el-col :span="18">
                 <slot name="actions"></slot>
             </el-col>
-            <el-col :span="4" class="flex-right">
+            <el-col :span="6" class="flex-right">
                 <el-button type="primary" @click="onSubmit" :title="options.submitName || '保存'">
                     <i class="fa fa-floppy-o" aria-hidden="true"></i>
                 </el-button>

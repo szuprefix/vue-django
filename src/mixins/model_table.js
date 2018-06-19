@@ -5,6 +5,7 @@ import model_view from './model_view'
 import table_view from './table_view'
 
 import TrueFlag from '../components/widgets/TrueFlag.vue'
+import ChoicesDisplay from '../components/widgets/ChoicesDisplay.vue'
 import Date2Now from '../components/widgets/Date2Now.vue'
 import ForeignKey from '../components/widgets/ForeignKey.vue'
 export default {
@@ -103,7 +104,7 @@ export default {
             }
         },
         tableToEditModel (row, column, cell, event){
-            this.$router.replace(`/${this.appModelName.replace('.','/')}/${row.id}/`)
+            this.$router.replace(`/${this.appModelName.replace('.', '/')}/${row.id}/`)
         },
         tableToCreateModel(){
             let url = `${this.modelListUrl}create/?${this.modelConfig.title_field}=${this.tableQueries.search}`
@@ -118,13 +119,14 @@ export default {
                     if (!field) {
                         console.error(`field ${i} not found`)
                     }
-                    a = {name: i, label: field.label || field.name, type: field.type, model: field.model, field}
+                    a = {name: i, label: field.label || field.name, type: field.type, model: field.model, choices:field.choices, field}
                 } else {
                     field = this.modelFieldConfigs[i.name]
                     a = Object.assign({}, {
                         label: field.label || field.name,
                         type: field.type,
                         model: field.model,
+                        choices:field.choices,
                         field
                     }, i)
                 }
@@ -137,7 +139,10 @@ export default {
 
         tableDefaultWidget(f){
             // console.log(f)
-            return f.model ? ForeignKey : (f.type == 'boolean' ? TrueFlag : ( ['datetime', 'date'].includes(f.type) ? Date2Now : undefined))
+            return f.model ? ForeignKey :
+                (f.type == 'boolean' ? TrueFlag :
+                    ( ['datetime', 'date'].includes(f.type) ? Date2Now :
+                        f.choices ? ChoicesDisplay : undefined))
         },
         choices2selectOptions(choices){
             return choices.map((a) => {
