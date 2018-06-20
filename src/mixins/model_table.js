@@ -159,6 +159,9 @@ export default {
                 if (f.choices) {
                     filters[`${k}_name`] = filters[k] = this.choices2selectOptions(f.choices)
                 }
+                // else if(f.type == 'boolean'){
+                //     filters[k] = [{text:'是', value:true},{text:'否', value:false}]
+                // }
             })
             return filters
         }

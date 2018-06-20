@@ -12,9 +12,9 @@
                         v-if="modelTableSearchFields.length>0">
                 </el-input>
                 <template v-for="f in modelTableFilterFields">
-                    <el-checkbox v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"
-                                 @change="tableUpdateQueries" v-if="f.type=='boolean'">{{f.label}}
-                    </el-checkbox>
+                    <el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"
+                                 @change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}
+                    </el-switch>
                     <related-select :field="f" v-model="tableQueries[f.name]"  @input="tableUpdateQueries"
                                     style="width: 120px" :showCreate="false" v-if="f.model"></related-select>
                     &nbsp;
