@@ -122,8 +122,17 @@
 //                return row[property] === value
             },
             onFilterChanged(filters){
-                console.log(filters)
-                this.tableUpdateQueries(filters)
+                let d = {}
+                Object.keys(filters).forEach( (a) => {
+                    let v = filters[a]
+                    if(v instanceof Array){
+                        d[`${a}__in`] = v.join(",")
+                    }else{
+                        d[a] = v
+                    }
+                })
+                console.log(d)
+                this.tableUpdateQueries(d)
             },
             onSortChange(payLoad){
                 this.tableUpdateQueries({ordering: (payLoad.order == 'descending' ? '-' : '') + payLoad.prop})
