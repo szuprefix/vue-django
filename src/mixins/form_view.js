@@ -100,7 +100,7 @@ export default{
 
         },
         formDefaultWidget (f) {
-            return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime'].includes(f.type) ? f.type : ( ['integer'].includes(f.type) ? 'number' : 'text'))
+            return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime'].includes(f.type) ? f.type : ( ['integer','decimal'].includes(f.type) ? 'number' : 'text'))
         },
         formDefaultRuleType(f){
             if (f.multiple) {

@@ -15,7 +15,7 @@
         <el-switch v-model="value[field.name]" on-text="开" off-text="关"
                    v-else-if="field.widget === 'checkbox'" @change="fieldValueChanged">
         </el-switch>
-        <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'" @change="fieldValueChanged">
+        <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'" :controls="field.type === 'integer'" @change="fieldValueChanged">
         </el-input-number>
         <el-date-picker v-model="value[field.name]" :type="field.widget"
                         :placeholder="field.label" v-else-if="field.widget == 'date' " @change="fieldValueChanged">

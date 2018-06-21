@@ -13,14 +13,14 @@
                 </el-input>
                 <template v-for="f in modelTableFilterFields">
                     <el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"
-                                 @change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}
+                               @change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}
                     </el-switch>
-                    <related-select :field="f" v-model="tableQueries[f.name]"  @input="tableUpdateQueries"
+                    <related-select :field="f" v-model="tableQueries[f.name]" @input="tableUpdateQueries"
                                     style="width: 120px" :showCreate="false" v-if="f.model"></related-select>
                     &nbsp;
                 </template>
                 <!--<el-button @click="tableLoad"-->
-                           <!--v-if="modelTableSearchFields.length>0"><i class="fa fa-search"></i></el-button>-->
+                <!--v-if="modelTableSearchFields.length>0"><i class="fa fa-search"></i></el-button>-->
             </el-col>
             <el-col :span="8">
                 <div class="flex-right">
@@ -61,12 +61,12 @@
             </el-table-column>
         </el-table>
         <el-pagination v-if="showPagger"
-                background
-                layout="total, sizes, prev, pager, next, jumper"
-                :page-size="tablePageSize"
-                :current-page.sync="tablePage"
-                @size-change="tableOnPageSizeChanged"
-                :total="tableCount">
+                       background
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :page-size="tablePageSize"
+                       :current-page.sync="tablePage"
+                       @size-change="tableOnPageSizeChanged"
+                       :total="tableCount">
         </el-pagination>
     </div>
 </template>
@@ -109,9 +109,13 @@
         methods: {
             get_actions(action_list){
                 return action_list.map((a) => {
-                    let d = this.modelTableAvairableActions[a]
-                    d.name = a
-                    return d
+                    if (a instanceof Object) {
+                        return a
+                    } else {
+                        let d = this.modelTableAvairableActions[a]
+                        d.name = a
+                        return d
+                    }
                 })
             },
 
@@ -123,11 +127,11 @@
             },
             onFilterChanged(filters){
                 let d = {}
-                Object.keys(filters).forEach( (a) => {
+                Object.keys(filters).forEach((a) => {
                     let v = filters[a]
-                    if(v instanceof Array){
+                    if (v instanceof Array) {
                         d[`${a}__in`] = v.join(",")
-                    }else{
+                    } else {
                         d[a] = v
                     }
                 })
