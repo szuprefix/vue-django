@@ -59,8 +59,10 @@ export default {
         },
         modelEmptyDataFromOptions(m){
             let r = {}
+            console.log(this.$route.query)
             Object.keys(m).forEach((k) => {
                 let f = m[k]
+                // if(this.$router)
                 r[k] = f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null
             })
             return r

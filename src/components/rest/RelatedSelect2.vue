@@ -6,9 +6,10 @@
             <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
                        v-for="c,i in tableData" :key="c.id || c.pk || c.url || c.name"></el-option>
         </el-select>
-        <el-button @click="tableToCreateModel" size="mini" v-if="showCreate">
-            <i class="fa fa-plus" :title="`新增${field.label}`"></i>
-        </el-button>
+            <i class="fa fa-plus" :title="`新增${field.label}`" @click="toCreateModel" v-if="showCreate"
+               style="cursor: pointer">
+
+            </i>
     </span>
 </template>
 <script>
@@ -32,7 +33,7 @@
             this.appModelName = this.field.model
             this.modelInit()
             this.tableUrl = this.modelListUrl
-            this.tablePageSize = 200
+            this.tablePageSize = 2000
             this.tableLoad()
         },
         methods: {
@@ -41,6 +42,11 @@
             },
             onFilter(search){
                 this.tableUpdateQueries({search})
+            },
+            toCreateModel(row){
+                let url = `${this.tableUrl}create/?${this.modelConfig.title_field}=${this.tableQueries.search}`
+                console.log(url)
+                this.$router.push(url)
             }
         },
         computed: {
