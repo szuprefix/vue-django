@@ -26,7 +26,7 @@ export default{
             type: String, default: null
         },
         formLabelWidth: {
-            type: String, default: '160px'
+            type: String, default: '8rem'
         },
         formTextareaSize: {
             type: Object, default(){
@@ -112,7 +112,7 @@ export default{
             return f.model ? 'number' : (f.type == 'field' ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
         },
         formDefaultSpan(f){
-            return f.widget == 'textarea' ? {xs: 24, sm: 24, md: 24, xl: 24} : {xs: 24, sm: 12, md: 8, xl: 6}
+            return f.widget == 'textarea' ? {xs: 24, sm: 24, md: 24, lg:24, xl: 24} : {xs: 24, sm: 24, md: 12, lg:8, xl: 6}
         },
         formDefaultRules(f){
             let rs = []

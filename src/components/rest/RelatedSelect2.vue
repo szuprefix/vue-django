@@ -63,6 +63,6 @@
 </script>
 <style>
     .related-select {
-        width: 180px;
+        width: 24rem;
     }
 </style>
