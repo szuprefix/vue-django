@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="form-field">
         <!--{{field}}-->
         <template v-if="field.widget === 'readonly'">
           {{value[field.name]}}
@@ -61,4 +61,24 @@
         computed: {}
     }
 </script>
-<style scoped></style>
+
+<style>
+    .form-field .related-select {
+        width: 24rem;
+    }
+    @media screen and (max-width:1920px ) {
+        .form-field .related-select {
+            width: 18rem;
+        }
+    }
+    @media screen and (max-width:1200px ) {
+        .form-field .related-select {
+            width: 12rem;
+        }
+    }
+    @media screen and (max-width:992px ) {
+        .form-field .related-select {
+            width: 24rem;
+        }
+    }
+</style>

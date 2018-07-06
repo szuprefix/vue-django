@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-row :gutter="20" v-if="showTopBar">
+        <el-row :gutter="20" v-if="showTopBar"  class="filterbox">
             <el-col :span="16">
                 <el-input
                         :placeholder="`搜索${modelTableSearchFieldNames}`"
@@ -15,8 +15,7 @@
                     <el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"
                                @change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}
                     </el-switch>
-                    <related-select :field="f" v-model="tableQueries[f.name]" @input="tableUpdateQueries"
-                                    style="width: 120px" :showCreate="false" v-if="f.model"></related-select>
+                    <related-select :field="f" v-model="tableQueries[f.name]" @input="tableUpdateQueries" :showCreate="false" v-if="f.model"></related-select>
                     &nbsp;
                 </template>
                 <!--<el-button @click="tableLoad"-->
@@ -70,6 +69,11 @@
         </el-pagination>
     </div>
 </template>
+<style>
+    .filterbox .related-select {
+        width: 10rem;
+    }
+</style>
 <script>
     import model_table from '../../mixins/model_table'
     import RelatedSelect from './RelatedSelect2.vue'

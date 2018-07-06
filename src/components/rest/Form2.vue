@@ -15,7 +15,7 @@
                         <template slot="label" v-if="!formNoLabel">{{f.label}}
                             <el-tooltip placement="top" v-if="f.help_text">
                                 <div slot="content" v-html="f.help_text"></div>
-                                <i class="fa fa-info-circle bg-info"></i>
+                                <i class="fa fa-info-circle bg-info" tabindex="-1"></i>
                             </el-tooltip>
                         </template>
                         <template slot="label" v-else><span></span></template>

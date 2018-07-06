@@ -87,7 +87,7 @@ export default {
         modelData(val)
         {
             this.formValue = Object.assign({}, val)
-
+            this.$emit("change", val)
         }
     }
 

@@ -61,8 +61,3 @@
         }
     }
 </script>
-<style>
-    .related-select {
-        width: 24rem;
-    }
-</style>

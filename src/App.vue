@@ -4,7 +4,7 @@
             <el-menu-item index="/" class="brand"><img :src="logo" height="32"><b v-if="user.as_saas_worker">{{user.as_saas_worker.party}}</b>{{system_name}}</el-menu-item>
             <el-submenu index="2" style="float:right">
                 <template slot="title">{{user.name}}</template>
-                <el-menu-item index="/" @click="$store.dispatch('logout')">退出登录</el-menu-item>
+                <el-menu-item index="/" @click="logout">退出登录</el-menu-item>
                 <el-menu-item index="/auth/change_password/">修改密码</el-menu-item>
             </el-submenu>
         </el-menu>
@@ -36,7 +36,14 @@
             LoginView,
         },
         computed: mapState(['user', 'system_name', 'logo']),
-        methods: {}
+        methods: {
+            logout(){
+                this.$confirm("确定要退出登录吗?").then(()=> {
+                    this.$store.dispatch('logout')
+
+                }).catch(this.onServerResponseError)
+            }
+        }
     }
 </script>
 
