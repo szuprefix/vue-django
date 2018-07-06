@@ -137,7 +137,7 @@ export default{
             a.rules = a.rules || this.formDefaultRules(a)
             a.widget = a.widget || this.formDefaultWidget(a)
             let sp = a.span
-            a.span = sp && (typeof  sp === 'number' && {xs:sp,sm:sp,md:sp,lg:sp,xl:sp}) || {}
+            a.span = sp && (typeof  sp === 'number' && {xs:sp,sm:sp,md:sp,lg:sp,xl:sp} || sp) || {}
             a.span = Object.assign({}, this.formDefaultSpan(a), a.span)
             return a
         },

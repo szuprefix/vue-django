@@ -8,7 +8,7 @@
             <el-alert :title="formErrors.non_field_errors" type="error" v-if="formErrors.non_field_errors"
                       :closable="false"></el-alert>
             <el-row>
-                <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :xl="f.span.xl"
+                <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
                         v-for="f in _formItems" :key="f.name" v-if="f.widget !== 'hidden'">
                     <el-form-item :prop="f.name" :rules="f.rules" :label="f.label" :error="formErrors[f.name]"
                                   :ref="f.name" :style="formNoLabel && {} || formItemStyle">
