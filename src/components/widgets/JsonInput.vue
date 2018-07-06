@@ -1,10 +1,11 @@
 <template>
-    <el-input v-model="valueStr" type="textarea" :autosize="{ minRows: 2, maxRows: 10}" @change="onChange"></el-input>
+    <el-input v-model="valueStr" :autosize="field.autosize || { minRows: 4, maxRows: 10}" type="textarea" @change="onChange"></el-input>
 </template>
 <script>
     export default{
         props: {
-            value: Object
+            value: Object,
+            field:Object
         },
         data () {
             return {
