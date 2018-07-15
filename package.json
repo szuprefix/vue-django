@@ -1,6 +1,6 @@
 {
   "name": "vue-django",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "description": "personal experiment",
   "main": "index.js",
   "files": [

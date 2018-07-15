@@ -10,7 +10,10 @@
 .el-table__row:hover .hover-show {
     visibility: visible;
     cursor: pointer;
-    font-size: 18px;
+    /*font-size: 18px;*/
+}
+.hover-show__parent:hover .hover-show {
+    visibility: visible;
 }
 .table-row-actions .fa{
     /*margin: 10px 0;*/

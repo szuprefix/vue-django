@@ -66,6 +66,11 @@ export default {
                     icon: 'pencil',
                     title: '编辑',
                     do: this.tableToEditModel
+                },
+                'batch':{
+                    icon: 'archive',
+                    title: '批量创建',
+                    do: this.tableToBatchCreateModel
                 }
             }
         }
@@ -105,6 +110,11 @@ export default {
         },
         tableToEditModel (row, column, cell, event){
             this.$router.replace(`/${this.appModelName.replace('.', '/')}/${row.id}/`)
+        },
+        tableToBatchCreateModel (){
+            let url = `${this.modelListUrl}batch/?${this.modelConfig.title_field}=${this.tableQueries.search}`
+            console.log(url)
+            this.$router.push(url)
         },
         tableToCreateModel(){
             let url = `${this.modelListUrl}create/?${this.modelConfig.title_field}=${this.tableQueries.search}`
