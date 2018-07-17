@@ -2,7 +2,7 @@
  * Created by denishuang on 2017/7/27.
  */
 import Qs from 'qs'
-import moment from 'moment'
+import { format } from 'date-fns'
 function joinErrors(errors) {
     let es = {}
     for (let n in errors) {
@@ -16,7 +16,7 @@ function formatDates(data) {
     for (let n in data) {
         let d = data[n]
         if (d instanceof Date) {
-            rs[n] = moment(d).format('YYYY-MM-DD')
+            rs[n] = format(d, 'YYYY-MM-DD')
         } else {
             rs[n] = d
         }

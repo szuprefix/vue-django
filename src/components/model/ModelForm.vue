@@ -47,7 +47,7 @@
 <script>
     import server_response from '../../mixins/server_response'
     import Qs from 'qs'
-    import moment from 'moment'
+    import { format } from 'date-fns'
     export default{
         props: {
             url: String,
@@ -158,9 +158,9 @@
                     let v = this.formData[n]
                     if (v instanceof Date) {
                         if (dt === 'date') {
-                            r[n] = moment(v).format('YYYY-MM-DD')
+                            r[n] = format(v, 'YYYY-MM-DD')
                         } else if (dt === 'datetime') {
-                            r[n] = moment(v).format('YYYY-MM-DD HH:mm:ss')
+                            r[n] = format(v, 'YYYY-MM-DD HH:mm:ss')
                         }
                     } else {
                         r[n] = v

@@ -1,14 +1,14 @@
 <template>
     <el-dialog title="登录" :visible="!(user.id>0)" :show-close="false"
                :close-on-click-modal="false">
-        <rest-form url="/auth/user/login/" :values="form" :fieldItems="fieldItems"
-                   :options="{'labelWidth':'20%','submitButtonText':'登录'}" @form-posted="done"></rest-form>
+        <rest-form formUrl="/auth/user/login/" v-model="form" :formItems="fieldItems"
+                   formSubmitName="登录" formLabelWidth="20%" @form-posted="done"></rest-form>
     </el-dialog>
 
 </template>
 <script>
     import {mapState} from 'vuex'
-    import RestForm from '../../components/rest/Form.vue'
+    import RestForm from '../../components/rest/Form2.vue'
     export default{
         data () {
             return {
