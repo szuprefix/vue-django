@@ -1,23 +1,15 @@
 /**
  * Created by denishuang on 2017/11/16.
  */
-import moment from 'moment'
-moment.locale('zh_CN')
+import { formatRelative, subDays, distance_in_words_to_now } from 'date-fns'
+import zh_cn from 'date-fns/locale/zh_cn'
 export function date2now(d) {
     "use strict";
-    return moment(d).toNow()
+    return d
 }
 
 export function date(d) {
-    "use strict";
-    let md = moment(d)
-    let now = moment()
-    return md.format(md.year() == now.year() ? 'MM-DD hh:mm' : 'YYYY-MM-DD hh:mm')
-    if (md.isBefore(moment().subtract(1, 'days'))) {
-        return md.format('YYYY-MM-DD hh:mm')
-    } else {
-        return md.toNow()
-    }
+    return distance_in_words_to_now(d, { locale: zh_cn})
 }
 
 function pluralize(time, label) {
