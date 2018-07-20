@@ -132,13 +132,17 @@ export default {
                     a = {name: i, label: field.label || field.name, type: field.type, model: field.model, choices:field.choices, field}
                 } else {
                     field = this.modelFieldConfigs[i.name]
-                    a = Object.assign({}, {
-                        label: field.label || field.name,
-                        type: field.type,
-                        model: field.model,
-                        choices:field.choices,
-                        field
-                    }, i)
+                    if(field) {
+                        a = Object.assign({}, {
+                            label: field.label || field.name,
+                            type: field.type,
+                            model: field.model,
+                            choices: field.choices,
+                            field
+                        }, i)
+                    }else{
+                        a=i
+                    }
                 }
 
                 a.widget = a.widget || this.tableDefaultWidget(a)

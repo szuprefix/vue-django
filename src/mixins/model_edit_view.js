@@ -34,6 +34,9 @@ export  default {
         },
         setTitle(){
             this.tab.title = this.$refs.form.modelFormTitle
+        },
+        load(){
+            return this.$refs.form.modelLoad()
         }
     },
     computed: {

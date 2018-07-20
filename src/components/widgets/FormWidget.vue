@@ -24,7 +24,7 @@
                         :placeholder="field.label" v-else-if="field.widget == 'datetime' " @change="fieldValueChanged">
         </el-date-picker>
         <el-input v-model="value[field.name]"
-                  :autosize="field.autosize || {minRows: 4, maxRows: 8}"  @change="fieldValueChanged"
+                  :autosize="field.autosize || {minRows: 8, maxRows: 24}"  @change="fieldValueChanged"
                   :placeholder="[field.label, field.help_text].join('\n')" type="textarea"
                   v-else-if="field.widget === 'textarea'"></el-input>
         <component :is="field.widget" v-else-if="typeof field.widget == 'object'"  @change="fieldValueChanged"
