@@ -44,8 +44,10 @@
 <script>
     //    import {Paper} from '../../utils/paper'
     //    import PaperView from './Paper.vue'
+    import ForeignKeyTranslater from '../../utils/foreign_key_translater'
     import {debounce} from 'lodash'
     import model_view from '../../mixins/model_view'
+    import Qs from 'qs'
     export default{
         mixins: [model_view],
         model: {
@@ -62,7 +64,8 @@
                 type: Object, default: () => {
                     return {}
                 }
-            }
+            },
+            pk: {type: String, default: 'code'}
         },
         data () {
             return {
@@ -73,7 +76,8 @@
                 currentValue: null,
                 splitChar: ',',
                 began: false,
-                queueIndex: 0
+                queueIndex: 0,
+                tmap: {}
             }
         },
         components: {
@@ -81,9 +85,25 @@
         },
         mounted (){
             this.currentValue = this.value
-            this.modelLoadOptions().then(this.genRecords)
+            this.modelLoadOptions().then(this.loadForeignKeyTranslater).then(this.genRecords)
         },
         methods: {
+            loadForeignKeyTranslater(){
+                Object.keys(this.modelFieldConfigs).forEach((fn) => {
+                    let f = this.modelFieldConfigs[fn]
+                    if (f.model && f.multiple != true) {
+                        ForeignKeyTranslater.getMap(f.model).then((rs) => {
+                            let m = {}
+                            rs.forEach((d) => {
+                                m[d.name] = d.id
+                            })
+                            this.tmap[f.name] = {map: m, field: f}
+                            console.log(this.tmap)
+                        })
+                    }
+                })
+                return Promise.resolve()
+            },
             genRecords: debounce(function () {
                 this.began = false
                 let s = this.currentValue.trim()
@@ -136,16 +156,35 @@
                 r['_result'] = d
                 this.$set(this.records, i, r)
             },
+            translateForeignKey(a){
+                Object.keys(this.tmap).forEach((fn) => {
+                    let t = this.tmap[fn]
+                    let f = t.field
+                    let m = t.map
+                    a[f.name] = m[a[f.name]]
+                    console.log(a)
+                })
+
+            },
             postOne(){
                 let qi = this.queueIndex
                 if (qi < this.records.length) {
                     let a = Object.assign({}, this.baseValues, this.records[qi])
-                    this.modelId = undefined
-                    this.modelSave(a).then((data) => {
+                    this.translateForeignKey(a)
+                    let q = {}
+                    q[this.pk]=a[this.pk]
+                    this.$http.get(`${this.modelListUrl}?${Qs.stringify(q)}`).then(({data}) => {
+                        if(data.count>0){
+                            let r = data.results[0]
+                            a = Object.assign(r, a)
+                            return this.$http.put(`${this.modelListUrl}${a.id}/`, a)
+                        }else{
+                            return this.$http.post(`${this.modelListUrl}`,a)
+                        }
+                    }).then((data) => {
                         this.setResult(qi, {status: 'success', info: '成功'})
                     }).catch((error) => {
                         this.setResult(qi, {status: 'failed', info: error.msg})
-//                        console.log(this.records)
                     }).then(() => {
                         this.postOne()
                     })
