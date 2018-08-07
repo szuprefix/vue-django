@@ -42,7 +42,7 @@
     import model_form from '../../mixins/model_form'
     import model_table from '../../mixins/model_table'
     import FormWidget from '../widgets/FormWidget.vue'
-    import RForm from './Form2.vue'
+    import RForm from './Form.vue'
     export default{
         mixins: [model_table, model_form],
         props: {

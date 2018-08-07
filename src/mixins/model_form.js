@@ -3,7 +3,7 @@
  */
 import model_view from './model_view'
 import form_view from './form_view'
-import RelatedSelect from '../components/rest/RelatedSelect2.vue'
+import RelatedSelect from '../components/rest/RelatedSelect.vue'
 export default {
     mixins: [model_view, form_view],
     data(){

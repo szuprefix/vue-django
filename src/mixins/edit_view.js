@@ -2,7 +2,7 @@
 //  * Created by denishuang on 2018/3/4.
 //  */
 // import {Register} from '../utils/app_model'
-// import ModelForm from '../components/rest/ModelForm.vue'
+// import ModelForm from '../components/rest/ModelForm2.vue'
 // import server_response from './server_response'
 // export  default {
 //     props: {

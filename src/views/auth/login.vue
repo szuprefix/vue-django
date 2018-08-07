@@ -8,7 +8,7 @@
 </template>
 <script>
     import {mapState} from 'vuex'
-    import RestForm from '../../components/rest/Form2.vue'
+    import RestForm from '../../components/rest/Form.vue'
     export default{
         data () {
             return {

@@ -55,7 +55,7 @@ export default {
                 'refresh': {
                     icon: 'refresh',
                     title: '刷新',
-                    do: this.tableLoad
+                    do: this.modelTableRefresh
                 },
                 'create': {
                     icon: 'plus',
@@ -102,6 +102,9 @@ export default {
             if (model.fullName === this.appModelName || this.modelConfig.dependents && this.modelConfig.dependents.indexOf(model.fullName) >= 0) {
                 this.tableLoad()
             }
+        },
+        modelTableRefresh(){
+           this.tableLoad()
         },
         tableOnRowSelect(row, column, cell, event){
             if (this.rowActionList.includes('edit')) {

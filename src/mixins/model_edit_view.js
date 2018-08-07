@@ -1,7 +1,7 @@
 /**
  * Created by denishuang on 2018/4/25.
  */
-import ModelForm from '../components/rest/ModelForm2.vue'
+import ModelForm from '../components/rest/ModelForm.vue'
 import server_response from './server_response'
 export  default {
     props: {

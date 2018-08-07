@@ -1,7 +1,7 @@
 /**
  * Created by denishuang on 2018/4/25.
  */
-import ModelTable from '../components/rest/ModelTable2.vue'
+import ModelTable from '../components/rest/ModelTable.vue'
 import server_response from './server_response'
 export  default {
     props: {

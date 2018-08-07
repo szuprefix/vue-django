@@ -5,7 +5,8 @@
     export default{
         props: {
             value: Object,
-            field:Object
+            field:Object,
+            defaultValue : [String, Object, Array]
         },
         data () {
             return {
@@ -18,7 +19,7 @@
         components: {},
         methods: {
             setValue(){
-                this.valueStr = JSON.stringify(this.value)
+                this.valueStr = JSON.stringify(this.value || this.defaultValue)
 
             },
             onChange(v){
