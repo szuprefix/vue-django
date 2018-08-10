@@ -51,22 +51,22 @@ export default {
                 a = Object.assign({}, this.modelFieldConfigs[i.name], i)
             }
             a.widget = a.widget || this.modelFormDefaultWidget(a)
-            if (a.choices) {
-                a.choices = this.modelFormatChoices(a.choices)
-            }
+            // if (a.choices) {
+            //     a.choices = this.modelFormatChoices(a.choices)
+            // }
             return a
         },
         modelFormNormalizeItems(formItems) {
             let items = formItems.map((i) => this.modelFormNormalizeItem(i))
             return items
         },
-        modelFormatChoices(cs)
-        {
-            if (cs.length < 1 || cs[0] instanceof Array) {
-                return cs
-            }
-            return cs.map((a) => [a.value, a.display_name])
-        },
+        // modelFormatChoices(cs)
+        // {
+        //     if (cs.length < 1 || cs[0] instanceof Array) {
+        //         return cs
+        //     }
+        //     return cs.map((a) => [a.value, a.display_name])
+        // },
         modelFormSubmit()
         {
             return this.modelSave(this.formValue)

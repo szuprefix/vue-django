@@ -5,12 +5,12 @@
           {{value[field.name]}}
         </template>
         <el-radio-group v-model="value[field.name]" v-else-if="field.widget === 'radio'" @change="fieldValueChanged">
-            <el-radio-button :label="c[0]" v-for="c in field.choices" :key="c[0]">{{ c[1] }}
+            <el-radio-button :label="c.value" v-for="c in field.choices" :key="c.value">{{ c.display_name}}
             </el-radio-button>
         </el-radio-group>
         <el-select v-model="value[field.name]" :multiple="field.multiple" filterable allow-create  @change="fieldValueChanged"
                    :placeholder="`请选择${field.label}`" v-else-if="field.widget === 'select'">
-            <el-option :label="c[1]" :value="c[0]" v-for="c in field.choices" :key="c[0]"></el-option>
+            <el-option :label="c.display_name" :value="c.value" v-for="c in field.choices" :key="c.value"></el-option>
         </el-select>
         <el-switch v-model="value[field.name]" on-text="开" off-text="关"
                    v-else-if="field.widget === 'checkbox'" @change="fieldValueChanged">
