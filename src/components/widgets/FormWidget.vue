@@ -23,6 +23,11 @@
         <el-date-picker v-model="value[field.name]" :type="field.widget"  value-format="yyyy-MM-ddTHH:mm:ssZ"
                         :placeholder="field.label" v-else-if="field.widget == 'datetime' " @change="fieldValueChanged">
         </el-date-picker>
+        <el-time-select v-model="value[field.name]" v-else-if="field.widget == 'time'" :picker-options="field.pickerOptions || {
+    start: '00:00',
+    step: '00:30',
+    end: '23:59'
+  }"></el-time-select>
         <el-input v-model="value[field.name]"
                   :autosize="field.autosize || {minRows: 8, maxRows: 24}"  @change="fieldValueChanged"
                   :placeholder="[field.label, field.help_text].join('\n')" type="textarea"

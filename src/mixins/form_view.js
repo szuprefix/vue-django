@@ -100,7 +100,7 @@ export default{
 
         },
         formDefaultWidget (f) {
-            return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime'].includes(f.type) ? f.type : ( ['integer','decimal'].includes(f.type) ? 'number' : 'text'))
+            return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime', 'time'].includes(f.type) ? f.type : ( ['integer','decimal'].includes(f.type) ? 'number' : 'text'))
         },
         formDefaultRuleType(f){
             if (f.multiple) {
@@ -109,7 +109,7 @@ export default{
             if (f.choices && f.choices.length > 0) {
                 return typeof f.choices[0][0]
             }
-            return f.model ? 'number' : (f.type == 'field' ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
+            return f.model ? 'number' : (['field','time'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
         },
         formDefaultSpan(f){
             return f.widget == 'textarea' ? {xs: 24, sm: 24, md: 24, lg:24, xl: 24} : {xs: 24, sm: 24, md: 12, lg:12, xl: 8}
