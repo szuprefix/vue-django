@@ -17,11 +17,8 @@
         </el-switch>
         <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'" :controls="field.type === 'integer'" @change="fieldValueChanged">
         </el-input-number>
-        <el-date-picker v-model="value[field.name]" :type="field.widget"
-                        :placeholder="field.label" v-else-if="field.widget == 'date' " @change="fieldValueChanged">
-        </el-date-picker>
         <el-date-picker v-model="value[field.name]" :type="field.widget"  value-format="yyyy-MM-ddTHH:mm:ssZ"
-                        :placeholder="field.label" v-else-if="field.widget == 'datetime' " @change="fieldValueChanged">
+                        :placeholder="field.label" v-else-if="['date','datetime'].includes(field.widget)" @change="fieldValueChanged">
         </el-date-picker>
         <el-time-select v-model="value[field.name]" v-else-if="field.widget == 'time'" :picker-options="field.pickerOptions || {
     start: '00:00',
