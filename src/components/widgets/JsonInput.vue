@@ -19,7 +19,7 @@
         components: {},
         methods: {
             setValue(){
-                this.valueStr = JSON.stringify(this.value || this.defaultValue)
+                this.valueStr = JSON.stringify(this.value || this.defaultValue, null, 4)
 
             },
             onChange(v){
