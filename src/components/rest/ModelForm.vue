@@ -50,6 +50,7 @@
         },
         created(){
             this.modelFormInit()
+            this.$on("model-delete", this.onDelete)
         },
         methods: {
             onBeforeSubmit(values){
@@ -58,7 +59,12 @@
             onSubmit(){
                 this.$refs.form.onSubmit()
             },
-
+            onDelete(){
+                this.$confirm('确定要删除吗?', '提示', {type: 'warning'}).then(() => {
+                    this.modelDelete()
+                    this.$emit("model-deleted", {model: this.modelConfig})
+                }).catch(this.onServerResponseError)
+            },
             get_actions(action_list){
                 return action_list.map((a) => {
                     if (typeof a == 'string' || a instanceof String) {

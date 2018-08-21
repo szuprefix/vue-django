@@ -23,6 +23,13 @@ export default {
                     label: '',
                     do: this.modelLoad,
                     type: 'default'
+                },
+                'delete': {
+                    icon: 'trash',
+                    title: '删除',
+                    label: '',
+                    do: this.modelFormToDelete,
+                    type: 'danger'
                 }
             },
         }
@@ -75,6 +82,9 @@ export default {
         {
             let payLoad = {model: this.modelConfig, data}
             this.$emit("form-posted", payLoad)
+        },
+        modelFormToDelete(){
+            this.$emit("model-delete",this)
         }
     },
     computed: {
