@@ -91,7 +91,7 @@ export default {
         },
         modelDelete(){
            return axios.delete(this.modelDetailUrl).then(({data}) => {
-              return data
+
            })
         },
         modelEmitPosted(){
