@@ -89,6 +89,11 @@ export default {
                 return data
             })//.catch((error) => this.onErrors(error))
         },
+        modelDelete(){
+           return axios.delete(this.modelDetailUrl).then(({data}) => {
+
+           })
+        },
         modelEmitPosted(){
             store.state.bus.$emit('model-posted', {model: this.modelConfig})
         },

@@ -6,8 +6,8 @@
                 <el-button type="plain" size="mini" icon="el-icon-view" @click="onView">预览</el-button>
             </el-button-group>
             <el-radio-group v-model="splitChar" size="mini">
-                <el-radio-button label="," title="字段用逗号分隔">,</el-radio-button>
                 <el-radio-button :label="'\t'" title="字段用Tab符分隔">TAB</el-radio-button>
+                <el-radio-button label="," title="字段用逗号分隔">,</el-radio-button>
                 <el-radio-button label="|" title="字段用竖线分隔">|</el-radio-button>
             </el-radio-group>
         </div>
@@ -74,7 +74,7 @@
                 showAnswer: false,
                 records: [],
                 currentValue: null,
-                splitChar: ',',
+                splitChar: '\t',
                 began: false,
                 queueIndex: 0,
                 tmap: {}

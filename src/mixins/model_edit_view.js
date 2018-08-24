@@ -19,7 +19,7 @@ export  default {
     mounted(){
 
         this.$refs.form.$on("form-posted", this.redirectToEdit)
-
+        this.$refs.form.$on("model-deleted", this.destroy)
     },
     methods: {
         redirectToEdit(payLoad){
@@ -37,6 +37,9 @@ export  default {
         },
         load(){
             return this.$refs.form.modelLoad()
+        },
+        destroy(){
+            this.$store.state.bus.$emit("tab-destroy", this.tab.name)
         }
     },
     computed: {

@@ -23,6 +23,17 @@ export default {
                     label: '',
                     do: this.modelLoad,
                     type: 'default'
+                },
+                'delete': {
+                    icon: 'trash',
+                    title: '删除',
+                    label: '',
+                    do: this.modelFormToDelete,
+                    type: 'danger'
+                },
+                'saveadd': {
+                    label: '保存并新增另一个',
+                    do: this.modelSaveAndAdd
                 }
             },
         }
@@ -47,6 +58,9 @@ export default {
             let a
             if (typeof i == 'string') {
                 a = this.modelFieldConfigs[i]
+                if(!a){
+                    console.error(i," not found in ",this.modelFieldConfigs)
+                }
             } else {
                 a = Object.assign({}, this.modelFieldConfigs[i.name], i)
             }
@@ -75,6 +89,14 @@ export default {
         {
             let payLoad = {model: this.modelConfig, data}
             this.$emit("form-posted", payLoad)
+        },
+        modelFormToDelete(){
+            this.$emit("model-delete",this)
+        },
+        modelSaveAndAdd(){
+            this.modelSave().then(()=> {
+                this.$route.replace(`${this.modelListUrl}create/`)
+            }).catch(this.onServerResponseError)
         }
     },
     computed: {

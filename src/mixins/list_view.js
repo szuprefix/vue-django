@@ -25,6 +25,7 @@ export default{
     modelTableFilters: filters,
     created(){
         this.$store.state.bus.$on('model-posted', this.onModelPosted)
+        this.$store.state.bus.$on('model-deleted', this.onModelPosted)
     },
     mounted () {
         this.model = Register.get(this.appModelName)

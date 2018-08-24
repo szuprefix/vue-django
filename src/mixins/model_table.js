@@ -77,9 +77,11 @@ export default {
     },
     created(){
         this.$store.state.bus.$on('model-posted', this.modelTableOnModelPosted)
+        this.$store.state.bus.$on('model-deleted', this.modelTableOnModelPosted)
     },
     beforeDestroy () {
         this.$store.state.bus.$off('model-posted', this.modelTableOnModelPosted)
+        this.$store.state.bus.$off('model-deleted', this.modelTableOnModelPosted)
     },
     components: {},
     methods: {
