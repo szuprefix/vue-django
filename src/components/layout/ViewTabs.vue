@@ -46,9 +46,16 @@
                 this.curTab = tab.name
             },
             changeRoute(newVal, oldVal){
+              console.log(newVal)
+              console.log(oldVal)
                 let to = newVal
-                let view = to.matched[0]
-                if (view === undefined) {
+                // let view = to.matched[0]
+                let view = null
+                if (to.length > 0) {
+                  view = to.matched[to.length-1]
+                }
+
+                if (view === null) {
                     if (to.path != '/') {
                         this.$message({message: `找不到该路径:${to.path}`, type: 'error'})
                     }
