@@ -33,6 +33,7 @@ export default{
                 return {minRows: 4, maxRows: 8}
             }
         },
+        formNoLabel: {type:Boolean, default:false},
         formItemStyle: {
             type: Object, default(){
                 return {minWidth: '350px'}

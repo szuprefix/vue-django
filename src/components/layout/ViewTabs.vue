@@ -52,8 +52,8 @@
                 let to = newVal
                 // let view = to.matched[0]
                 let view = null
-                if (to.length > 0) {
-                  view = to.matched[to.length-1]
+                if (to.matched.length > 0) {
+                  view = to.matched[to.matched.length-1]
                 }
 
                 if (view === null) {
