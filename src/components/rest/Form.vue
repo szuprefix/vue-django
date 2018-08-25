@@ -42,6 +42,10 @@
         ],
         props: {
             value: Object,
+            formNoLabel: {
+              type: Boolean,
+              default: () => true
+            }
         },
         components: {
             FormWidget

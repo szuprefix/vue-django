@@ -70,12 +70,11 @@ export default{
             this.toEditModel(row, column, cell, event)
         },
         toEditModel (row, column, cell, event){
-            this.$router.replace(`${row.id}/`)
+            this.$router.replace(this.resolveRoutePath(`${row.id}`))
         },
         toCreateModel(){
-            let url = `/${this.model.listUrl}create/?${this.model.title_field}=${this.queries.search}`
-            console.log(url)
-            this.$router.push(url)
+            let url = `/${this.model.listUrl}create?${this.model.title_field}=${this.queries.search}`
+            this.$router.push(this.resolveRoutePath(url))
         },
         onPageChanged (val) {
             this.page = val

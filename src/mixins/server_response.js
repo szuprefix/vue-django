@@ -28,7 +28,7 @@ export default  {
     data (){
         return {
             loading: false,
-
+            loadingText: '数据加载中...'
         }
     },
     methods: {
@@ -65,8 +65,7 @@ export default  {
             if (error.code === 400) {
                 this.errors = this.formErrors = joinErrors(error.msg)
             } else if (error.code === 401) {
-                // this.$router.replace('/auth/login/')
-                this.$store.state.bus.$emit("user-logout")
+                // this.$store.state.bus.$emit("user-logout")
             } else if (error.code === 502){
                 this.alertError("网关错误")
             } else {

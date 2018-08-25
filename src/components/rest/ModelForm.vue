@@ -32,7 +32,10 @@
             model_form
         ],
         props: {
-            appModelName: String,
+            appModelName: {
+              type: String,
+              default: () => ''
+            },
             value: Object,
             id: [Number, String],
             onFormPosted: Function,
@@ -43,7 +46,9 @@
             }
         },
         data () {
-            return {}
+            return {
+
+            }
         },
         components: {
             RForm

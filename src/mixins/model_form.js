@@ -38,6 +38,17 @@ export default {
             },
         }
     },
+
+    computed: {
+      formMethod () {
+        return this.modelId ? "put" : "post"
+      },
+
+      formUrl () {
+        return this.modelId ? this.modelDetailUrl : this.modelListUrl
+      }
+    },
+
     methods: {
         modelFormInit(){
             this.modelInit()
@@ -45,8 +56,8 @@ export default {
             // console.log(this.value)
             this.modelId = id === 'create' ? undefined : id
             this.modelLoad().then((data, options) => {
-                this.formMethod = this.modelId ? "put" : "post"
-                this.formUrl = this.modelId ? this.modelDetailUrl : this.modelListUrl
+                // this.formMethod = this.modelId ? "put" : "post"
+                // this.formUrl = this.modelId ? this.modelDetailUrl : this.modelListUrl
                 this.modelFormItems = this.formNormalizeItems(this.modelFormNormalizeItems(this.formItems))
             })
         },
