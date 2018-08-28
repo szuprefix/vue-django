@@ -107,7 +107,7 @@ export default {
         },
 
         resolveRoutePath(path) {
-          // wayky add : 根据isTagsView自动给路由路径处理结尾的 /
+          // wayky add : 根据isTagsView自动给路由路径处理结尾的 / , tagView 组件的去掉结尾的 /
           if (this.isTagsView) {
             return path
           } else {

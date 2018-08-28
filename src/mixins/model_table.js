@@ -119,12 +119,16 @@ export default {
         tableToEditModel (row, column, cell, event){
           // wayky edit
           this.$router.push(this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`))
+          this.$route.meta.title = `${row.__str__}`
         },
         tableToBatchCreateModel (){
           this.$router.push(this.resolveRoutePath(`${this.modelListUrl}batch?${this.modelConfig.title_field}=${this.tableQueries.search}`))
+          this.$route.meta.title = `批量新增${this.modelConfig.verbose_name}`
         },
         tableToCreateModel(){
+          this.$route.meta.title = `新增${this.modelConfig.verbose_name}`
           this.$router.push(this.resolveRoutePath(`${this.modelListUrl}create?${this.modelConfig.title_field}=${this.tableQueries.search}`))
+
         },
         tableNormalizeItems(tableItems){
             return tableItems.map((i) => {
