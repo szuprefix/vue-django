@@ -116,20 +116,24 @@ export default {
                 this.tableToEditModel(row, column, cell, event)
             }
         },
+
         tableToEditModel (row, column, cell, event){
           // wayky edit
-          this.$router.push(this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`))
-          this.$route.meta.title = `${row.__str__}`
+          const path = this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`)
+          this.$router.push(path)
+          this.resolveCurrentTagLabel(path, `编辑${row.__str__}`)
         },
+
         tableToBatchCreateModel (){
           this.$router.push(this.resolveRoutePath(`${this.modelListUrl}batch?${this.modelConfig.title_field}=${this.tableQueries.search}`))
-          this.$route.meta.title = `批量新增${this.modelConfig.verbose_name}`
         },
-        tableToCreateModel(){
-          this.$route.meta.title = `新增${this.modelConfig.verbose_name}`
-          this.$router.push(this.resolveRoutePath(`${this.modelListUrl}create?${this.modelConfig.title_field}=${this.tableQueries.search}`))
 
+        tableToCreateModel(){
+          const path = this.resolveRoutePath(`${this.modelListUrl}create?${this.modelConfig.title_field}=${this.tableQueries.search}`)
+          this.$router.push(path)
+          this.resolveCurrentTagLabel(path, `新增${this.modelConfig.verbose_name}`)
         },
+
         tableNormalizeItems(tableItems){
             return tableItems.map((i) => {
                 let a, field
