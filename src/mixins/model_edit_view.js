@@ -40,6 +40,8 @@ export  default {
             }
         },
         setTitle(p){
+          p = !!p ? p : this.resolveRoutePath(this.modelDetailUrl)
+
           const formTitle = this.$refs.form.modelFormTitle
           if (this.tab) {
             this.tab.title = formTitle
