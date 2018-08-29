@@ -46,7 +46,10 @@
     export default{
         mixins: [model_table, model_form],
         props: {
-            appModelName: String,
+            appModelName: {
+              type: String,
+              default: () => ''
+            },
             value: Object,
             defaultCreateValue: {
                 type: Object, default: function () {

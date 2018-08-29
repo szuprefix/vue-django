@@ -5,7 +5,10 @@ import ModelForm from '../components/rest/ModelForm.vue'
 import server_response from './server_response'
 export  default {
     props: {
-        tab: Object
+        tab: Object,
+        default: () => {
+          return {}
+        }
     },
     data () {
         return {
@@ -26,14 +29,20 @@ export  default {
             let form = this.$refs.form
             if (this.$route.params.id === 'create') {
                 let p = form.modelDetailUrl
-                this.tab.name = p
-                this.$router.replace(p)
+                if (this.tab) {
+                  this.tab.name = p
+                }
+                this.$router.replace(this.resolveRoutePath(p))
             } else {
                 this.setTitle()
             }
         },
         setTitle(){
-            this.tab.title = this.$refs.form.modelFormTitle
+          const formTitle = this.$refs.form.modelFormTitle
+          if (this.tab) {
+            this.tab.title = formTitle
+          }
+          this.$route.meta.title = formTitle
         },
         load(){
             return this.$refs.form.modelLoad()

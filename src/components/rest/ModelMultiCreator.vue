@@ -59,7 +59,10 @@
                 default: ''
             },
             fields: Array,
-            appModelName: String,
+            appModelName: {
+              type: String,
+              default: () => ''
+            },
             baseValues: {
                 type: Object, default: () => {
                     return {}

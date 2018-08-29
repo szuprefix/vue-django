@@ -72,7 +72,7 @@
         },
         watch: {
             curTab(){
-                this.$router.push(this.curTab)
+                this.$router.push(this.resolveRoutePath(this.curTab))
             },
             $route(newVal, oldVal){
                 this.changeRoute(newVal, oldVal)

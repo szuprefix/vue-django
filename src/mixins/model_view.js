@@ -3,7 +3,7 @@
  */
 import {Register} from '../utils/app_model'
 import axios from '../configs/axios'
-import store from '../store'
+// import store from '../store'
 export function joinErrors(errors) {
     let es = {}
     for (let n in errors) {
@@ -21,14 +21,13 @@ export default {
             modelOptions: {},
             modelErrors: {},
             modelData: {},
-            appModelName: null
+            // appModelName: null // wayky modified : model_table mixin already define props
         }
     },
 
     methods: {
         modelInit(){
             this.modelConfig = Register.getConfig(this.appModelName)
-
         },
         modelLoadData () {
             if (!this.modelId) {
@@ -95,7 +94,7 @@ export default {
            })
         },
         modelEmitPosted(){
-            store.state.bus.$emit('model-posted', {model: this.modelConfig})
+            // store.state.bus.$emit('model-posted', {model: this.modelConfig})
         },
         onErrors(error){
             if (error.code === 400) {
@@ -107,6 +106,19 @@ export default {
             return !this.modelId && `新增${this.modelConfig.verboseName}` || this.modelData['__str__']
         },
 
+        resolveRoutePath(path) {
+          // wayky add : 根据isTagsView自动给路由路径处理结尾的 / , tagView 组件的去掉结尾的 /
+          if (this.isTagsView) {
+            return path
+          } else {
+            if (path.indexof('?') !== -1) {
+              const p = path.split('?')
+              return `${p[0]}/?${p[1]}`
+            } else {
+              return `${path}/`
+            }
+          }
+        }
     },
     computed: {
         modelListUrl(){
@@ -115,6 +127,9 @@ export default {
         modelDetailUrl(){
             return `${this.modelListUrl}${this.modelId}/`
         },
-
+        isTagsView() {
+          // wayky add : 判断是否tagsView作tab导航
+          return !!this.$store.state.tagsView
+        }
     }
 }

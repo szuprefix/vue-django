@@ -10,7 +10,9 @@ export default{
     props: {
         tableBaseQueries: {
             type:Object,
-            default: {}
+            default: () => {
+              return {}
+            }
         },
     },
     data () {
@@ -21,7 +23,7 @@ export default{
             tablePage: 1,
             tableCount: 0,
             tableUrl: "",
-            tableItems: [],
+            // tableItems: [], // wayky modified : model_table mixin already define props
             tableSearchFields: []
         }
     },
@@ -40,7 +42,8 @@ export default{
         },
         tableLoad (queris) {
             let d = queris || this.tableQueries
-            this.loading = '查询中'
+            this.loading = true
+            this.loadingText = '查询中'
             // console.log(this.tableUrl)
             this.$http.get(`${this.tableUrl}?${Qs.stringify(d)}`).then(({data}) => {
                 this.tableData = data.results

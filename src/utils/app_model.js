@@ -2,7 +2,7 @@
  * Created by denishuang on 2017/11/29.
  */
 import axios from '../configs/axios'
-import store from '../store'
+// import store from '../store' // wayky : should not use when user defined itself
 export function joinErrors(errors) {
     let es = {}
     for (let n in errors) {
@@ -70,7 +70,7 @@ export function AppModel(config) {
             return promise.then(({data}) => {
                 this.id = data.id
                 this.data = data
-                store.state.bus.$emit('model-posted', {model: this})
+                // store.state.bus.$emit('model-posted', {model: this})
                 return data
             })//.catch((error) => this.onErrors(error))
         },

@@ -2,7 +2,7 @@
     <span>
         <el-select v-model="value" :multiple="field.multiple" filterable @change="changed" remote clearable
                    :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
-                   :loading="loading" :loading-text="loading" :placeholder="field.placeholder || `请选择${field.label}`">
+                   :loading="loading" :loading-text="loadingText" :placeholder="field.placeholder || `请选择${field.label}`">
             <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
                        v-for="c,i in tableData" :key="c.id || c.pk || c.url || c.name"></el-option>
         </el-select>
@@ -44,9 +44,8 @@
                 this.tableUpdateQueries({search})
             },
             toCreateModel(row){
-                let url = `${this.tableUrl}create/?${this.modelConfig.title_field}=${this.tableQueries.search}`
-                console.log(url)
-                this.$router.push(url)
+                let url = `${this.tableUrl}create?${this.modelConfig.title_field}=${this.tableQueries.search}`
+                this.$router.push(this.resolveRoutePath(url))
             }
         },
         computed: {

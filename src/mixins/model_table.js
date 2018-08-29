@@ -11,7 +11,10 @@ import ForeignKey from '../components/widgets/ForeignKey.vue'
 export default {
     mixins: [model_view, table_view],
     props: {
-        appModelName: String,
+        appModelName: {
+          type: String,
+          default: () => ''
+        },
         tableItems: {
             type: Array, default: function () {
                 return [{name: '__str__', label: '名称'}]
@@ -114,17 +117,18 @@ export default {
             }
         },
         tableToEditModel (row, column, cell, event){
-            this.$router.replace(`/${this.appModelName.replace('.', '/')}/${row.id}/`)
+          // wayky edit
+          this.$router.push(this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`))
+          this.$route.meta.title = `${row.__str__}`
         },
         tableToBatchCreateModel (){
-            let url = `${this.modelListUrl}batch/?${this.modelConfig.title_field}=${this.tableQueries.search}`
-            console.log(url)
-            this.$router.push(url)
+          this.$router.push(this.resolveRoutePath(`${this.modelListUrl}batch?${this.modelConfig.title_field}=${this.tableQueries.search}`))
+          this.$route.meta.title = `批量新增${this.modelConfig.verbose_name}`
         },
         tableToCreateModel(){
-            let url = `${this.modelListUrl}create/?${this.modelConfig.title_field}=${this.tableQueries.search}`
-            console.log(url)
-            this.$router.push(url)
+          this.$route.meta.title = `新增${this.modelConfig.verbose_name}`
+          this.$router.push(this.resolveRoutePath(`${this.modelListUrl}create?${this.modelConfig.title_field}=${this.tableQueries.search}`))
+
         },
         tableNormalizeItems(tableItems){
             return tableItems.map((i) => {
