@@ -44,7 +44,7 @@
             value: Object,
             formNoLabel: {
               type: Boolean,
-              default: () => true
+              default: () => false
             }
         },
         components: {

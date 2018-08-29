@@ -27,22 +27,25 @@ export  default {
     methods: {
         redirectToEdit(payLoad){
             let form = this.$refs.form
+            let p = form.modelDetailUrl
             if (this.$route.params.id === 'create') {
-                let p = form.modelDetailUrl
                 if (this.tab) {
-                  this.tab.name = p
+                  this.tab.name = form.modelFormTitle
                 }
-                this.$router.replace(this.resolveRoutePath(p))
+                const path = this.resolveRoutePath(p)
+                this.$router.replace(path)
+                this.resolveCurrentTagLabel(path, `创建${form.modelFormTitle}`)
             } else {
-                this.setTitle()
+                this.setTitle(p)
             }
         },
-        setTitle(){
+        setTitle(p){
           const formTitle = this.$refs.form.modelFormTitle
           if (this.tab) {
             this.tab.title = formTitle
+          } else {
+            this.resolveCurrentTagLabel(p, formTitle)
           }
-          this.$route.meta.title = formTitle
         },
         load(){
             return this.$refs.form.modelLoad()
