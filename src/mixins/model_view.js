@@ -94,7 +94,7 @@ export default {
            })
         },
         modelEmitPosted(){
-            // store.state.bus.$emit('model-posted', {model: this.modelConfig})
+            store.state.bus.$emit('model-posted', {model: this.modelConfig})
         },
         onErrors(error){
             if (error.code === 400) {
