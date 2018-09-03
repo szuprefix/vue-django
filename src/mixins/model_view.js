@@ -94,7 +94,7 @@ export default {
            })
         },
         modelEmitPosted(){
-            // store.state.bus.$emit('model-posted', {model: this.modelConfig})
+            this.$store.state.bus.$emit('model-posted', {model: this.modelConfig})
         },
         onErrors(error){
             if (error.code === 400) {
@@ -112,10 +112,6 @@ export default {
         },
         modelDetailUrl(){
             return `${this.modelListUrl}${this.modelId}/`
-        },
-        isTagsView() {
-          // wayky add : 判断是否tagsView作tab导航
-          return !!this.$store.state.tagsView
         }
     }
 }

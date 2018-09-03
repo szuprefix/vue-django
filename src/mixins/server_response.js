@@ -31,6 +31,12 @@ export default  {
             loadingText: '数据加载中...'
         }
     },
+    computed: {
+      isTagsView() {
+        // wayky add : 判断是否tagsView作tab导航
+        return !!this.$store.state.tagsView
+      }
+    },
     methods: {
         joinErrors,
         submitData: function (url, data, successMsg, isCreate) {
@@ -52,7 +58,6 @@ export default  {
             this.$message({
                 message: `${error.code}错误:${error.msg}`, type: 'error'
             })
-
         },
         onServerResponseError: function (error) {
             this.loading = false
@@ -91,6 +96,8 @@ export default  {
           // wayky add : 根据isTagsView设置当前的Tag标签
           if (this.isTagsView) {
             this.$store.dispatch('setCurrentTagLabel', { path, title})
+            // 同时修改
+            this.$store.dispatch('updateLabelInVisitedViews', { path, title})
           }
         }
     }

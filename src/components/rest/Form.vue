@@ -12,11 +12,12 @@
                         v-for="f in _formItems" :key="f.name" v-if="f.widget !== 'hidden'">
                     <el-form-item :prop="f.name" :rules="f.rules" :label="f.label" :error="formErrors[f.name]"
                                   :ref="f.name" :style="formNoLabel && {} || formItemStyle">
-                        <template slot="label" v-if="!formNoLabel">{{f.label}}
-                            <el-tooltip placement="top" v-if="f.help_text">
-                                <div slot="content" v-html="f.help_text"></div>
-                                <i class="fa fa-info-circle bg-info" tabindex="-1"></i>
-                            </el-tooltip>
+                        <template slot="label" v-if="!formNoLabel">
+                          {{f.label}}
+                          <el-tooltip placement="top" v-if="f.help_text">
+                              <div slot="content" v-html="f.help_text"></div>
+                              <i class="fa fa-info-circle bg-info"></i>
+                          </el-tooltip>
                         </template>
                         <template slot="label" v-else><span></span></template>
                         <template>
@@ -56,7 +57,6 @@
         watch: {
             value(val){
                 this.formValue = val
-
             }
         }
     }

@@ -5,7 +5,7 @@
                 <slot name="actions"></slot>
             </el-col>
             <el-col :span="6" class="flex-right">
-                <slot name="actions">
+                <slot name="actions2">
                     <el-button-group>
                         <el-button :type="a.type" :title="a.title" @click="a.do" v-for="a in top_actions"
                                    :key="a.name">
@@ -91,7 +91,6 @@
         watch: {
             modelData(val){
                 this.$emit("input", val)
-
             }
         }
     }
