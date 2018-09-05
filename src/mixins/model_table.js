@@ -129,7 +129,11 @@ export default {
         },
 
         tableToCreateModel(){
-          const path = this.resolveRoutePath(`${this.modelListUrl}create?${this.modelConfig.title_field}=${this.tableQueries.search}`)
+          let createUrl = `${this.modelListUrl}create`
+          if (!!this.modelConfig.title_field && !!this.tableQueries.search) {
+            createUrl = `${createUrl}?${this.modelConfig.title_field}=${this.tableQueries.search}`
+          }
+          const path = this.resolveRoutePath(createUrl)
           this.$router.push(path)
           this.resolveCurrentTagLabel(path, `新增${this.modelConfig.verbose_name}`)
         },
