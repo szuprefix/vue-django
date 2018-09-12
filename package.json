@@ -36,7 +36,9 @@
     "vue-router": "^2.7.0",
     "vuex": "^2.3.1",
     "vux": "^2.9.0",
-    "js-cookie": "^2.2.0"
+    "js-cookie": "^2.2.0",
+    "script-loader": "0.7.2",
+    "codemirror": "^5.39.2"
   },
   "engines": {
     "node": ">=6"
@@ -58,6 +60,7 @@
     "vue-loader": "^11.1.4",
     "vue-template-compiler": "^2.1.8",
     "webpack": "^2.4.1",
-    "webpack-dev-server": "^2.4.2"
+    "webpack-dev-server": "^2.4.2",
+    "jsonlint": "^1.6.2"
   }
 }
