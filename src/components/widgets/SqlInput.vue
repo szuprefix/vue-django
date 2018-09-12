@@ -1,5 +1,7 @@
 <template>
-  <textarea ref="textarea"></textarea>
+  <div class="sql-editor">
+    <textarea ref="textarea"></textarea>
+  </div>
 </template>
 
 <script>
@@ -53,3 +55,17 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.sql-editor{
+  height: 100%;
+  position: relative;
+}
+.sql-editor >>> .CodeMirror {
+  height: auto;
+  min-height: 300px;
+}
+.sql-editor >>> .CodeMirror-scroll{
+  min-height: 300px;
+}
+</style>
