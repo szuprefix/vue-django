@@ -47,10 +47,20 @@ export default {
       this.$emit('changed', cm.getValue())
       this.$emit('input', cm.getValue())
     })
+
+    this.sqlEditor.on('blur', cm => {
+      this.$emit('blur', cm.getCursor())
+    })
   },
   methods: {
     getValue() {
       return this.sqlEditor.getValue()
+    },
+    insertString(str, pos) {
+      this.sqlEditor.replaceSelection(str)
+      this.sqlEditor.focus()
+      pos.ch += str.length
+      this.sqlEditor.setCursor(pos)
     }
   }
 }
