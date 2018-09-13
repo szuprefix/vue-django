@@ -20,11 +20,6 @@ export default {
                 return [{name: '__str__', label: '名称'}]
             }
         },
-        extraActions: {
-            type: Object, default: function () {
-                return {}
-            }
-        },
         modelTableUrl: String,
         topActionList: {
             type: Array, default: function () {
