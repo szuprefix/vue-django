@@ -55,9 +55,13 @@ export default  {
             return promise
         },
         alertError(error){
-            this.$message({
-                message: `${error.code}错误:${error.msg}`, type: 'error'
-            })
+          const errstr = error.msg
+          this.$message({
+            showClose: true,
+            duration: 0,
+            message: errstr ? errstr.substr(0, 500) : '未知错误',
+            type: 'error'
+          })
         },
         onServerResponseError: function (error) {
             this.loading = false

@@ -89,7 +89,11 @@
             }
         },
         watch: {
-            modelData(val){
+            // modelData(val){
+            //     this.$emit("input", val)
+            // },
+
+            formValue(val){
                 this.$emit("input", val)
             }
         }

@@ -24,7 +24,15 @@
   }"></el-time-select>
   <el-input v-model="value[field.name]" :autosize="field.autosize || {minRows: 8, maxRows: 24}" @change="fieldValueChanged" :placeholder="[field.label, field.help_text].join('\n')" type="textarea" v-else-if="field.widget === 'textarea'"></el-input>
 
-  <component :is="field.widget" v-else-if="typeof field.widget == 'object'" @change="fieldValueChanged" :placeholder="field.label" v-model="value[field.name]" :field="field"></component>
+  <component
+    v-else-if="typeof field.widget == 'object'"
+    v-model="value[field.name]"
+    :is="field.widget"
+    @change="fieldValueChanged"
+    :placeholder="field.label"
+    :field="field"
+    :ref="field.ref">
+  </component>
 
   <el-input v-else v-model="value[field.name]" :placeholder="[field.label, field.help_text].join('\n')" @change="fieldValueChanged" :type="['password', 'textarea'].includes(field.widget)?field.widget:'text'"></el-input>
 </div>

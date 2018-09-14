@@ -43,9 +43,9 @@ export default {
     })
 
     this.sqlEditor.setValue(this.value)
+
     this.sqlEditor.on('change', cm => {
       this.$emit('changed', cm.getValue())
-      this.$emit('input', cm.getValue())
     })
 
     this.sqlEditor.on('blur', cm => {
@@ -56,6 +56,7 @@ export default {
     getValue() {
       return this.sqlEditor.getValue()
     },
+
     insertString(str, pos) {
       this.sqlEditor.replaceSelection(str)
       this.sqlEditor.focus()
