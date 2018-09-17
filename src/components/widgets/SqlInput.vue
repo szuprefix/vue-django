@@ -45,7 +45,8 @@ export default {
     this.sqlEditor.setValue(this.value)
 
     this.sqlEditor.on('change', cm => {
-      this.$emit('changed', cm.getValue())
+      this.$emit('change', cm.getValue())
+      this.$emit('input', cm.getValue())
     })
 
     this.sqlEditor.on('blur', cm => {

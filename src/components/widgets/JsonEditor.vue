@@ -54,7 +54,7 @@ export default {
     this.jsonEditor.setValue(this.valueStr)
 
     this.jsonEditor.on('change', cm => {
-      this.$emit('changed', JSON.parse(cm.getValue()))
+      this.$emit('change', JSON.parse(cm.getValue()))
       this.$emit("input", JSON.parse(cm.getValue()))
     })
   },
