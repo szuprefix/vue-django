@@ -64,6 +64,9 @@
             onSubmit(){
                 this.$refs.form.onSubmit()
             },
+            onBack() {
+              this.$router.go(-1)
+            },
             onDelete(){
                 this.$confirm('确定要删除吗?', '提示', {type: 'warning'}).then(() => {
                     this.modelDelete()

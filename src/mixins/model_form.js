@@ -10,6 +10,13 @@ export default {
         return {
             modelFormItems: [],
             modelFormAvairableActions: {
+                'back': {
+                    icon: 'angle-left',
+                    title: '后退',
+                    label: '',
+                    do: this.onBack,
+                    type: 'default'
+                },
                 'save': {
                     icon: 'floppy-o',
                     title: '保存',
