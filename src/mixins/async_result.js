@@ -37,7 +37,7 @@ export default  {
                         console.log(`got other task id , ignore: ${rs.task_id}`)
                         return
                     }
-                    this.loading = this.asyncStatusMap(rs.status)
+                    this.loading = rs.status == null ? rs.result : this.asyncStatusMap(rs.status)
                     console.log(rs)
                     if (['SUCCESS', 'FAILURE'].includes(rs.status)) {
                         this.loading = false
