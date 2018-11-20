@@ -28,7 +28,8 @@ export default  {
     data (){
         return {
             loading: false,
-            loadingText: '数据加载中...'
+            loadingText: '数据加载中...',
+            server_response_error: undefined
         }
     },
     computed: {
@@ -55,13 +56,10 @@ export default  {
             return promise
         },
         alertError(error){
-          const errstr = error.msg
-          this.$message({
-            showClose: true,
-            duration: 0,
-            message: errstr ? errstr.substr(0, 500) : '未知错误',
-            type: 'error'
-          })
+            this.$message({
+                message: `${error.code}错误:${error.msg}`, type: 'error'
+            })
+
         },
         onServerResponseError: function (error) {
             this.loading = false
@@ -80,6 +78,7 @@ export default  {
             } else {
                 this.alertError(error)
             }
+            this.server_response_error = error
         },
 
         resolveRoutePath(path) {

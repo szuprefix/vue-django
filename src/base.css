@@ -7,7 +7,7 @@
     visibility: hidden;
 }
 
-.el-table__row:hover .hover-show {
+.el-table__row:hover .hover-show, .el-tree-node__content:hover .hover-show {
     visibility: visible;
     cursor: pointer;
     /*font-size: 18px;*/

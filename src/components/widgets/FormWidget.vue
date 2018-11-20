@@ -2,8 +2,10 @@
 <div class="form-field">
   <!--{{field}}-->
   <template v-if="field.widget === 'readonly'">
-          {{value[field.name]}}
-        </template>
+    {{value[field.name]}}
+  </template>
+  <span v-else-if="typeof(field.widget) === 'function'" v-html="field.widget(value,field)">
+  </span>
   <el-radio-group v-model="value[field.name]" v-else-if="field.widget === 'radio'" @change="fieldValueChanged">
     <el-radio-button :label="c.value" v-for="c in field.choices" :key="c.value">{{ c.display_name}}
     </el-radio-button>
