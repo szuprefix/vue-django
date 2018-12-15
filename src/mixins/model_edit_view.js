@@ -30,11 +30,11 @@ export  default {
             let p = form.modelDetailUrl
             if (this.$route.params.id === 'create') {
                 if (this.tab) {
-                  this.tab.name = form.modelFormTitle
+                  this.tab.name = p
                 }
                 const path = this.resolveRoutePath(p)
                 this.$router.replace(path)
-                this.resolveCurrentTagLabel(path, `创建${form.modelFormTitle}`)
+                //this.resolveCurrentTagLabel(path, `创建${form.modelFormTitle}`)
             } else {
                 this.setTitle(p)
             }
