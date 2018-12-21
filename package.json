@@ -1,6 +1,6 @@
 {
   "name": "vue-django",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "description": "personal experiment",
   "main": "index.js",
   "files": [
@@ -30,11 +30,11 @@
   "dependencies": {
     "axios": "^0.16.2",
     "date-fns": "^1.29.0",
-    "element-ui": "^2.3.6",
+    "element-ui": "^2.4.11",
     "qs": "^6.4.0",
-    "vue": "^2.1.8",
-    "vue-router": "^2.7.0",
-    "vuex": "^2.3.1",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.2",
+    "vuex": "^3.0.1",
     "vux": "^2.9.0",
     "js-cookie": "^2.2.0",
     "script-loader": "0.7.2",

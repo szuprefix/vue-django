@@ -83,7 +83,7 @@ export default{
                 formValid(procedure)
             } else {
                 let validator = new schema(this.formRules)
-                validator.validate(this.formValue, (errors, fields) => {
+                validator.validate(this.formValue, (errors /*, fields*/) => {
                     let valid = true
                     if (errors) {
                         this.formErrors = errors
@@ -152,7 +152,6 @@ export default{
     computed: {
         formRules () {
             let d = {}
-            let self = this
             Object.keys(this._formItems).forEach((i) => {
                 let f = this._formItems[i]
                 let n = f.name

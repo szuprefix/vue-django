@@ -8,23 +8,25 @@
             <el-alert :title="formErrors.non_field_errors" type="error" v-if="formErrors.non_field_errors"
                       :closable="false"></el-alert>
             <el-row>
-                <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
-                        v-for="f in _formItems" :key="f.name" v-if="f.widget !== 'hidden'">
-                    <el-form-item :prop="f.name" :rules="f.rules" :label="f.label" :error="formErrors[f.name]"
-                                  :ref="f.name" :style="formNoLabel && {} || formItemStyle">
-                        <template slot="label" v-if="!formNoLabel">
-                          {{f.label}}
-                          <el-tooltip placement="top" v-if="f.help_text">
-                              <div slot="content" v-html="f.help_text"></div>
-                              <i class="fa fa-info-circle bg-info"></i>
-                          </el-tooltip>
-                        </template>
-                        <template slot="label" v-else><span></span></template>
-                        <template>
-                            <form-widget v-model="formValue" :field="f"></form-widget>
-                        </template>
-                    </el-form-item>
-                </el-col>
+                <template v-for="f in _formItems">
+                    <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
+                            :key="f.name" v-if="f.widget !== 'hidden'">
+                        <el-form-item :prop="f.name" :rules="f.rules" :label="f.label" :error="formErrors[f.name]"
+                                      :ref="f.name" :style="formNoLabel && {} || formItemStyle">
+                            <template slot="label" v-if="!formNoLabel">
+                                {{f.label}}
+                                <el-tooltip placement="top" v-if="f.help_text">
+                                    <div slot="content" v-html="f.help_text"></div>
+                                    <i class="fa fa-info-circle bg-info"></i>
+                                </el-tooltip>
+                            </template>
+                            <template slot="label" v-else><span></span></template>
+                            <template>
+                                <form-widget v-model="formValue" :field="f"></form-widget>
+                            </template>
+                        </el-form-item>
+                    </el-col>
+                </template>
             </el-row>
             <slot name="submit">
                 <el-form-item>
@@ -44,8 +46,8 @@
         props: {
             value: Object,
             formNoLabel: {
-              type: Boolean,
-              default: () => false
+                type: Boolean,
+                default: () => false
             }
         },
         components: {
