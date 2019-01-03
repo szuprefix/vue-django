@@ -27,7 +27,7 @@ let router = new Router({
     routes: [
         {
             path: '/auth/login/',
-            meta: {title: '登录'},
+            meta: {title: '登录', layout:'main'},
             component: resolve => require(['../views/auth/login.vue'], resolve)
         },
         {

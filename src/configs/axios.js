@@ -9,16 +9,19 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.headers['X-REQUESTED-WITH'] = 'XMLHttpRequest'
 axios.defaults.baseURL = '/api/'
 
-axios.interceptors.request.use(function (config) {
-    // Do something before request is sent
-    if (Cookies.get('sharetoken')) {
-      config.headers['X-SHARETOKEN'] = Cookies.get('sharetoken')
-    }
-    return config;
-}, function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-});
+// axios.interceptors.request.use(function (config) {
+//     // Do something before request is sent
+//     // if (Cookies.get('sharetoken')) {
+//     //   config.headers['X-SHARETOKEN'] = Cookies.get('sharetoken')
+//     // }
+//     // if (Cookies.get('access_token')) {
+//     //     config.headers['Authorization'] = Cookies.get('access_token')
+//     // }
+//     return config;
+// }, function (error) {
+//     // Do something with request error
+//     return Promise.reject(error);
+// });
 
 axios.interceptors.response.use(function (response) {
     return response;

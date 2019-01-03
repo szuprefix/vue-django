@@ -22,6 +22,9 @@ export default{
         formInline: {
             type: Boolean, default: false
         },
+        formHideRequiredAsterisk:{
+            type: Boolean, default: false
+        },
         formSize: {
             type: String, default: null
         },

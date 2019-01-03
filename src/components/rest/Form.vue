@@ -1,10 +1,12 @@
 <template>
     <div>
         <el-form ref="form" :inline="formInline" :size="formSize" :model="formValue" v-if="value"
-                 :inline-message="formInline"
+                 :inline-message="formInline" :hide-required-asterisk="formHideRequiredAsterisk"
                  label-position="right" :label-width="formNoLabel && '0px' || formLabelWidth"
                  v-loading="loading"
                  :element-loading-text="loading">
+
+            <slot name="header"></slot>
             <el-alert :title="formErrors.non_field_errors" type="error" v-if="formErrors.non_field_errors"
                       :closable="false"></el-alert>
             <el-row>

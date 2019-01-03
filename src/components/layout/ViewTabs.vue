@@ -6,7 +6,9 @@
     </el-tabs>
 </template>
 <script>
+    import server_response from '../../mixins/server_response'
     export default{
+        mixins: [server_response],
         data () {
             return {
                 tabs: [],
@@ -47,13 +49,13 @@
                 this.curTab = tab.name
             },
             changeRoute(newVal, oldVal){
-              console.log(newVal)
-              console.log(oldVal)
+//                console.log(newVal)
+//                console.log(oldVal)
                 let to = newVal
                 // let view = to.matched[0]
                 let view = null
                 if (to.matched.length > 0) {
-                  view = to.matched[to.matched.length-1]
+                    view = to.matched[to.matched.length - 1]
                 }
 
                 if (view === null) {
@@ -82,7 +84,7 @@
     }
 </script>
 <style>
-    .el-tabs__item{
+    .el-tabs__item {
         font-size: 0.5rem;
     }
 </style>

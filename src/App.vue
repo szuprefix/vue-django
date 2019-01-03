@@ -1,22 +1,28 @@
 <template>
     <div id="app">
-        <el-menu class="el-menu-demo" mode="horizontal" router>
-            <el-menu-item index="/" class="brand"><img :src="logo" height="32"><b v-if="user.as_saas_worker">{{user.as_saas_worker.party}}</b>{{system_name}}</el-menu-item>
-            <el-submenu index="2" style="float:right">
-                <template slot="title">{{user.name}}</template>
-                <el-menu-item index="/" @click="logout">退出登录</el-menu-item>
-                <el-menu-item index="/auth/change_password/">修改密码</el-menu-item>
-            </el-submenu>
-        </el-menu>
-        <el-row :gutter="10">
-            <el-col :span="4">
-                <side-bar></side-bar>
-            </el-col>
-            <el-col :span="20">
-                <view-tabs></view-tabs>
-            </el-col>
-        </el-row>
-        <login-view></login-view>
+        <router-view v-if="layout === 'main'">
+        </router-view>
+        <template v-else>
+            <el-menu class="el-menu-demo" mode="horizontal" router>
+                <el-menu-item index="/" class="brand"><img :src="logo" height="32"><b
+                        v-if="user.as_saas_worker">{{user.as_saas_worker.party}}</b>{{system_name}}
+                </el-menu-item>
+                <el-submenu index="2" style="float:right">
+                    <template slot="title">{{user.name}}</template>
+                    <el-menu-item index="/" @click="logout">退出登录</el-menu-item>
+                    <el-menu-item index="/auth/change_password/">修改密码</el-menu-item>
+                </el-submenu>
+            </el-menu>
+            <el-row :gutter="10">
+                <el-col :span="4">
+                    <side-bar></side-bar>
+                </el-col>
+                <el-col :span="20">
+                    <view-tabs></view-tabs>
+                </el-col>
+            </el-row>
+            <!--<login-view></login-view>-->
+        </template>
     </div>
 </template>
 
@@ -27,18 +33,22 @@
     import LoginView from './views/auth/login.vue'
     export default {
         data () {
-            return {
-            }
+            return {}
         },
         components: {
             SideBar,
             ViewTabs,
             LoginView,
         },
-        computed: mapState(['user', 'system_name', 'logo']),
+        computed: {
+            layout (){
+                return this.$route.meta.layout
+            },
+            ...mapState(['user', 'system_name', 'logo'])
+        },
         methods: {
             logout(){
-                this.$confirm("确定要退出登录吗?").then(()=> {
+                this.$confirm("确定要退出登录吗?").then(() => {
                     this.$store.dispatch('logout')
 
                 }).catch(this.onServerResponseError)

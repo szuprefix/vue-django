@@ -1,15 +1,39 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'sessionid'
+const TokenKey = 'access_token'
+
+import axios from 'axios'
 
 export function getToken() {
-  return Cookies.get(TokenKey)
+    return Cookies.get(TokenKey)
 }
 
 export function setToken(token) {
-  return Cookies.set(TokenKey, token)
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    return Cookies.set(TokenKey, token)
 }
 
 export function removeToken() {
-  return Cookies.remove(TokenKey)
+    delete axios.defaults.headers.common['Authorization']
+    return Cookies.remove(TokenKey)
+}
+
+export function login(username, password) {
+    axios.post('/auth/user/login/', {username, password}).then(({data}) => {
+        let token = data.token.access
+        setToken(token)
+    })
+}
+
+export function logout() {
+    axios.get('/auth/user/logout/').then(({data}) => {
+        removeToken()
+    })
+}
+export default {
+    getToken,
+    setToken,
+    removeToken,
+    login,
+    logout
 }

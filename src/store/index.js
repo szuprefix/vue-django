@@ -3,8 +3,8 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
-import apps from '../configs/apps'
-import menus from '../configs/menus'
+import apps from '@/configs/apps'
+import menus from '@/configs/menus'
 Vue.use(Vuex)
 const state = {
     bus: new Vue(),
@@ -45,5 +45,5 @@ var store = new Vuex.Store({
     plugins: []
 })
 // Vue.prototype.$store = Vue.store =store
-store.dispatch("getUserInfo").catch((e) => {console.error(e)})
+// store.dispatch("getUserInfo").catch((e) => {console.error(e)})
 export default store
