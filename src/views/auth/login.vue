@@ -6,7 +6,7 @@
                    class="login-form"
                    formSubmitName="登录" formNoLabel :formHideRequiredAsterisk="true" @form-posted="done">
 
-            <h3 slot="header">登录系统</h3>
+            <h3 slot="header">登录{{$store.state.system_name}}</h3>
         </rest-form>
         <!--</el-dialog>-->
     </div>
@@ -14,7 +14,7 @@
 <script>
     import {mapState} from 'vuex'
     import RestForm from '../../components/rest/Form.vue'
-    import {setToken} from '@/utils/auth'
+    import {setToken} from '../../utils/auth'
     export default{
         data () {
             return {
@@ -44,7 +44,6 @@
                 this.$router.replace('/')
             },
             submit(){
-                console.log('submit')
                 this.$refs.form.submit()
             }
         },

@@ -40,6 +40,11 @@
             ViewTabs,
             LoginView,
         },
+        created(){
+            this.$store.state.bus.$on("user-logout", () => {
+                this.$router.replace('/login/')
+            })
+        },
         computed: {
             layout (){
                 return this.$route.meta.layout

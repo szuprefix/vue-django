@@ -18,7 +18,6 @@
         created (){
             this.curTab = this.$route.path
             this.changeRoute(this.$route)
-            this.$store.state.bus.$on("user-logout", this.clearTabs)
             this.$store.state.bus.$on("tab-destroy", this.tabRemove)
         },
         components: {},

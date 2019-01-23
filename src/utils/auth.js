@@ -26,8 +26,9 @@ export function login(username, password) {
 }
 
 export function logout() {
-    axios.get('/auth/user/logout/').then(({data}) => {
+    return axios.get('/auth/user/logout/').then(({data}) => {
         removeToken()
+        return data
     })
 }
 export default {

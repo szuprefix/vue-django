@@ -72,7 +72,7 @@ export default  {
             if (error.code === 400) {
                 this.errors = this.formErrors = joinErrors(error.msg)
             } else if (error.code === 401) {
-                // this.$store.state.bus.$emit("user-logout")
+                this.$store.state.bus.$emit("user-logout")
             } else if (error.code === 502){
                 this.alertError("网关错误")
             } else {
@@ -82,6 +82,7 @@ export default  {
         },
 
         resolveRoutePath(path) {
+            return path
           // wayky add : 根据isTagsView自动给路由路径处理结尾的 / , tagView 组件的去掉结尾的 /
           if (this.isTagsView) {
             return path

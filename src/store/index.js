@@ -5,6 +5,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import apps from '@/configs/apps'
 import menus from '@/configs/menus'
+import {logout} from '../utils/auth'
 Vue.use(Vuex)
 const state = {
     bus: new Vue(),
@@ -36,7 +37,7 @@ var store = new Vuex.Store({
             })
         },
         logout (context){
-            return Vue.http.post("/auth/user/logout/").then(({data}) => {
+            return logout().then((data) => {
                 context.commit("clearUser")
                 return data
             })

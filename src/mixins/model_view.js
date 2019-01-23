@@ -115,7 +115,7 @@ export default {
     },
     modelCanEdit(){
       let actions = this.modelOptions.actions
-      console.log(actions)
+      // console.log(actions)
       return actions && actions.POST ? true : false
     }
   }

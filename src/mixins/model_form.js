@@ -124,7 +124,7 @@ export default {
   computed: {
     modelFormTitle()
     {
-      return !this.modelId && `新增${this.modelConfig.verbose_name}` || this.modelData['__str__'] || this.modelData[this.modelConfig.title_field]
+      return !this.modelId && `新增${this.modelConfig.verbose_name}` || this.modelData['__str__'] || this.modelData[this.modelConfig.title_field] || `编辑${this.modelConfig.verbose_name}`
     }
   },
   watch: {

@@ -1,6 +1,6 @@
 <template>
     <span>
-        <el-select v-model="select_value"
+        <el-select v-model="select_value" :disabled="field.disabled"
                    :multiple="field.multiple" filterable @change="changed" remote clearable
                    :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
                    :loading="loading" :loading-text="loadingText" :placeholder="field.placeholder || `请选择${field.label}`">
