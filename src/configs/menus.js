@@ -29,7 +29,7 @@ export function genMenusFromApps(apps, menus) {
             let menu = m
             if (typeof m == 'string') {
                 let model = app.models[m]
-                menu = {name: model.verbose_name, icon: model.icon || 'file', url: `/${a}/${m}/`}
+                menu = {name: model.verbose_name, icon: model.icon || 'file', url: `/${a}/${m}/`, hidden:model.hidden}
             }
             return menu
         })

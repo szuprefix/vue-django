@@ -27,7 +27,7 @@
           <slot name="actions">
             <el-button-group>
               <el-button :title="a.title" size="small" @click="a.do" v-for="a in top_actions"
-                         v-if="!(a.name=='create' && !modelCanEdit)" :key="a.name">
+                         v-if="!a.show || a.show()" :key="a.name">
                 <i :class="`fa fa-${a.icon}`"></i>
               </el-button>
             </el-button-group>
