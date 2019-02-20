@@ -33,7 +33,7 @@ export function genMenusFromApps(apps, menus) {
             }
             return menu
         })
-        return {name: app.verbose_name, items, icon:app.icon || 'file'}
+        return {name: app.verbose_name, items, icon:app.icon || 'file', hidden:app.hidden}
     })
 }
 let menus = {
