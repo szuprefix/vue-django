@@ -9,17 +9,17 @@ let DEFAULT_PAGE_SIZE = 20
 export default{
     props: {
         tableBaseQueries: {
-            type:Object,
+            type: Object,
             default: () => {
-              return {}
+                return {}
             }
         },
+        tablePageSize: {type: Number, default: () => DEFAULT_PAGE_SIZE},
     },
     data () {
         return {
-            tableQueries: {page_size: DEFAULT_PAGE_SIZE,search:''},
+            tableQueries: {page_size: this.tablePageSize, search: ''},
             tableData: [],
-            tablePageSize: DEFAULT_PAGE_SIZE,
             tablePage: 1,
             tableCount: 0,
             tableUrl: "",
@@ -53,7 +53,7 @@ export default{
             }).catch(this.onServerResponseError)
         },
         tableOnSearch(){
-            this.tableUpdateQueries({page:1})
+            this.tableUpdateQueries({page: 1})
         },
         tableOnPageChanged (val) {
             this.tablePage = val

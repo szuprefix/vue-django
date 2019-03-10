@@ -22,7 +22,8 @@
             placeholder: String,
             field: Object,
             showCreate: {type: Boolean, default: true},
-            value: [String, Number, Array]
+            value: [String, Number, Array],
+            modelListSubUrl:String
         },
         created(){
             if (this.field.queries) {
@@ -30,8 +31,7 @@
             }
             this.appModelName = this.field.model
             this.modelInit()
-            this.tableUrl = this.modelListUrl
-            this.tablePageSize = 2000
+            this.tableUrl = this.modelListSubUrl && `${this.modelListUrl}${this.modelListSubUrl}/` || this.modelListUrl
             this.tableLoad()
         },
         methods: {

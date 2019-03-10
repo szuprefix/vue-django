@@ -117,6 +117,11 @@ export function toThousandslsFilter(num) {
     return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
 }
 
+export function percent(value){
+    let a = value && (value * 100).toFixed(2)
+    return `${a}%`
+}
+
 export default {
     date2now,
     date,

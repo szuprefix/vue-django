@@ -43,7 +43,9 @@ export default {
         },
         onTableDBClick: {
             type: Function, default: undefined
-        }
+        },
+        modelListSubUrl:String,
+        filterItems: Array
     },
     data () {
         return {
@@ -91,13 +93,14 @@ export default {
     methods: {
         modelTableInit(){
             this.modelInit()
-            this.tableUrl = this.modelTableUrl || this.modelListUrl
+            this.tableUrl = this.modelTableUrl || this.modelListSubUrl && `${this.modelListUrl}${this.modelListSubUrl}/` || this.modelListUrl
             this.tableUpdateQueries({})
             this.modelLoadOptions().then((data) => {
                 let search = this.modelOptions.actions.SEARCH
                 this.modelTableOrderingFields = search.ordering_fields
                 this.modelTableSearchFields = search.search_fields
-                this.modelTableFilterFields = search.filter_fields.map((a) => {
+                let filterItems = this.filterItems || search.filter_fields
+                this.modelTableFilterFields = filterItems.map((a) => {
                     return Object.assign({multiple: false}, this.modelFieldConfigs[a])
                 })
                 Object.assign(this.modelTableFilters, this.getFilters())
