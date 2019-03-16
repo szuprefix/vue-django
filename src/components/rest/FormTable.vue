@@ -1,5 +1,9 @@
 <template>
     <div>
+        <r-form :formUrl="formUrl" :formItems="formTableFormItems" v-model="formValue" ref="form" v-if="dialogVisible"
+                :formMethod="formMethod" @form-posted="formTableOnFormPosted" :formSubmit="modelFormSubmit"
+                :formTextareaSize="formTextareaSize">
+        </r-form>
         <el-table :data="tableData" size="mini" v-loading="loading" :element-loading-text="loading">
             <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
                              :class-name="`${f.type} field_${f.name}`" v-for="f in modelTableItems"
@@ -11,31 +15,37 @@
                     <template v-else>{{row[f.name]}}</template>
                 </template>
             </el-table-column>
-            <el-table-column label="">
-                <template slot="header">
-                    <el-button><i class="fa fa-plus"></i>产品 </el-button>
+            <!--<el-table-column label="">-->
+            <!--<template slot="header">-->
+            <!--<el-button><i class="fa fa-plus"></i>产品 </el-button>-->
+            <!--</template>-->
+            <!--<template slot-scope="{row}">-->
+            <!--&lt;!&ndash;<el-button title="编辑" size="mini" @click="showEditForm(row)">&ndash;&gt;-->
+            <!--&lt;!&ndash;<i :class="`fa fa-pencil`"></i>&ndash;&gt;-->
+            <!--&lt;!&ndash;</el-button>&ndash;&gt;-->
+            <!--<el-button title="保存" size="mini" @click="saveRow(row)" v-if="readOnly == false">-->
+            <!--<i :class="`fa fa-save`"></i>-->
+            <!--</el-button>-->
+            <!--</template>-->
+            <!--</el-table-column>-->
+            <el-table-column :width="`${60*rowActionList.length}px`"
+                             align="right">
+                <template slot="header" slot-scope="scope">
+                    <el-button title="新增" size="small" @click="showEditForm()" v-if="readOnly == false">
+                        <i class="fa fa-plus"></i>
+                    </el-button>
                 </template>
                 <template slot-scope="{row}">
-                    <!--<el-button title="编辑" size="mini" @click="showEditForm(row)">-->
-                    <!--<i :class="`fa fa-pencil`"></i>-->
-                    <!--</el-button>-->
-                    <el-button title="保存" size="mini" @click="saveRow(row)" v-if="readOnly == false">
-                        <i :class="`fa fa-save`"></i>
-                    </el-button>
+                    <el-button-group class="hover-show">
+                        <el-button :title="a.title" size="small" @click="a.do(row)" v-for="a in row_actions"
+                                   v-if="!(a.name=='edit' && !modelCanEdit)" :key="a.name">
+                            <i :class="`fa fa-${a.icon}`"></i>
+                        </el-button>
+                    </el-button-group>
                 </template>
             </el-table-column>
         </el-table>
-        <div class="flex-right">
-            <el-button title="新增" size="small" @click="showEditForm()" v-if="readOnly == false">
-                <i class="fa fa-plus"></i>
-            </el-button>
-        </div>
-        <el-dialog :visible.sync="dialogVisible">
-            <r-form :formUrl="formUrl" :formItems="formTableFormItems" v-model="formValue" ref="form"
-                    :formMethod="formMethod" @form-posted="formTableOnFormPosted" :formSubmit="modelFormSubmit"
-                    :formTextareaSize="formTextareaSize">
-            </r-form>
-        </el-dialog>
+
     </div>
 </template>
 <script>
@@ -47,8 +57,8 @@
         mixins: [model_table, model_form],
         props: {
             appModelName: {
-              type: String,
-              default: () => ''
+                type: String,
+                default: () => ''
             },
             value: Object,
             defaultCreateValue: {
@@ -67,7 +77,7 @@
                     return []
                 }
             },
-            readOnly:{
+            readOnly: {
                 type: Boolean, default: false
             }
         },
@@ -80,7 +90,6 @@
         data () {
             return {
                 modelData: {id: 'create'},
-                value: {},
                 dialogVisible: false,
                 formTableFormItems: []
             }

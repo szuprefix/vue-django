@@ -45,7 +45,8 @@ export default {
             type: Function, default: undefined
         },
         modelListSubUrl:String,
-        filterItems: Array
+        filterItems: Array,
+        batchActionItems: {type:Array, default: () => []}
     },
     data () {
         return {
@@ -193,7 +194,17 @@ export default {
                 return {text: a.display_name, value: a.value}
             })
         },
-
+        get_actions(action_list){
+            return action_list.map((a) => {
+                if (a instanceof Object) {
+                    return a
+                } else {
+                    let d = this.modelTableAvairableActions[a]
+                    d.name = a
+                    return d
+                }
+            })
+        },
         getFilters(){
             let postFields = this.modelFieldConfigs
             let filters = {}
@@ -218,5 +229,11 @@ export default {
         modelTableTitle(){
             return `${this.modelConfig.verbose_name}列表`
         },
+        top_actions(){
+            return this.get_actions(this.topActionList)
+        },
+        row_actions(){
+            return this.get_actions(this.rowActionList)
+        }
     }
 }

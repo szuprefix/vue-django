@@ -1,5 +1,5 @@
 <template>
-    <el-tabs v-model="curTab" type="card" closable @tab-remove="tabRemove">
+    <el-tabs v-model="curTab" type="card" closable @tab-remove="tabRemove" class="viewtabs">
         <el-tab-pane :label="t.title" :name="t.name" v-for="t in tabs" :key="t.name">
             <component :is="t.view" :tab="t"></component>
         </el-tab-pane>
@@ -83,7 +83,7 @@
     }
 </script>
 <style>
-    .el-tabs__item {
+    .viewtabs .el-tabs__item {
         font-size: 0.5rem;
     }
 </style>

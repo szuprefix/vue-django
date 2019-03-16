@@ -45,7 +45,7 @@ export default{
             this.loading = true
             this.loadingText = '查询中'
             // console.log(this.tableUrl)
-            this.$http.get(`${this.tableUrl}?${Qs.stringify(d)}`).then(({data}) => {
+            return this.$http.get(`${this.tableUrl}?${Qs.stringify(d)}`).then(({data}) => {
                 this.tableData = data.results
                 this.tableCount = data.count
                 this.loading = false

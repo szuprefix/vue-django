@@ -12,9 +12,14 @@
                         v-if="modelTableSearchFields.length>0">
                 </el-input>
                 <template v-for="f in modelTableFilterFields">
-                    <el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"
-                               @change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}
-                    </el-switch>
+                    <el-select v-model="tableQueries[f.name]" clearable :placeholder="`请选择${f.label}`"
+                               v-if="f.type=='boolean'" @change="tableUpdateQueries">
+                        <el-option :label="f.label" :value="true"></el-option>
+                        <el-option :label="`非${f.label}`" :value="false"></el-option>
+                    </el-select>
+                    <!--<el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"-->
+                    <!--@change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}-->
+                    <!--</el-switch>-->
                     <related-select :field="f" v-model="tableQueries[f.name]" @input="tableUpdateQueries"
                                     :showCreate="false"
                                     v-if="f.model" :modelListSubUrl="modelListSubUrl"
@@ -37,12 +42,17 @@
                 </div>
             </el-col>
         </el-row>
-        <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange"
+        <div v-if="batchActionItems && batchActionItems.length>0">
+            <el-button plain :icon="a.icon" v-for="a in batchActionItems" @click="onCommand(a.name)" :disabled="selectionCount==0"
+                        :key="a.name">{{a.label}}</el-button>
+        </div>
+        <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange" :max-height="maxHeight"
+                  @selection-change="onModelTableSelectionChange"
                   @filter-change="onFilterChanged" v-loading="loading" :element-loading-text="loadingText" ref="table">
             <slot name="left">
             </slot>
             <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
-                             :min-width="f.min_width" :width="f.width"
+                             :min-width="f.min_width" :width="f.width" :fixed="f.fixed"
                              :align="['number','integer'].includes(f.type)?'right':'left'"
                              :sortable="modelTableOrderingFields.includes(f.name) && 'custom'" :class-name="f.type"
                              :type="f.type" :filters="modelTableFilters[f.name]" v-for="f in modelTableItems"
@@ -55,7 +65,17 @@
                     <template v-else>{{row[f.name]}}</template>
                 </template>
             </el-table-column>
-            <el-table-column label="" :width="`${60*rowActionList.length}px`">
+            <el-table-column label="" :min-width="`${60*rowActionList.length}px`" align="right">
+                <!--<template slot="header" slot-scope="scope">-->
+                    <!--<el-dropdown v-if="batchActionItems && batchActionItems.length>0" @command="onCommand">-->
+                        <!--<span class="el-dropdown-link"> 操作<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i> </span>-->
+                        <!--<el-dropdown-menu slot="dropdown">-->
+                            <!--<el-dropdown-item :command="a.name" :icon="a.icon" v-for="a in batchActionItems"-->
+                                              <!--:key="a.name">{{a.label}}-->
+                            <!--</el-dropdown-item>-->
+                        <!--</el-dropdown-menu>-->
+                    <!--</el-dropdown>-->
+                <!--</template>-->
                 <template slot-scope="{row}">
                     <el-button-group class="hover-show">
                         <el-button :title="a.title" size="small" @click="a.do(row)" v-for="a in row_actions"
@@ -98,41 +118,32 @@
         mounted (){
             this.modelTableInit()
         },
-        computed: {
-
-//      filterItems () {
-//        let actions = this.modelOptions.actions
-//        if (!actions) {
-//          return []
-//        }
-//        let sms = {}
-//        let ff = actions.SEARCH.filter_fields
-//        let rs = []
-//        rs = ff.map((a) => {
-//          let d = Object.assign({}, actions.POST[a])
-//          d.name = a
-//          return d
-//        })
-//        return rs
-//      },
-            top_actions(){
-                return this.get_actions(this.topActionList)
-            },
-            row_actions(){
-                return this.get_actions(this.rowActionList)
-            }
+        data(){
+           return {
+               selectionCount:0
+           }
         },
         methods: {
-            get_actions(action_list){
-                return action_list.map((a) => {
-                    if (a instanceof Object) {
-                        return a
-                    } else {
-                        let d = this.modelTableAvairableActions[a]
-                        d.name = a
-                        return d
-                    }
-                })
+            onModelTableSelectionChange(selection){
+                this.selectionCount = selection.length
+                this.$emit("selection-change", selection)
+            },
+            onCommand(name){
+                let rc = this.selection.length
+                if (rc == 0) {
+                    this.$message('请先勾选至少一条记录')
+                    return
+                }
+                let action = this.batchActionItems.find((a) => a.name == name)
+                if (action && action.do) {
+                    this.$confirm(`确定要对勾选中的${rc}条记录执行"${action.label}"操作吗?`, {type: 'warning'}).then(() => {
+                        action.do(name).then(({data}) => {
+                            this.$message(`操作成功 ${data.rows}`)
+                            this.modelTableRefresh()
+                        })
+                    }).catch(this.onServerResponseError)
+                }
+                this.$emit("command", name)
             },
             toggleRowExpansion(row, expanded){
                 this.$refs.table.toggleRowExpansion(row, expanded)
@@ -159,6 +170,17 @@
             },
             onSortChange(payLoad){
                 this.tableUpdateQueries({ordering: (payLoad.order == 'descending' ? '-' : '') + payLoad.prop})
+            }
+        },
+        computed: {
+            selection(){
+                return this.$refs.table.selection
+            },
+            selectionIds(){
+                return this.selection.map((a) => a.id)
+            },
+            maxHeight(){
+                return window.screen.availHeight
             }
         },
         watch: {
