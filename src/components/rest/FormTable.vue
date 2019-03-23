@@ -4,7 +4,7 @@
                 :formMethod="formMethod" @form-posted="formTableOnFormPosted" :formSubmit="modelFormSubmit"
                 :formTextareaSize="formTextareaSize">
         </r-form>
-        <el-table :data="tableData" size="mini" v-loading="loading" :element-loading-text="loading">
+        <el-table :data="tableData" size="mini" v-loading="loading" :element-loading-text="loading"  @row-dblclick="tableOnRowSelect">
             <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
                              :class-name="`${f.type} field_${f.name}`" v-for="f in modelTableItems"
                              :key="f.name" :type="f.columnType || undefined">
@@ -38,7 +38,7 @@
                 <template slot-scope="{row}">
                     <el-button-group class="hover-show">
                         <el-button :title="a.title" size="small" @click="a.do(row)" v-for="a in row_actions"
-                                   v-if="!(a.name=='edit' && !modelCanEdit)" :key="a.name">
+                                   v-if="!a.show || a.show()" :key="a.name">
                             <i :class="`fa fa-${a.icon}`"></i>
                         </el-button>
                     </el-button-group>

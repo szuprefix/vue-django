@@ -11,19 +11,19 @@
                         :style="`width:${80+15*modelTableSearchFieldNames.length}px`"
                         v-if="modelTableSearchFields.length>0">
                 </el-input>
-                <template v-for="f in modelTableFilterFields">
+                <template v-for="f in modelTableFilterFields" v-if="! (f.name in tableBaseQueries)">
                     <el-select v-model="tableQueries[f.name]" clearable :placeholder="`请选择${f.label}`"
-                               v-if="f.type=='boolean'" @change="tableUpdateQueries">
+                               v-if="f.type=='boolean'" @change="tableOnSearch">
                         <el-option :label="f.label" :value="true"></el-option>
                         <el-option :label="`非${f.label}`" :value="false"></el-option>
                     </el-select>
                     <!--<el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"-->
                     <!--@change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}-->
                     <!--</el-switch>-->
-                    <related-select :field="f" v-model="tableQueries[f.name]" @input="tableUpdateQueries"
+                    <related-select :field="f" v-model="tableQueries[f.name]" @input="tableOnSearch"
                                     :showCreate="false"
                                     v-if="f.model" :modelListSubUrl="modelListSubUrl"
-                                    :tablePageSize="1000"></related-select>
+                                    :tablePageSize="100"></related-select>
                     &nbsp;
                 </template>
                 <!--<el-button @click="tableLoad"-->
@@ -66,20 +66,10 @@
                 </template>
             </el-table-column>
             <el-table-column label="" :min-width="`${60*rowActionList.length}px`" align="right">
-                <!--<template slot="header" slot-scope="scope">-->
-                    <!--<el-dropdown v-if="batchActionItems && batchActionItems.length>0" @command="onCommand">-->
-                        <!--<span class="el-dropdown-link"> 操作<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i> </span>-->
-                        <!--<el-dropdown-menu slot="dropdown">-->
-                            <!--<el-dropdown-item :command="a.name" :icon="a.icon" v-for="a in batchActionItems"-->
-                                              <!--:key="a.name">{{a.label}}-->
-                            <!--</el-dropdown-item>-->
-                        <!--</el-dropdown-menu>-->
-                    <!--</el-dropdown>-->
-                <!--</template>-->
                 <template slot-scope="{row}">
                     <el-button-group class="hover-show">
                         <el-button :title="a.title" size="small" @click="a.do(row)" v-for="a in row_actions"
-                                   v-if="!(a.name=='edit' && !modelCanEdit)" :key="a.name">
+                                   v-if="!a.show || a.show()" :key="a.name">
                             <i :class="`fa fa-${a.icon}`"></i>
                         </el-button>
                     </el-button-group>
@@ -136,7 +126,7 @@
                 }
                 let action = this.batchActionItems.find((a) => a.name == name)
                 if (action && action.do) {
-                    this.$confirm(`确定要对勾选中的${rc}条记录执行"${action.label}"操作吗?`, {type: 'warning'}).then(() => {
+                    this.$confirm(`确定要对勾选中的${rc}条记录执行"${action.label}"操作吗?`, action.notice, {type: 'warning'}).then(() => {
                         action.do(name).then(({data}) => {
                             this.$message(`操作成功 ${data.rows}`)
                             this.modelTableRefresh()

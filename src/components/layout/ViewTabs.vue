@@ -1,6 +1,7 @@
 <template>
     <el-tabs v-model="curTab" type="card" closable @tab-remove="tabRemove" class="viewtabs">
-        <el-tab-pane :label="t.title" :name="t.name" v-for="t in tabs" :key="t.name">
+        <el-tab-pane :name="t.name" v-for="t in tabs" :key="t.name">
+            <template slot="label"><i :class="`fa fa-${t.icon}`" v-if="t.icon"></i>{{t.title}}</template>
             <component :is="t.view" :tab="t"></component>
         </el-tab-pane>
     </el-tabs>
@@ -66,7 +67,7 @@
 
                 let title = to.meta && to.meta.title || to.path
                 let tab = {
-                    title, name: to.path, to, view: view.components.default
+                    title, icon:to.meta.icon, name: to.path, to, view: view.components.default
                 }
                 this.tabAdd(tab)
             }

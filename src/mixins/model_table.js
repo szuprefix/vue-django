@@ -28,7 +28,7 @@ export default {
         },
         rowActionList: {
             type: Array, default: function () {
-                return ['edit']
+                return ['delete', 'edit']
             }
         },
         showTopBar: {
@@ -65,19 +65,25 @@ export default {
                     icon: 'plus',
                     title: '创建',
                     do: this.tableToCreateModel,
-                    show: () => this.modelCanEdit
+                    show: () => this.modelCheckPermission('add')
                 },
                 'edit': {
                     icon: 'pencil',
                     title: '编辑',
                     do: this.tableToEditModel,
-                    show: () => this.modelCanEdit
+                    show: () => this.modelCheckPermission('change')
+                },
+                'delete': {
+                    icon: 'trash',
+                    title: '删除',
+                    do: this.tableToDeleteModel,
+                    show: () => this.modelCheckPermission('delete')
                 },
                 'batch': {
                     icon: 'archive',
                     title: '批量创建',
                     do: this.tableToBatchCreateModel,
-                    show: () => this.modelCanEdit
+                    show: () => this.modelCheckPermission('add')
                 }
             }
         }
@@ -119,17 +125,24 @@ export default {
         tableOnRowSelect(row, column, cell, event){
             if (this.onTableDBClick) {
                 this.onTableDBClick(row, column, cell, event)
-            } else if (this.rowActionList.includes('edit') && this.modelCanEdit) {
+            } else if (this.rowActionList.includes('edit') && this.modelCheckPermission('change')) {
                 this.tableToEditModel(row, column, cell, event)
             }
         },
 
-        tableToEditModel (row, column, cell, event){
+        tableToEditModel (row, ){
             // wayky edit
             const path = this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`)
             this.$router.push(path)
             this.resolveCurrentTagLabel(path, `编辑${row.__str__}`)
         },
+
+        tableToDeleteModel (row){
+            return this.$confirm(`确定要删除${row.__str__}吗?`, {type:'warning'}).then(()=> {
+                return this.modelDelete(row.id)
+            }).catch(this.onServerResponseError)
+        },
+
 
         tableToBatchCreateModel (){
             this.$router.push(this.resolveRoutePath(`${this.modelListUrl}batch?${this.modelConfig.title_field}=${this.tableQueries.search}`))
@@ -223,7 +236,14 @@ export default {
     },
     computed: {
         modelTableSearchFieldNames () {
-            return this.modelTableSearchFields.join(',')
+            let vns = []
+            Object.keys(this.tableBaseQueries).forEach((a) => {
+                let c = this.modelFieldConfigs[a]
+                if(c){
+                    vns.push(c.label)
+                }
+            })
+            return this.modelTableSearchFields.filter((a) => !(a in vns)).join(',')
         },
 
         modelTableTitle(){

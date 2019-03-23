@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-row type="flex" justify="space-between" style="padding-bottom: 20px;">
+        <el-row type="flex" justify="space-between" style="padding-bottom: 20px;" v-if="!formInline">
             <el-col :span="18">
                 <slot name="actions"></slot>
             </el-col>
@@ -8,7 +8,7 @@
                 <slot name="actions2">
                     <el-button-group>
                         <el-button :type="a.type" :title="a.title" @click="a.do" v-for="a in top_actions"
-                                   :key="a.name">
+                                   v-if="!a.show || a.show()" :key="a.name">
                             <i :class="`fa fa-${a.icon}`"></i>{{a.label}}
                         </el-button>
                     </el-button-group>
@@ -20,7 +20,7 @@
                 @beforesubmit="onBeforeSubmit" :formInline="formInline"
                 :formMethod="formMethod" @form-posted="modelFormOnPosted" :formSubmit="modelFormSubmit"
                 :formTextareaSize="formTextareaSize">
-            <span slot="submit"></span>
+            <span slot="submit" v-if="!formInline"></span>
         </r-form>
     </div>
 </template>
@@ -33,22 +33,20 @@
         ],
         props: {
             appModelName: {
-              type: String,
-              default: () => ''
+                type: String,
+                default: () => ''
             },
             value: Object,
             id: [Number, String],
             onFormPosted: Function,
             topActionList: {
                 type: Array, default: function () {
-                    return ['save']
+                    return ['delete', 'save']
                 }
             }
         },
         data () {
-            return {
-
-            }
+            return {}
         },
         components: {
             RForm
@@ -65,12 +63,14 @@
                 this.$refs.form.onSubmit()
             },
             onBack() {
-              this.$router.go(-1)
+                this.$router.go(-1)
             },
             onDelete(){
-                this.$confirm('确定要删除吗?', '提示', {type: 'warning'}).then(() => {
-                    this.modelDelete()
-                    this.$emit("model-deleted", {model: this.modelConfig})
+                this.$confirm('确定要删除吗?', {type: 'warning'}).then(() => {
+                    return this.modelDelete()
+
+                }).then(() => {
+//                    this.$emit("model-deleted", {model: this.modelConfig})
                 }).catch(this.onServerResponseError)
             },
             get_actions(action_list){

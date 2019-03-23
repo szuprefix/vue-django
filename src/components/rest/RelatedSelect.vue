@@ -7,6 +7,7 @@
                    :placeholder="field.placeholder || `请选择${field.label}`">
             <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
                        v-for="c,i in tableData" :key="c.id || c.pk || c.url || c.name"></el-option>
+            <el-option v-if="tableCount>tablePageSize" value="" disabled>记录太多未展示完全,请输入关键字进行搜索</el-option>
         </el-select>
             <i class="fa fa-plus" :title="`新增${field.label}`" @click="toCreateModel" v-if="showCreate"
                style="cursor: pointer">

@@ -29,12 +29,14 @@
                         </el-form-item>
                     </el-col>
                 </template>
+                <slot name="submit">
+                    <el-col :xs="formInline?12:24" :sm="formInline?8:24" :md="formInline?6:24" :lg="formInline?4:24" :xl="formInline?3:24">
+                        <el-form-item>
+                            <el-button type="primary" @click="onSubmit">{{formSubmitName}}</el-button>
+                        </el-form-item>
+                    </el-col>
+                </slot>
             </el-row>
-            <slot name="submit">
-                <el-form-item>
-                    <el-button type="primary" @click="onSubmit">{{formSubmitName}}</el-button>
-                </el-form-item>
-            </slot>
         </el-form>
     </div>
 </template>

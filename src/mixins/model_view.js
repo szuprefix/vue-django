@@ -5,118 +5,126 @@ import {Register} from '../utils/app_model'
 import axios from '../configs/axios'
 // import store from '../store'
 export function joinErrors(errors) {
-  let es = {}
-  for (let n in errors) {
-    es[n] = errors[n].join("")
-  }
-  return es
+    let es = {}
+    for (let n in errors) {
+        es[n] = errors[n].join("")
+    }
+    return es
 }
 
 export default {
-  data () {
-    return {
-      modelConfig: {},
-      modelId: null,
-      modelFieldConfigs: {},
-      modelOptions: {},
-      modelErrors: {},
-      modelData: {},
-      // appModelName: null // wayky modified : model_table mixin already define props
-    }
-  },
+    props:{
 
-  methods: {
-    modelInit(){
-      this.modelConfig = Register.getConfig(this.appModelName)
+        modelDefaultValues: {type:Object, default: () => { return {}}}
     },
-    modelLoadData () {
-      if (!this.modelId) {
-        return Promise.resolve({})
-      } else {
-        return axios.get(this.modelDetailUrl).then(({data}) => {
-          return data
-        })
-      }
-    },
-    modelLoadOptions(){
-      if (this.modelConfig.rest_options) {
-        this.modelCacheOptions(this.modelConfig.rest_options)
-        return Promise.resolve(this.modelConfig.rest_options)
-      }
-      return axios.options(this.modelListUrl).then(({data}) => {
-        this.modelConfig.rest_options = data
-        this.modelCacheOptions(this.modelConfig.rest_options)
-        return data
-      })
-    },
-    modelCacheOptions(options){
-      this.modelOptions = Object.assign({}, this.modelOptions, options)
-      this.modelFieldConfigs = Object.assign({}, this.modelFieldConfigs, options.actions.LIST, options.actions.POST)
-      Object.keys(this.modelFieldConfigs).forEach((a) => {
-        this.modelFieldConfigs[a].name = a
-      })
-    },
-    modelEmptyDataFromOptions(m){
-      let r = {}
-      Object.keys(m).forEach((k) => {
-        let f = m[k]
-        r[k] = f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null
-      })
-      return r
-    },
-    modelLoad() {
-      return axios.all([this.modelLoadData(), this.modelLoadOptions()]).then(axios.spread((data, rest_options) => {
-        if (!this.modelId) {
-          data = this.modelEmptyDataFromOptions(rest_options.actions.POST)
+    data () {
+        return {
+            modelConfig: {},
+            modelId: null,
+            modelFieldConfigs: {},
+            modelOptions: {},
+            modelErrors: {},
+            modelData: {},
+            // appModelName: null // wayky modified : model_table mixin already define props
         }
-        this.modelData = Object.assign({}, this.modelData, data)
-        return [data, rest_options]
-      }))
     },
-    modelSave(data){
-      let d = data || this.modelData
-      let promise
-      if (!this.modelId) {
-        promise = axios.post(this.modelListUrl, d)
-      } else {
-        promise = axios.put(this.modelDetailUrl, d)
-      }
-      return promise.then(({data}) => {
-        this.modelId = data.id
-        this.modelData = Object.assign({}, this.modelData, data)
-        this.modelEmitPosted()
-        return data
-      })//.catch((error) => this.onErrors(error))
-    },
-    modelDelete(){
-      return axios.delete(this.modelDetailUrl).then(({data}) => {
 
-      })
+    methods: {
+        modelInit(){
+            this.modelConfig = Register.getConfig(this.appModelName)
+        },
+        modelLoadData () {
+            if (!this.modelId) {
+                return Promise.resolve({})
+            } else {
+                return axios.get(this.modelDetailUrl).then(({data}) => {
+                    return data
+                })
+            }
+        },
+        modelLoadOptions(){
+            if (this.modelConfig.rest_options) {
+                this.modelCacheOptions(this.modelConfig.rest_options)
+                return Promise.resolve(this.modelConfig.rest_options)
+            }
+            return axios.options(this.modelListUrl).then(({data}) => {
+                this.modelConfig.rest_options = data
+                this.modelCacheOptions(this.modelConfig.rest_options)
+                return data
+            })
+        },
+        modelCacheOptions(options){
+            this.modelOptions = Object.assign({}, this.modelOptions, options)
+            this.modelFieldConfigs = Object.assign({}, this.modelFieldConfigs, options.actions.LIST, options.actions.POST)
+            Object.keys(this.modelFieldConfigs).forEach((a) => {
+                this.modelFieldConfigs[a].name = a
+            })
+        },
+        modelEmptyDataFromOptions(m){
+            let r = {}
+            Object.keys(m).forEach((k) => {
+                let f = m[k]
+                let v = this.modelDefaultValues[f.name]
+                r[k] = v !== undefined ? v : ( f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null )
+            })
+            return r
+        },
+        modelLoad() {
+            return axios.all([this.modelLoadData(), this.modelLoadOptions()]).then(axios.spread((data, rest_options) => {
+                if (!this.modelId) {
+                    data = this.modelEmptyDataFromOptions(rest_options.actions.POST)
+                }
+                this.modelData = Object.assign({}, this.modelData, data)
+                return [data, rest_options]
+            }))
+        },
+        modelSave(data){
+            let d = data || this.modelData
+            let promise
+            if (!this.modelId) {
+                promise = axios.post(this.modelListUrl, d)
+            } else {
+                promise = axios.put(this.modelDetailUrl, d)
+            }
+            return promise.then(({data}) => {
+                this.modelId = data.id
+                this.modelData = Object.assign({}, this.modelData, data)
+                this.modelEmitPosted()
+                return data
+            })//.catch((error) => this.onErrors(error))
+        },
+        modelDelete(id){
+            return axios.delete(this.modelGetDetailUrl(id)).then(() => {
+                this.$store.state.bus.$emit('model-deleted', {model: this.modelConfig})
+            })
+        },
+        modelEmitPosted(){
+            this.$store.state.bus.$emit('model-posted', {model: this.modelConfig})
+        },
+        onErrors(error){
+            if (error.code === 400) {
+                this.modelErrors = joinErrors(error.msg)
+            }
+            return Promise.reject(error)
+        },
+        modelGetDetailUrl(id){
+            let mid = id || this.modelId
+            return `${this.modelListUrl}${mid}/`
+        },
+        modelTitle(){
+            return !this.modelId && `新增${this.modelConfig.verboseName}` || this.modelData['__str__']
+        },
+        modelCheckPermission(p){
+            let pn = this.appModelName.replace('.', `.${p}_`)
+            return this.$store.state.user.permissions.includes(pn)
+        }
     },
-    modelEmitPosted(){
-      this.$store.state.bus.$emit('model-posted', {model: this.modelConfig})
-    },
-    onErrors(error){
-      if (error.code === 400) {
-        this.modelErrors = joinErrors(error.msg)
-      }
-      return Promise.reject(error)
-    },
-    modelTitle(){
-      return !this.modelId && `新增${this.modelConfig.verboseName}` || this.modelData['__str__']
+    computed: {
+        modelListUrl(){
+            return `/${this.appModelName.replace(".", "/")}/`
+        },
+        modelDetailUrl(){
+            return this.modelGetDetailUrl(this.modelId)
+        }
     }
-  },
-  computed: {
-    modelListUrl(){
-      return `/${this.appModelName.replace(".", "/")}/`
-    },
-    modelDetailUrl(){
-      return `${this.modelListUrl}${this.modelId}/`
-    },
-    modelCanEdit(){
-      let actions = this.modelOptions.actions
-      // console.log(actions)
-      return actions && actions.POST ? true : false
-    }
-  }
 }
