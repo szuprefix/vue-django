@@ -15,7 +15,7 @@
                     <el-select v-model="tableQueries[f.name]" clearable :placeholder="`请选择${f.label}`"
                                v-if="f.type=='boolean'" @change="tableOnSearch">
                         <el-option :label="f.label" :value="true"></el-option>
-                        <el-option :label="`非${f.label}`" :value="false"></el-option>
+                        <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
                     </el-select>
                     <!--<el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"-->
                     <!--@change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}-->
@@ -43,8 +43,10 @@
             </el-col>
         </el-row>
         <div v-if="batchActionItems && batchActionItems.length>0">
-            <el-button plain :icon="a.icon" v-for="a in batchActionItems" @click="onCommand(a.name)" :disabled="selectionCount==0"
-                        :key="a.name">{{a.label}}</el-button>
+            <el-button plain :icon="a.icon" v-for="a in batchActionItems" @click="onCommand(a.name)"
+                       :disabled="selectionCount==0"
+                       :key="a.name">{{a.label}}
+            </el-button>
         </div>
         <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange" :max-height="maxHeight"
                   @selection-change="onModelTableSelectionChange"
@@ -56,7 +58,7 @@
                              :align="['number','integer'].includes(f.type)?'right':'left'"
                              :sortable="modelTableOrderingFields.includes(f.name) && 'custom'" :class-name="f.type"
                              :type="f.type" :filters="modelTableFilters[f.name]" v-for="f in modelTableItems"
-                             :filter-method="filterHandler"
+                             :filter-method="f.name in modelTableFilters?filterHandler:undefined"
                              :key="f.name">
                 <template slot-scope="{row}">
                     <component :is="f.widget" v-model="row" :prop="f.name" :field="f.field"
@@ -109,9 +111,9 @@
             this.modelTableInit()
         },
         data(){
-           return {
-               selectionCount:0
-           }
+            return {
+                selectionCount: 0
+            }
         },
         methods: {
             onModelTableSelectionChange(selection){
@@ -160,6 +162,12 @@
             },
             onSortChange(payLoad){
                 this.tableUpdateQueries({ordering: (payLoad.order == 'descending' ? '-' : '') + payLoad.prop})
+            },
+            getBoolFieldFalseLabel(trueLabel){
+                let l = trueLabel
+                return l.startsWith('已') ? `未${l.substr(1)}` : (
+                    l.startsWith('有') ? `无${l.substr(1)}` : `非${l}`
+                )
             }
         },
         computed: {

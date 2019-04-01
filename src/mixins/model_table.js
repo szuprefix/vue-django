@@ -110,7 +110,7 @@ export default {
                 this.modelTableFilterFields = filterItems.map((a) => {
                     return Object.assign({multiple: false}, this.modelFieldConfigs[a])
                 })
-                Object.assign(this.modelTableFilters, this.getFilters())
+                this.modelTableFilters = Object.assign({}, this.getFilters())
                 this.modelTableItems = this.tableNormalizeItems(this.tableItems)
             })
         },
