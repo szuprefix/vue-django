@@ -68,6 +68,9 @@
                 </template>
             </el-table-column>
             <el-table-column label="" :min-width="`${60*rowActionList.length}px`" align="right">
+                <template slot="header" slot-scope="scope">
+                    <el-button title="导出excel" @click="dumpExcelData"><i class="fa fa-download"></i></el-button>
+                </template>
                 <template slot-scope="{row}">
                     <el-button-group class="hover-show">
                         <el-button :title="a.title" size="small" @click="a.do(row)" v-for="a in row_actions"
@@ -101,11 +104,14 @@
 <script>
     import model_table from '../../mixins/model_table'
     import RelatedSelect from './RelatedSelect.vue'
+    //    import DownloadExcel from 'vue-json-excel'
+    import XLSX from 'xlsx'
+    import Qs from 'qs'
     export default{
         mixins: [model_table],
 
         components: {
-            RelatedSelect
+            RelatedSelect//, DownloadExcel
         },
         mounted (){
             this.modelTableInit()
@@ -116,6 +122,34 @@
             }
         },
         methods: {
+            getGridData(data){
+                let ds = data.map((d) => {
+                    return this.modelTableItems.map((a) => {
+                        let v = d[a.name]
+                        if (a.choices) {
+                            return a.choices[v]
+                        } else if (a.model) {
+                            return d[`${a.name}_name`]
+                        }
+                        return v
+
+                    })
+                })
+                return [this.modelTableItems.map((a) => a.label)].concat(ds)
+            },
+            dumpExcelData(){
+                console.log('dumpExcelData')
+                let d = Object.assign({}, this.tableQueries, {page: 1, page_size: this.tableCount})
+                this.loading = true
+                this.loadingText = '正在导出'
+                this.$http.get(`${this.tableUrl}?${Qs.stringify(d)}`).then(({data}) => {
+                    let wb = XLSX.utils.book_new()
+                    let ws = XLSX.utils.aoa_to_sheet(this.getGridData(data.results))
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1')
+                    XLSX.writeFile(wb, `${this.modelTableTitle}.xlsx`)
+                    this.loading = false
+                }).catch(this.onServerResponseError)
+            },
             onModelTableSelectionChange(selection){
                 this.selectionCount = selection.length
                 this.$emit("selection-change", selection)

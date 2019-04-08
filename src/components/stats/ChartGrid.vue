@@ -1,12 +1,20 @@
 <template>
     <el-row>
-        <el-col :sm="24" :md="12" :xl="8" v-for="c in items" :key="c.name">
+        <el-col :sm="c.sm || 24" :md="c.md || 12" :xl="c.xl || 8" v-for="c in items" :key="c.name">
             <chart v-if="chartData[c.name]" :options="chartOptions[c.name]" :auto-resize="true"></chart>
         </el-col>
     </el-row>
 </template>
 <script>
     import Qs from 'qs'
+    let OPTIONS_TOOLBOX = {
+        show: true,
+        right:'5%',
+        feature : {
+            dataView: {show: true, title: '数据视图', readOnly: true},
+        }
+    }
+
     export default{
         props: {
             period: Array,
@@ -16,7 +24,7 @@
         },
         data () {
             return {
-                chartData: {}
+                chartData: {},
             }
         },
         components: {},
@@ -36,6 +44,7 @@
                             type: 'cross'
                         }
                     },
+                    toolbox: OPTIONS_TOOLBOX,
                     xAxis: {
                         type: 'category',
                         data: data.map((a) => a[0])
@@ -46,6 +55,7 @@
                     series: [{
                         type: 'line',
                         smooth: true,
+                        name: item.title,
                         data: data.map((a) => a[1])
                     }]
                 }
@@ -75,6 +85,7 @@
                         }
                     },
                     dataZoom,
+                    toolbox: OPTIONS_TOOLBOX,
                     yAxis: {
                         type: 'category',
                         data: data.map((a) => a[0])
@@ -89,6 +100,7 @@
                     series: [{
                         type: 'bar',
                         smooth: true,
+                        name: item.title,
                         data: data.map((a) => a[1])
                     }]
                 }

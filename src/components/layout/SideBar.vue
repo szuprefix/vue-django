@@ -21,8 +21,13 @@
 </template>
 <script>
     import {mapState} from 'vuex'
+    import menus from '@/configs/menus'
+
     export default {
-        computed: mapState(['user', 'menus']),
+        computed: mapState(['user']),
+        data () {
+            return {menus}
+        },
         methods: {
             hasPerm(p){
                 if (p instanceof Array) {

@@ -4,17 +4,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import apps from '@/configs/apps'
-import menus from '@/configs/menus'
 import {logout} from '../utils/auth'
 Vue.use(Vuex)
 const state = {
     bus: new Vue(),
     user: {},
     apps,
-    menus,
     system_name: '',
     logo:require('../assets/logo.png'),
 }
+
 
 var store = new Vuex.Store({
     state: state,
