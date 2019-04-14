@@ -4,7 +4,7 @@
 ///全角空格为12288，半角空格为32
 ///其他字符半角(33-126)与全角(65281-65374)的对应关系是：均相差65248
 //半角转换为全角函数
-function strB2Q(txtstring) {
+export function strB2Q(txtstring) {
     var tmp = ""
     for (var i = 0; i < txtstring.length; i++) {
         var a = txtstring.charCodeAt(i)
@@ -18,7 +18,7 @@ function strB2Q(txtstring) {
     return tmp
 }
 //全角转换为半角函数   
-function strQ2B(str) {
+export function strQ2B(str) {
     var tmp = ""
     for (var i = 0; i < str.length; i++) {
         var a = str.charCodeAt(i)
