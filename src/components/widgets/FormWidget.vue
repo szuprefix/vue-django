@@ -39,6 +39,7 @@
                 :is="field.widget"
                 @change="fieldValueChanged"
                 :placeholder="field.label"
+                :appModelName="field.model"
                 :field="field"
                 :ref="field.ref">
         </component>

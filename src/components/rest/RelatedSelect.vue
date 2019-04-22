@@ -28,7 +28,6 @@
             modelListSubUrl: String
         },
         created(){
-            this.appModelName = this.field.model
             this.modelInit()
             this.tableUrl = this.modelListSubUrl && `${this.modelListUrl}${this.modelListSubUrl}/` || this.modelListUrl
             if (['number','string'].includes(typeof this.value) ) {

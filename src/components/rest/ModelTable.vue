@@ -1,52 +1,35 @@
 <template>
     <div>
-        <el-row :gutter="20" v-if="showTopBar" class="filterbox">
-            <el-col :span="16">
-                <el-input
-                        :placeholder="`搜索${modelTableSearchFieldNames}`"
-                        v-model="tableQueries.search"
-                        suffix-icon="el-icon-search"
-                        @change="tableOnSearch"
-                        clearable
-                        :style="`width:${80+15*modelTableSearchFieldNames.length}px`"
-                        v-if="modelTableSearchFields.length>0">
-                </el-input>
-                <template v-for="f in modelTableFilterFields" v-if="! (f.name in tableBaseQueries)">
-                    <el-select v-model="tableQueries[f.name]" clearable :placeholder="`请选择${f.label}`"
-                               v-if="f.type=='boolean'" @change="tableOnSearch">
-                        <el-option :label="f.label" :value="true"></el-option>
-                        <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
-                    </el-select>
-                    <!--<el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"-->
-                    <!--@change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}-->
-                    <!--</el-switch>-->
-                    <related-select :field="f" v-model="tableQueries[f.name]" @input="tableOnSearch"
-                                    :showCreate="false"
-                                    v-if="f.model" :modelListSubUrl="modelListSubUrl"
-                                    :tablePageSize="100"></related-select>
-                    &nbsp;
-                </template>
-                <!--<el-button @click="tableLoad"-->
-                <!--v-if="modelTableSearchFields.length>0"><i class="fa fa-search"></i></el-button>-->
-            </el-col>
-            <el-col :span="8">
-                <div class="flex-right">
-                    <slot name="actions">
-                        <el-button-group>
-                            <el-button :title="a.title" size="small" @click="a.do" v-for="a in top_actions"
-                                       v-if="!a.show || a.show()" :key="a.name">
-                                <i :class="`fa fa-${a.icon}`"></i>
-                            </el-button>
-                        </el-button-group>
-                    </slot>
-                </div>
-            </el-col>
-        </el-row>
-        <div v-if="batchActionItems && batchActionItems.length>0">
-            <el-button plain :icon="a.icon" v-for="a in batchActionItems" @click="onCommand(a.name)"
-                       :disabled="selectionCount==0"
-                       :key="a.name">{{a.label}}
-            </el-button>
+        <div v-if="showTopBar">
+        <span>
+            <el-input
+                    :placeholder="`搜索${modelTableSearchFieldNames}`"
+                    v-model="tableQueries.search"
+                    suffix-icon="el-icon-search"
+                    @change="tableOnSearch"
+                    clearable
+                    :style="`width:${modelTableSearchFieldNames.length+4}rem`"
+                    v-if="modelTableSearchFields.length>0">
+            </el-input>
+            <template v-for="f in modelTableFilterFields" v-if="! (f.name in tableBaseQueries)">
+                <el-select v-model="tableQueries[f.name]" clearable :placeholder="`请选择${f.label}`"
+                           v-if="f.type=='boolean'" @change="tableOnSearch">
+                    <el-option :label="f.label" :value="true"></el-option>
+                    <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
+                </el-select>
+                <related-select :field="f" v-model="tableQueries[f.name]" @input="tableOnSearch"
+                                :showCreate="false" :appModelName="f.model"
+                                v-if="f.model" :modelListSubUrl="modelListSubUrl"
+                                :tablePageSize="100"></related-select>
+                &nbsp;
+            </template>
+        </span>
+            <p v-if="batchActionItems && batchActionItems.length>0"/>
+            <batch-actions :items="batchActionItems" :count="selectionCount" @done="modelTableRefresh"
+                           v-if="batchActionItems"></batch-actions>
+            <slot name="actions">
+                <actions :items="top_actions" style="float: right"></actions>
+            </slot>
         </div>
         <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange" :max-height="maxHeight"
                   @selection-change="onModelTableSelectionChange"
@@ -69,15 +52,10 @@
             </el-table-column>
             <el-table-column label="" :min-width="`${60*rowActionList.length}px`" align="right">
                 <template slot="header" slot-scope="scope">
-                    <el-button title="导出excel" @click="dumpExcelData"><i class="fa fa-download"></i></el-button>
+
                 </template>
                 <template slot-scope="{row}">
-                    <el-button-group class="hover-show">
-                        <el-button :title="a.title" size="small" @click="a.do(row)" v-for="a in row_actions"
-                                   v-if="!a.show || a.show()" :key="a.name">
-                            <i :class="`fa fa-${a.icon}`"></i>
-                        </el-button>
-                    </el-button-group>
+                    <actions :items="row_actions" class="hover-show" trigger="hover"></actions>
                 </template>
             </el-table-column>
 
@@ -103,6 +81,8 @@
 </style>
 <script>
     import model_table from '../../mixins/model_table'
+    import Actions from '../layout/Actions.vue'
+    import BatchActions from '../layout/BatchActions.vue'
     import RelatedSelect from './RelatedSelect.vue'
     //    import DownloadExcel from 'vue-json-excel'
     import XLSX from 'xlsx'
@@ -111,7 +91,7 @@
         mixins: [model_table],
 
         components: {
-            RelatedSelect//, DownloadExcel
+            RelatedSelect, Actions, BatchActions//, DownloadExcel
         },
         mounted (){
             this.modelTableInit()
@@ -138,7 +118,7 @@
                 return [this.modelTableItems.map((a) => a.label)].concat(ds)
             },
             dumpExcelData(){
-                console.log('dumpExcelData')
+//                console.log('dumpExcelData')
                 let d = Object.assign({}, this.tableQueries, {page: 1, page_size: this.tableCount})
                 this.loading = true
                 this.loadingText = '正在导出'
