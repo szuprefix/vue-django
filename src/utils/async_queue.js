@@ -18,6 +18,9 @@ let queueLimit = (list, limit, asyncHandle) => {
 
     let listCopy = [].concat(list)
     let asyncList = [] // 正在进行的所有并发异步操作
+    if ( limit > list.length){
+        limit = list.length
+    }
     while (limit--) {
         asyncList.push(recursion(listCopy))
     }

@@ -14,7 +14,7 @@ export function joinErrors(errors) {
 
 export default {
     props:{
-
+        appModelName: String,
         modelDefaultValues: {type:Object, default: () => { return {}}}
     },
     data () {
@@ -24,8 +24,7 @@ export default {
             modelFieldConfigs: {},
             modelOptions: {},
             modelErrors: {},
-            modelData: {},
-            // appModelName: null // wayky modified : model_table mixin already define props
+            modelData: {}
         }
     },
 

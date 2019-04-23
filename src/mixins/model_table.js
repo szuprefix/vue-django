@@ -11,10 +11,6 @@ import ForeignKey from '../components/widgets/ForeignKey.vue'
 export default {
     mixins: [model_view, table_view],
     props: {
-        appModelName: {
-            type: String,
-            default: () => ''
-        },
         tableItems: {
             type: Array, default: function () {
                 return [{name: '__str__', label: '名称'}]
@@ -23,12 +19,12 @@ export default {
         modelTableUrl: String,
         topActionList: {
             type: Array, default: function () {
-                return ['refresh', 'create']
+                return ['refresh', 'create', ['download']]
             }
         },
         rowActionList: {
             type: Array, default: function () {
-                return ['delete', 'edit']
+                return ['edit', ['delete']]
             }
         },
         showTopBar: {
@@ -44,9 +40,9 @@ export default {
         onTableDBClick: {
             type: Function, default: undefined
         },
-        modelListSubUrl:String,
+        modelListSubUrl: String,
         filterItems: Array,
-        batchActionItems: {type:Array, default: () => []}
+        batchActionItems: {type: Array, default: () => []}
     },
     data () {
         return {
@@ -78,6 +74,11 @@ export default {
                     title: '删除',
                     do: this.tableToDeleteModel,
                     show: () => this.modelCheckPermission('delete')
+                },
+                'download': {
+                    icon: 'download',
+                    title: '导出',
+                    do: this.dumpExcelData
                 },
                 'batch': {
                     icon: 'archive',
@@ -130,7 +131,7 @@ export default {
             }
         },
 
-        tableToEditModel (row, ){
+        tableToEditModel (row,){
             // wayky edit
             const path = this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`)
             this.$router.push(path)
@@ -138,7 +139,7 @@ export default {
         },
 
         tableToDeleteModel (row){
-            return this.$confirm(`确定要删除${row.__str__}吗?`, {type:'warning'}).then(()=> {
+            return this.$confirm(`确定要删除${row.__str__}吗?`, {type: 'warning'}).then(() => {
                 return this.modelDelete(row.id)
             }).catch(this.onServerResponseError)
         },
@@ -209,13 +210,20 @@ export default {
         },
         get_actions(action_list){
             return action_list.map((a) => {
-                if (a instanceof Object) {
-                    return a
-                } else {
+                if (typeof a === 'string') {
                     let d = this.modelTableAvairableActions[a]
+                    if (! d){
+                        console.error(`find no avariable actions for ${a}`)
+                    }
                     d.name = a
                     return d
                 }
+                else if (a instanceof Array) {
+                    return this.get_actions(a)
+                } else {
+                    return a
+                }
+
             })
         },
         getFilters(){
@@ -239,7 +247,7 @@ export default {
             let vns = []
             Object.keys(this.tableBaseQueries).forEach((a) => {
                 let c = this.modelFieldConfigs[a]
-                if(c){
+                if (c) {
                     vns.push(c.label)
                 }
             })

@@ -5,15 +5,7 @@
                 <slot name="actions"></slot>
             </el-col>
             <el-col :span="6" class="flex-right">
-                <slot name="actions2">
-                    <el-button-group>
-                        <el-button :type="a.type" :title="a.title" @click="a.do" v-for="a in top_actions"
-                                   v-if="!a.show || a.show()" :key="a.name">
-                            <i :class="`fa fa-${a.icon}`"></i>{{a.label}}
-                        </el-button>
-                    </el-button-group>
-                </slot>
-
+                    <actions :items="top_actions"></actions>
             </el-col>
         </el-row>
         <r-form :formUrl="formUrl" :formItems="modelFormItems" v-model="formValue" ref="form"
@@ -27,15 +19,12 @@
 <script>
     import RForm from './Form.vue'
     import model_form from '../../mixins/model_form'
+    import Actions from '../layout/Actions.vue'
     export default{
         mixins: [
             model_form
         ],
         props: {
-            appModelName: {
-                type: String,
-                default: () => ''
-            },
             value: Object,
             id: [Number, String],
             onFormPosted: Function,
@@ -49,7 +38,7 @@
             return {}
         },
         components: {
-            RForm
+            RForm,Actions
         },
         created(){
             this.modelFormInit()
