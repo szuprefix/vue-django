@@ -85,7 +85,7 @@
             </slot>
         </el-table>
         <div class="stick-bottom model-table-pager-container">
-            <el-pagination v-if="showPagger"
+            <el-pagination v-if="tableCount>tablePageSize || showPagger"
                            background
                            layout="total, sizes, prev, pager, next, jumper"
                            :page-size="tablePageSize"
