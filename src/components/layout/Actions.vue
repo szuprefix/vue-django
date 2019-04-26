@@ -46,7 +46,9 @@
             dropdownActions () {
                 return this.items.filter((a) => {
                     return (a instanceof Array)
-                }).reduce((a, b) => a.concat(b), [])
+                }).reduce((a, b) => a.concat(b), []).filter((a) => {
+                    return !a.show || a.show()
+                })
             }
         }
     }
