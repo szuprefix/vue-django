@@ -8,7 +8,7 @@
                     suffix-icon="el-icon-search"
                     @change="tableOnSearch"
                     clearable
-                    :style="`width:${modelTableSearchFieldNames.length+4}rem`"
+                    :style="`width:${modelTableSearchFieldNames.length+5}rem;min-width:10rem;`"
                     v-if="modelTableSearchFields.length>0">
             </el-input>
             <template v-for="f in modelTableFilterFields" v-if="! (f.name in tableBaseQueries)">
