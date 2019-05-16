@@ -47,16 +47,6 @@ export default {
         }
     },
 
-    computed: {
-        formMethod () {
-            return this.modelId ? "put" : "post"
-        },
-
-        formUrl () {
-            return this.modelId ? this.modelDetailUrl : this.modelListUrl
-        }
-    },
-
     methods: {
         modelFormGetId(){
             let id = this.value && this.value.id || this.id || this.$route.params.id
@@ -66,8 +56,6 @@ export default {
             this.modelInit()
             this.modelId = this.modelFormGetId()
             this.modelLoad().then((data, options) => {
-                // this.formMethod = this.modelId ? "put" : "post"
-                // this.formUrl = this.modelId ? this.modelDetailUrl : this.modelListUrl
                 this.modelFormItems = this.formNormalizeItems(this.modelFormNormalizeItems(this.formItems))
             })
         },
@@ -90,22 +78,12 @@ export default {
                 a = Object.assign({}, this.modelFieldConfigs[i.name], i)
             }
             a.widget = a.widget || this.modelFormDefaultWidget(a)
-            // if (a.choices) {
-            //     a.choices = this.modelFormatChoices(a.choices)
-            // }
             return a
         },
         modelFormNormalizeItems(formItems) {
             let items = formItems.map((i) => this.modelFormNormalizeItem(i))
             return items
         },
-        // modelFormatChoices(cs)
-        // {
-        //     if (cs.length < 1 || cs[0] instanceof Array) {
-        //         return cs
-        //     }
-        //     return cs.map((a) => [a.value, a.display_name])
-        // },
         modelFormSubmit()
         {
             return this.modelSave(this.formValue)
@@ -135,6 +113,13 @@ export default {
         {
             this.formValue = Object.assign({}, val)
             this.$emit("change", val)
+        },
+        formMethod () {
+            return this.modelId ? "put" : "post"
+        },
+
+        formUrl () {
+            return this.modelId ? this.modelDetailUrl : this.modelListUrl
         }
     }
 
