@@ -98,7 +98,8 @@
         },
         data(){
             return {
-                selectionCount: 0
+                selectionCount: 0,
+                maxHeight: window.screen.availHeight
             }
         },
         methods: {
@@ -190,9 +191,6 @@
             },
             selectionIds(){
                 return this.selection.map((a) => a.id)
-            },
-            maxHeight(){
-                return window.screen.availHeight
             }
         },
         watch: {
