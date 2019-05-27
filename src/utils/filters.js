@@ -130,5 +130,6 @@ export default {
     formatTime,
     nFormatter,
     html2Text,
-
+    toThousandslsFilter,
+    percent
 }

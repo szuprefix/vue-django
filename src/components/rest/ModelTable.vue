@@ -54,8 +54,8 @@
                 <template slot="header" slot-scope="scope">
 
                 </template>
-                <template slot-scope="{row}">
-                    <actions :items="row_actions" class="hover-show" trigger="hover"></actions>
+                <template slot-scope="scope">
+                    <actions :items="row_actions" :context="scope" class="hover-show" trigger="hover"></actions>
                 </template>
             </el-table-column>
 
