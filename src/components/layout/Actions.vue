@@ -2,7 +2,7 @@
     <div>
         <el-button-group v-if="showActions.length>0">
             <template v-for="a in showActions">
-                <el-button :type="a.type" :title="a.title" size="small" @click="a.do" v-if="!a.show || a.show()" :key="a.name">
+                <el-button :type="a.type" :title="a.title" size="small" @click="handleCommand(a.do)" v-if="!a.show || a.show()" :key="a.name">
                     <i :class="`fa fa-${a.icon}`"></i>
                 </el-button>
             </template>
@@ -26,6 +26,7 @@
     export default{
         props: {
             items: Array,
+            context: Object,
             trigger: {type: String, default: "hover"}
         },
         data () {
@@ -34,7 +35,7 @@
         components: {},
         methods: {
             handleCommand (command) {
-                command()
+                command(this.context)
             }
         },
         computed: {

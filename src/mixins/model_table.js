@@ -127,18 +127,18 @@ export default {
             if (this.onTableDBClick) {
                 this.onTableDBClick(row, column, cell, event)
             } else if (this.rowActionList.includes('edit') && this.modelCheckPermission('change')) {
-                this.tableToEditModel(row, column, cell, event)
+                this.tableToEditModel({row, column, cell, event})
             }
         },
 
-        tableToEditModel (row,){
+        tableToEditModel ({row}){
             // wayky edit
             const path = this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`)
             this.$router.push(path)
             this.resolveCurrentTagLabel(path, `编辑${row.__str__}`)
         },
 
-        tableToDeleteModel (row){
+        tableToDeleteModel ({row}){
             return this.$confirm(`确定要删除${row.__str__}吗?`, {type: 'warning'}).then(() => {
                 return this.modelDelete(row.id)
             }).catch(this.onServerResponseError)
