@@ -101,7 +101,7 @@
                                 m[d.name] = d.id
                             })
                             this.tmap[f.name] = {map: m, field: f}
-                            console.log(this.tmap)
+//                            console.log(this.tmap)
                         })
                     }
                 })
@@ -135,13 +135,6 @@
             onView () {
                 this.view = true
                 this.edit = !this.edit
-            },
-            onShowAnswer (){
-                this.showAnswer = !this.showAnswer
-            },
-
-            handleChange(event) {
-                this.$emit('change', event.target.value)
             },
             change(val){
                 this.$emit('input', val)

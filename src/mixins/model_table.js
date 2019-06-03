@@ -116,7 +116,8 @@ export default {
             })
         },
         modelTableOnModelPosted({model}){
-            if (model.fullName === this.appModelName || this.modelConfig.dependents && this.modelConfig.dependents.indexOf(model.fullName) >= 0) {
+            let dps = this.modelConfig.rest_options.dependencies
+            if (model.fullName === this.appModelName || dps && dps.includes(model.fullName)) {
                 this.tableLoad()
             }
         },

@@ -42,7 +42,7 @@
         },
         created(){
             this.$store.state.bus.$on("user-logout", () => {
-                this.$router.replace('/login/')
+                this.$router.replace('/auth/login/')
             })
         },
         computed: {

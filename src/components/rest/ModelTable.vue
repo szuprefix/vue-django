@@ -31,7 +31,8 @@
                 <actions :items="top_actions" style="float: right"></actions>
             </slot>
         </div>
-        <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange" :max-height="maxHeight"
+        <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange" fixed
+                  :max-height="maxHeight"
                   @selection-change="onModelTableSelectionChange"
                   @filter-change="onFilterChanged" v-loading="loading" :element-loading-text="loadingText" ref="table">
             <slot name="left">
@@ -62,7 +63,7 @@
             <slot name="right">
             </slot>
         </el-table>
-        <div class="stick-bottom model-table-pager-container">
+        <div class="model-table-pager-container">
             <el-pagination v-if="tableCount>tablePageSize || showPagger"
                            background
                            layout="total, sizes, prev, pager, next, jumper"
@@ -99,7 +100,7 @@
         data(){
             return {
                 selectionCount: 0,
-                maxHeight: window.screen.availHeight
+                maxHeight: window.screen.availHeight - 100
             }
         },
         methods: {
@@ -181,7 +182,9 @@
             getBoolFieldFalseLabel(trueLabel){
                 let l = trueLabel
                 return l.startsWith('已') ? `未${l.substr(1)}` : (
-                    l.startsWith('有') ? `无${l.substr(1)}` : `非${l}`
+                    l.startsWith('有') ? `无${l.substr(1)}` : (
+                        l.startsWith('是') ? `非${l.substr(1)}` : `非${l}`
+                    )
                 )
             }
         },
@@ -205,5 +208,9 @@
     .model-table-pager-container {
         background-color: white;
         right: 0px;
+    }
+
+    .el-table__row td.decimal {
+        text-align: right;
     }
 </style>

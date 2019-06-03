@@ -15,7 +15,12 @@
                         label: '确认密码',
                         required: true,
                         widget: 'password',
-                        rules: [{validator: this.validatePass2}], span: 24
+                        rules: [{
+                            type: 'string',
+                            required: true,
+                            message: `不能为空`
+                        },
+                            {validator: this.validatePass2}], span: 24
                     }
                 ],
                 form: {
