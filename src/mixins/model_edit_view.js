@@ -2,12 +2,13 @@
  * Created by denishuang on 2018/4/25.
  */
 import ModelForm from '../components/rest/ModelForm.vue'
+import ModelTable from '../components/rest/ModelTable.vue'
 import server_response from './server_response'
 export  default {
     props: {
         tab: Object,
         default: () => {
-          return {}
+            return {}
         }
     },
     data () {
@@ -17,10 +18,9 @@ export  default {
     },
     mixins: [server_response],
     components: {
-        ModelForm
+        ModelForm, ModelTable
     },
     mounted(){
-
         this.$refs.form.$on("form-posted", this.redirectToEdit)
         this.$refs.form.$on("model-deleted", this.destroy)
     },
@@ -30,7 +30,7 @@ export  default {
             let p = form.modelDetailUrl
             if (this.$route.params.id === 'create') {
                 if (this.tab) {
-                  this.tab.name = p
+                    this.tab.name = p
                 }
                 const path = this.resolveRoutePath(p)
                 this.$router.replace(path)
@@ -40,14 +40,14 @@ export  default {
             }
         },
         setTitle(p){
-          p = !!p ? p : this.resolveRoutePath(this.modelDetailUrl)
+            p = !!p ? p : this.resolveRoutePath(this.modelDetailUrl)
 
-          const formTitle = this.$refs.form.modelFormTitle
-          if (this.tab) {
-            this.tab.title = formTitle
-          } else {
-            this.resolveCurrentTagLabel(p, formTitle)
-          }
+            const formTitle = this.$refs.form.modelFormTitle
+            if (this.tab) {
+                this.tab.title = formTitle
+            } else {
+                this.resolveCurrentTagLabel(p, formTitle)
+            }
         },
         load(){
             return this.$refs.form.modelLoad()

@@ -35,13 +35,8 @@
                         <i class="fa fa-plus"></i>
                     </el-button>
                 </template>
-                <template slot-scope="{row}">
-                    <el-button-group class="hover-show">
-                        <el-button :title="a.title" size="small" @click="a.do(row)" v-for="a in row_actions"
-                                   v-if="!a.show || a.show()" :key="a.name">
-                            <i :class="`fa fa-${a.icon}`"></i>
-                        </el-button>
-                    </el-button-group>
+                <template slot-scope="scope">
+                    <actions :items="row_actions" :context="scope" class="hover-show" trigger="hover"></actions>
                 </template>
             </el-table-column>
         </el-table>
@@ -52,6 +47,7 @@
     import model_form from '../../mixins/model_form'
     import model_table from '../../mixins/model_table'
     import FormWidget from '../widgets/FormWidget.vue'
+    import Actions from '../layout/Actions.vue'
     import RForm from './Form.vue'
     export default{
         mixins: [model_table, model_form],
@@ -94,7 +90,7 @@
                 formTableFormItems: []
             }
         },
-        components: {FormWidget, RForm},
+        components: {FormWidget, RForm, Actions},
         methods: {
             showEditForm(row){
                 if (!row) {

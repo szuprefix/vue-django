@@ -69,7 +69,7 @@ export function parseTime(time, cFormat) {
 export function formatTime(time, option) {
     // time = +time * 1000
     const d = new Date(time)
-    const now = Date.now()
+    const now = new Date()
 
     const diff = (now - d) / 1000
 
@@ -85,7 +85,10 @@ export function formatTime(time, option) {
     if (option) {
         return parseTime(time, option)
     } else {
-        return d.getMonth() + 1 + '月' + d.getDate() + '日' + d.getHours() + '时' + d.getMinutes() + '分'
+        if(d.getYear()!=now.getYear()){
+            return parseTime(d, '{y}-{m}-{d} {h}:{i}')
+        }
+        return (d.getMonth() + 1) + '月' + d.getDate() + '日' + d.getHours() + '时' + d.getMinutes() + '分'
     }
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <el-menu class="el-menu-vertical-demo" router :default-active="$route.path" :collapse="false">
+    <el-menu router :default-active="$route.path" :collapse="false" :default-openeds="['0']" class="sidebar">
         <template v-for="mg,i in menus.items" v-if="!mg.hidden">
             <el-submenu :index="`${i}`" :key="mg.title" v-if="mg.items.length>1">
                 <template slot="title">
@@ -39,8 +39,9 @@
     }
 </script>
 <style>
-    .el-menu-item .fa {
-        margin-right: 8px;
-        font-size: 18px;
+    .sidebar .fa {
+        min-width: 2rem;
+        font-size: 1rem;
+        text-align: center;
     }
 </style>

@@ -1,6 +1,6 @@
 {
   "name": "vue-django",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "description": "personal experiment",
   "main": "index.js",
   "files": [
@@ -32,7 +32,7 @@
     "axios": "^0.16.2",
     "codemirror": "^5.39.2",
     "date-fns": "^1.29.0",
-    "element-ui": "^2.6.0",
+    "element-ui": "^2.7.2",
     "js-cookie": "^2.2.0",
     "qs": "^6.4.0",
     "script-loader": "0.7.2",

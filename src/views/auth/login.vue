@@ -15,23 +15,15 @@
     import {mapState} from 'vuex'
     import RestForm from '../../components/rest/Form.vue'
     import {setToken} from '../../utils/auth'
+    const AUTH_STORAGE_NAME = 'auth.username'
     export default{
         data () {
             return {
-                form: {username: '', password: ''},
+                form: {username: localStorage.getItem(AUTH_STORAGE_NAME), password: ''},
                 fieldItems: [
-                    {
-                        name: 'username', required: true, label: '帐号', span: 24, icon: 'user'
-                    },
-                    {
-                        name: 'password',
-                        required: true,
-                        label: '密码',
-                        widget: 'password',
-                        icon: 'lock',
-                        span: 24,
-                        onEnter: this.submit
-                    }]
+                    {name: 'username', required: true, label: '帐号', span: 24, icon: 'user'},
+                    {name: 'password', required: true, label: '密码', widget: 'password', icon: 'lock', span: 24, onEnter: this.submit}
+                ]
             }
         },
         components: {
@@ -41,7 +33,8 @@
             done(data){
                 setToken(data.token.access)
                 this.$store.dispatch("getUserInfo")
-                this.$router.replace('/')
+                localStorage.setItem(AUTH_STORAGE_NAME, data.username)
+                this.$router.replace(this.$route.query.redirect || '/')
             },
             submit(){
                 this.$refs.form.submit()
