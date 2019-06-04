@@ -1,8 +1,5 @@
 <template>
     <div>
-        <!--<el-radio-group v-model="delimit" size="mini">-->
-        <!--<el-radio-button :label="c" :title="`字段用${n}符分隔`" v-for="n, c in allDelimits" :key="c">{{n}}</el-radio-button>-->
-        <!--</el-radio-group>-->
         <div class="csvinput-fields">
             <el-tag class="csvinput-fields__item" v-for="f in field.items" :key="f.name">{{f.label}}</el-tag>
         </div>
@@ -66,9 +63,8 @@
                     })
                     return d
                 })
-                this.$emit('records', {data: this.records})
-                if (this.field.onRecords) {
-                    this.field.onRecords(this.records)
+                if (this.field.callback) {
+                    this.field.callback(this.records)
                 }
             }, 2000),
 
@@ -89,7 +85,7 @@
                 return this.fieldItems.map((a) => a.label || a.name)
             },
             contentSample(){
-                return this.fieldNames.join(this.delimit || ' ')
+                return this.fieldNames.join(this.delimit || ',')
             },
         },
         watch: {
