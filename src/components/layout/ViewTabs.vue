@@ -85,6 +85,6 @@
 </script>
 <style>
     .viewtabs .el-tabs__item {
-        font-size: 0.5rem;
+        font-size: 0.8rem;
     }
 </style>
