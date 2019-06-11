@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="csvinput-fields">
-            <el-tag class="csvinput-fields__item" v-for="f in field.items" :key="f.name">{{f.label}}</el-tag>
-        </div>
+        <!--<div class="csvinput-fields">-->
+        <!--<el-tag class="csvinput-fields__item" v-for="f in field.items" :key="f.name">{{f.label}}</el-tag>-->
+        <!--</div>-->
         <el-input ref="content" type="textarea" :autosize="{ minRows: 24}" v-model="currentValue"
                   :placeholder="contentSample" @change="change"></el-input>
     </div>
@@ -21,25 +21,30 @@
         data () {
             return {
                 delimit: null,
+                matrix: [],
+                records: [],
                 currentValue: null,
                 allDelimits: {',': '逗号', '|': '竖线', '\t': 'Tab'}
             }
         },
         mounted (){
             this.currentValue = this.value
-            let el=this.$el.querySelector('.csvinput-fields')
-            Sortable.create(el, {
-                store: {
-                    set: function (sortable) {
-                        var order = sortable.toArray()
-                        console.log(order)
-//                        localStorage.setItem(sortable.options.group.name, order.join('|'));
-                    }
-                }
-            })
+
         },
         components: {},
         methods: {
+            createSortableTags(){
+                let el = this.$el.querySelector('.csvinput-fields')
+                Sortable.create(el, {
+                    store: {
+                        set: function (sortable) {
+                            var order = sortable.toArray()
+                            console.log(order)
+//                        localStorage.setItem(sortable.options.group.name, order.join('|'));
+                        }
+                    }
+                })
+            },
             guessDelimit(l){
 //                if(this.delimit){
 //                    return
@@ -56,15 +61,18 @@
                 }
                 let ls = s.split('\n')
                 this.guessDelimit(ls[0])
-                this.records = ls.map((l) => {
+                this.matrix = ls.map(a => a.split(this.delimit))
+                this.records = this.matrix.map((l) => {
                     let d = {}
-                    l.split(this.delimit).forEach((v, i) => {
-                        d[this.fieldItems[i].name] = v
+                    l.forEach((v, i) => {
+                        let mx = this.fieldItems.length - 1
+                        let fn = this.fieldItems[i <= mx ? i : mx].name
+                        d[fn] = d[fn] ? d[fn] + this.delimit + v : v
                     })
                     return d
                 })
                 if (this.field.callback) {
-                    this.field.callback(this.records)
+                    this.field.callback({matrix:this.matrix, records:this.records})
                 }
             }, 2000),
 
