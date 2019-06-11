@@ -6,7 +6,7 @@
 Welcome to vue-django's documentation!
 ======================================
 
-本框架的目标是借鉴django admin的自动化思想, 实现UI前端的极简快速定制开发.
+本框架的目标是借鉴并超越django admin的自动化思想, 实现UI前端的极简快速定制开发.
 
 快速预览
 ----------
@@ -24,6 +24,7 @@ Model编辑页
 .. image:: _static/img/example/model_edit.png
 
 后台api接口标准使用django-restful-framework, 并作了部分扩展, 参见django_szuprefix项目.
+前端MVVM框架使用vuejs, PC端控件库使用elementui, 移动端控件库使用vux.
 
 项目当前实现的功能有:
 
