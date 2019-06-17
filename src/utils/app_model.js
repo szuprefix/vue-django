@@ -28,7 +28,6 @@ export function AppModel(config) {
                 return data
             })
         },
-
         loadObject(id){
             return axios.get(`${this.listUrl}${id}/`).then(({data}) => {
                 return data

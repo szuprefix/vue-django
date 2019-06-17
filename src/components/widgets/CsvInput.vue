@@ -46,9 +46,9 @@
                 })
             },
             guessDelimit(l){
-//                if(this.delimit){
-//                    return
-//                }
+                if(this.delimit){
+                    return
+                }
                 let ds = this.allDelimits
                 this.delimit = Object.keys(ds).map((a) => {
                     return [l.split(a).length, a]
@@ -104,9 +104,9 @@
                 this.$emit('change', this.currentValue)
                 this.genRecords()
             },
-            delimit () {
-                this.genRecords()
-            }
+//            delimit () {
+//                this.genRecords()
+//            }
         }
     }
 </script>

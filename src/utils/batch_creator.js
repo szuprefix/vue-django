@@ -3,23 +3,118 @@
  */
 
 import {Register} from './app_model'
-
+import Qs from 'qs'
+import axios from '../configs/axios'
 import queueLimit from './async_queue'
-import {countBy, groupBy, merge, last} from 'lodash'
+import {countBy, groupBy, merge, last, uniqueId} from 'lodash'
 
-function Registry() {
-    this.dmap = {}
-    this.key = function (d){
-        return typeof d === 'object' ? JSON.stringify(d) : d
-    }
-    this.get = function(d) {
-        return this.dmap[this.key(d)]
-    }
-    this.set = function(d, v) {
-        this.dmap[this.key(d)] = v
+function ModelAccount(appModelName) {
+    // let model={}
+    let model = Register.get(appModelName)
+    model.loadOptions()
+    return {
+        dmap: {},
+        count: 0,
+        rel: undefined,
+        foreignKeys: [],
+        plainFields: [],
+        model,
+        key (d){
+            return typeof d === 'object' ? JSON.stringify(d) : d
+        },
+        get (d) {
+            return this.dmap[this.key(d)]
+        },
+        getRemote(d){
+            return axios.get(`${this.model.listUrl}?${Qs.stringify(d)}`).then(({data}) => {
+                if (data.count === 1) {
+                    return Promise.resolve(data.results[0])
+                } else {
+                    return Promise.reject(`数据异常:${data.count}`)
+                }
+            })
+        },
+        async getPk(d){
+            let pk = this.get(d)
+            if(pk){
+                return pk
+            }
+            let rels = {}
+            for (var i in this.foreignKeys) {
+                let a = this.foreignKeys[i]
+                rels[a.rel] = await a.getPk(d[a.rel])
+            }
+            console.log(rels)
+            if (Object.values(rels).find(a => a < 0)) {
+                pk = -uniqueId()
+                this.set(d, pk)
+                return pk
+            }
+            let q = Object.assign({}, d, rels)
+            let o = await this.getRemote(q).catch(err => {
+            })
+            pk = o && o.id || -uniqueId()
+            this.set(d, pk)
+            return pk
+        },
+        set  (d, v) {
+            this.dmap[this.key(d)] = v
+        },
+        genData (series) {
+            let c = this.count
+            let pfs = this.plainFields
+            let pfsc = pfs.length
+            let r = {}
+            let pfds = series.slice(c - pfsc)
+            pfs.forEach((f, i) => {
+                r[f] = pfds[i]
+            })
+
+            if (this.foreignKeys) {
+                let p = 0
+                this.foreignKeys.forEach(fk => {
+                    let fkds = series.slice(p, p + fk.count)
+                    r[fk.rel] = fk.genData(fkds)
+                    p += fk.count
+                })
+            }
+
+            return r
+        },
+        genDataList(dataframe){
+            return dataframe.map(s => this.genData(s))
+        },
+        getNotExists(){
+            return Object.keys(this.dmap).filter(a => this.dmap[a]<0).map(a => JSON.parse(a))
+        },
+        getTableItems() {
+            let tis = []
+            let fmap = model.config.rest_options.actions.POST
+            this.foreignKeys.forEach(a => {
+                let i = fmap[a.rel]
+                i.subColumns = a.getTableItems()
+                i.name=`${model.name}.${a.rel}`
+                tis.push(i)
+            } )
+            this.plainFields.forEach(a => {
+                let i = fmap[a]
+                i.name=`${model.name}.${a}`
+                tis.push(i)
+            })
+            return tis
+
+        },
+        getCsvItems() {
+
+        },
+        getModelNames(){
+            let mns = []
+            this.foreignKeys.forEach(a => mns=mns.concat(a.getModelNames()))
+            mns.push(appModelName)
+            return mns
+        }
     }
 }
-
 export default {
     batchLoadOptions(models){
         return queueLimit(models, 3, (model) => {
@@ -38,56 +133,24 @@ export default {
         }
         return rs
     },
-    getStructure(d){
-        let st = merge({}, d)
-
-        function _getStructure(s) {
-            let c = 0
-            if (s.foreignKeys) {
-                s.foreignKeys.forEach(fk => {
-                    let fs = _getStructure(fk)
-                    c += fs.count
-                })
-            }
-            c += s.plainFields.length
-            s.count = c
-            if(!s.rel){
-                s.rel=last(s.name.split('.'))
-            }
-            s.registry = {}
-            return s
-        }
-
-        return _getStructure(st)
-    },
-    genStructData(series, structure){
-        let st = structure
-        let c = st.count
-        let pfs = st.plainFields
-        let pfsc = pfs.length
-        let r = {}
-        let pfds = series.slice(c-pfsc)
-        pfs.forEach((f,i) => {
-            r[f] = pfds[i]
-        })
-
-        if(st.foreignKeys){
-            let p = 0
-            st.foreignKeys.forEach(fk => {
-               let fkds = series.slice(p, p+fk.count)
-                r[fk.rel]=genStructData(fkds, fk)
-                p+=fk.count
+    getStructure(s){
+        let r = ModelAccount(s.name)
+        r.plainFields = s.plainFields
+        r.rel = s.rel
+        if (s.foreignKeys) {
+            s.foreignKeys.forEach(fk => {
+                let st = this.getStructure(fk)
+                r.count += st.count
+                r.foreignKeys.push(st)
             })
         }
-
+        r.count += s.plainFields.length
+        if (!r.rel) {
+            r.rel = last(s.name.split('.'))
+        }
         return r
     },
-    genStructDataList(dataframe, structure){
-        return dataframe.map(s =>  genStructData(s, structure))
-    },
-    genRegister(structure){
 
-    },
     getFieldsByStep(d, ls, rel, p) {
         if (!ls) {
             ls = []

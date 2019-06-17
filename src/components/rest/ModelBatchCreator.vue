@@ -19,14 +19,20 @@
         },
         components: {CsvInput},
         created () {
-            let struct = {models:BatchCreator.getModels(this.structure)}
-            BatchCreator.batchLoadOptions(struct.models).then((r)=> {
-                struct.fields = this.fields = BatchCreator.getFields(this.structure)
-
-//                console.log(BatchCreator.groupByModel(this.fields))
-                this.$emit('struct', struct)
-//                console.log(JSON.stringify(this.fields))
+            let struct = BatchCreator.getStructure(this.structure)
+            BatchCreator.batchLoadOptions(struct.getModelNames()).then((r)=> {
+                 this.fields = struct.getTableItems()
             })
+
+//
+//            let struct = {models:BatchCreator.getModels(this.structure)}
+//            BatchCreator.batchLoadOptions(struct.models).then((r)=> {
+//                struct.fields = this.fields = BatchCreator.getFields(this.structure)
+//
+////                console.log(BatchCreator.groupByModel(this.fields))
+//                this.$emit('struct', struct)
+////                console.log(JSON.stringify(this.fields))
+//            })
         },
         methods: {
             change(d) {
