@@ -1,5 +1,5 @@
 <template>
-    <el-table :data="_value" ref="table" :span-method="spanMethod">
+    <el-table :data="_value" ref="table" :span-method="spanMethod" :cell-class-name="options.cellClassName">
         <!--<el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"-->
         <!--:min-width="f.min_width" :width="f.width" :formater="f.formater"-->
         <!--:align="f.align" :class-name="f.type"-->
@@ -19,11 +19,27 @@
     import {percent, toThousandslsFilter} from '../../../utils/filters'
     import {sortBy} from 'lodash'
     import DataTableColumn from './DataTableColumn.vue'
+    function flatten(ns, children_field_name){
+        let r = []
+        ns.forEach(a => {
+            let sns = a[children_field_name]
+            if(sns){
+                r = r.concat(flatten(sns, children_field_name))
+            }else{
+                let n = Object.assign({}, a)
+                // delete n[children_field_name]
+                r.push(n)
+            }
+        })
+        return r
+    }
+
     export default{
         props: {
             value: Array,
             defaultWidget: [Function, Object],
             group: false,
+            options:{type:Object, default:() => {}},
             fields: {
                 type: Array, default: function () {
                     return [{name: '__str__', label: '名称'}]
@@ -72,7 +88,8 @@
                 })
             },
             fieldNames (){
-                return this._fields.map(a => a.name)
+                let fs = flatten(this._fields, 'subColumns')
+                return fs.map(a => a.name)
             },
             spanMap () {
                 let vs = this._value

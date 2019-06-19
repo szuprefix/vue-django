@@ -8,10 +8,25 @@ import axios from '../configs/axios'
 import queueLimit from './async_queue'
 import {countBy, groupBy, merge, last, uniqueId} from 'lodash'
 
+function flatten(ns, children_field_name){
+    let r = []
+    ns.forEach(a => {
+        let sns = a[children_field_name]
+        if(sns){
+            r = r.concat(flatten(sns, children_field_name))
+        }else{
+            let n = Object.assign({}, a)
+            // delete n[children_field_name]
+            r.push(n)
+        }
+    })
+    return r
+}
+
 function ModelAccount(appModelName) {
     // let model={}
     let model = Register.get(appModelName)
-    model.loadOptions()
+    // model.loadOptions()
     return {
         dmap: {},
         count: 0,
@@ -44,7 +59,7 @@ function ModelAccount(appModelName) {
                 let a = this.foreignKeys[i]
                 rels[a.rel] = await a.getPk(d[a.rel])
             }
-            console.log(rels)
+            // console.log(rels)
             if (Object.values(rels).find(a => a < 0)) {
                 pk = -uniqueId()
                 this.set(d, pk)
@@ -57,6 +72,56 @@ function ModelAccount(appModelName) {
             this.set(d, pk)
             return pk
         },
+        async checkPk(series){
+           let d = this.get(series)
+            if(d.id){
+               return d
+            }
+            let rels = {}
+            let p=0
+            for (var i in this.foreignKeys) {
+                let a = this.foreignKeys[i]
+                let ses = series.slice(p, a.count)
+                let fd = await a.checkPk(ses)
+                if(fd.id && fd.id>0){
+                    rels[a.rel] = fd.id
+                }else{
+                    d.id = -1
+                    return d
+                }
+            }
+            let q = Object.assign({}, d, rels)
+            let o = await this.getRemote(q).catch(err => {})
+            d.id =  o && o.id ? o.id : -1
+            return d
+        },
+        postObject(d){
+            return axios.post(this.model.listUrl, d).then(r => r.data)
+        },
+        async create(series){
+            let d = this.get(series)
+            if(d.id>0){
+                return d
+            }
+            let rels = {}
+            let p=0
+            for (var i in this.foreignKeys) {
+                let a = this.foreignKeys[i]
+                let ses = series.slice(p, a.count)
+                let fd = await a.create(ses)
+                if(fd.id && fd.id>0){
+                    rels[a.rel] = fd.id
+                }else{
+                    d.id = -1
+                    return d
+                }
+            }
+            let q = Object.assign({}, d, rels)
+            let o = await this.postObject(q).catch(err => {})
+            d.id =  o && o.id ? o.id : -1
+            return d
+
+        },
         set  (d, v) {
             this.dmap[this.key(d)] = v
         },
@@ -64,7 +129,12 @@ function ModelAccount(appModelName) {
             let c = this.count
             let pfs = this.plainFields
             let pfsc = pfs.length
-            let r = {}
+            let r = this.get(series)
+            if(r){
+                return r
+            }else{
+                r=  {}
+            }
             let pfds = series.slice(c - pfsc)
             pfs.forEach((f, i) => {
                 r[f] = pfds[i]
@@ -78,33 +148,35 @@ function ModelAccount(appModelName) {
                     p += fk.count
                 })
             }
-
+            this.set(series, r)
             return r
         },
         genDataList(dataframe){
             return dataframe.map(s => this.genData(s))
         },
         getNotExists(){
-            return Object.keys(this.dmap).filter(a => this.dmap[a]<0).map(a => JSON.parse(a))
+            return Object.keys(this.dmap).filter(a => this.dmap[a].id<0).map(a => this.dmap[a])
+        },
+        getFieldMap(){
+           return  model.config.rest_options.actions.POST
         },
         getTableItems() {
-            let tis = []
-            let fmap = model.config.rest_options.actions.POST
+            let r = []
+            let fmap = this.getFieldMap()
             this.foreignKeys.forEach(a => {
-                let i = fmap[a.rel]
+                let i = Object.assign( {}, fmap[a.rel])
                 i.subColumns = a.getTableItems()
                 i.name=`${model.name}.${a.rel}`
-                tis.push(i)
+                i.modelVerboseName = a.model.verboseName
+                r.push(i)
             } )
             this.plainFields.forEach(a => {
-                let i = fmap[a]
+                let i = Object.assign( {}, fmap[a])
                 i.name=`${model.name}.${a}`
-                tis.push(i)
+                i.modelVerboseName = model.verboseName
+                r.push(i)
             })
-            return tis
-
-        },
-        getCsvItems() {
+            return r
 
         },
         getModelNames(){
@@ -151,6 +223,16 @@ export default {
         return r
     },
 
+    genCsvItems(tableItems) {
+        let ls =flatten(tableItems,'subColumns')
+        let lcs = countBy(ls, a => a.label)
+        ls.forEach(a => {
+            if (lcs[a.label] > 1) {
+                a.label = a.modelVerboseName + a.label
+            }
+        })
+        return ls
+    },
     getFieldsByStep(d, ls, rel, p) {
         if (!ls) {
             ls = []
