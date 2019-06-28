@@ -41,12 +41,15 @@
                              :min-width="f.min_width" :width="f.width" :fixed="f.fixed"
                              :align="['number','integer'].includes(f.type)?'right':'left'"
                              :sortable="modelTableOrderingFields.includes(f.name) && 'custom'" :class-name="f.type"
-                             :type="f.type" :filters="modelTableFilters[f.name]" v-for="f in modelTableItems"
+                             :type="f.columnType || undefined" :filters="modelTableFilters[f.name]"
+                             v-for="f in modelTableItems"
                              :filter-method="f.name in modelTableFilters?filterHandler:undefined"
-                             :key="f.name">
+                             :key="f.columnKey || f.name">
                 <template slot-scope="{row}">
+                    <form-widget v-if="f.useFormWidget" v-model="row" :field="f"
+                                 @change="onCellValueChange"></form-widget>
                     <component :is="f.widget" v-model="row" :prop="f.name" :field="f.field"
-                               v-if="f.widget && typeof f.widget == 'object'"></component>
+                               v-else-if="f.widget && typeof f.widget == 'object'"></component>
                     <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
                     <template v-else>{{row[f.name]}}</template>
                 </template>
@@ -83,16 +86,18 @@
 <script>
     import model_table from '../../mixins/model_table'
     import Actions from '../layout/Actions.vue'
+    import FormWidget from '../widgets/FormWidget.vue'
     import BatchActions from '../layout/BatchActions.vue'
     import RelatedSelect from './RelatedSelect.vue'
     //    import DownloadExcel from 'vue-json-excel'
-    import XLSX from 'xlsx'
     import Qs from 'qs'
     export default{
         mixins: [model_table],
 
         components: {
-            RelatedSelect, Actions, BatchActions//, DownloadExcel
+            RelatedSelect, Actions, BatchActions, FormWidget//, DownloadExcel
+        },
+        created () {
         },
         mounted (){
             this.modelTableInit()
@@ -100,7 +105,8 @@
         data(){
             return {
                 selectionCount: 0,
-                maxHeight: window.screen.availHeight - 100
+                maxHeight: window.screen.availHeight - 100,
+                changedData: {}
             }
         },
         methods: {
@@ -109,10 +115,13 @@
                     return this.modelTableItems.map((a) => {
                         let v = d[a.name]
                         if (a.choices) {
-                            return a.choices[v]
+                            return a.choices.find(a => a.value===v).display_name
                         } else if (a.model) {
                             return d[`${a.name}_name`]
                         }
+//                        if(typeof v === 'object'){
+//                            return JSON.stringify(v)
+//                        }
                         return v
 
                     })
@@ -125,11 +134,13 @@
                 this.loading = true
                 this.loadingText = '正在导出'
                 this.$http.get(`${this.tableUrl}?${Qs.stringify(d)}`).then(({data}) => {
-                    let wb = XLSX.utils.book_new()
-                    let ws = XLSX.utils.aoa_to_sheet(this.getGridData(data.results))
-                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1')
-                    XLSX.writeFile(wb, `${this.modelTableTitle}.xlsx`)
-                    this.loading = false
+                    import('xlsx').then(XLSX => {
+                        let wb = XLSX.utils.book_new()
+                        let ws = XLSX.utils.aoa_to_sheet(this.getGridData(data.results))
+                        XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1')
+                        XLSX.writeFile(wb, `${this.modelTableTitle}.xlsx`)
+                        this.loading = false
+                    })
                 }).catch(this.onServerResponseError)
             },
             onModelTableSelectionChange(selection){
@@ -173,7 +184,7 @@
                         d[a] = v
                     }
                 })
-                console.log(d)
+//                console.log(d)
                 this.tableUpdateQueries(d)
             },
             onSortChange(payLoad){
@@ -186,6 +197,24 @@
                         l.startsWith('是') ? `非${l.substr(1)}` : `非${l}`
                     )
                 )
+            },
+            onCellValueChange({form, field, value}){
+                let id = form.id
+                let fn = field.name
+                let d = this.changedData[id] || {}
+                d[fn] = value
+                this.changedData[id] = d
+                let pd = {}
+                this.patchFields.forEach(a => {
+                    pd[a.name] = form[a.name]
+                })
+                this.$http.patch(this.modelGetDetailUrl(id), pd).then(({data}) => {
+                    this.$message({message: '保存成功', type: 'success'})
+                    this.$emit('change', {data: this.tableData})
+                }).catch(error => {
+                    this.onServerResponseError(error)
+                    this.$message({message: '数据检验未通过，请修正.', type: 'error'})
+                })
             }
         },
         computed: {
@@ -194,6 +223,9 @@
             },
             selectionIds(){
                 return this.selection.map((a) => a.id)
+            },
+            patchFields () {
+                return this.modelTableItems.filter(a => a.useFormWidget)
             }
         },
         watch: {

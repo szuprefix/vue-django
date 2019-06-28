@@ -29,7 +29,7 @@
     step: '00:30',
     end: '23:59'
   }" :disabled="field.disabled"></el-time-select>
-        <el-input v-model="value[field.name]" :autosize="field.autosize || {minRows: 8, maxRows: 24}"
+        <el-input v-model="value[field.name]" :autosize="field.autosize || {minRows: 8, maxRows: 24}" :maxlength="field.max_length" :show-word-limit="value[field.name] && value[field.name].length>field.max_length*0.8 || false"
                   @change="fieldValueChanged" :placeholder="field.placeholder || [field.label, field.help_text].join('\n')" type="textarea"
                   v-else-if="field.widget === 'textarea'" :disabled="field.disabled"></el-input>
 
@@ -45,7 +45,7 @@
         </component>
 
         <el-input v-else v-model="value[field.name]" :placeholder="field.placeholder || [field.label, field.help_text].join('\n')"
-                  @change="fieldValueChanged"
+                  @change="fieldValueChanged" :maxlength="field.max_length" :show-word-limit="value[field.name] && value[field.name].length>field.max_length*0.8 || false"
                   :type="['password', 'textarea'].includes(field.widget)?field.widget:'text'"
                   v-on:keyup.enter="field.onEnter || doNothing" :disabled="field.disabled">
             <i slot="prefix"  v-if="field.icon" :class="`fa fa-${field.icon}`"></i>
@@ -62,18 +62,20 @@
             return {}
         },
         created() {
-            //           console.log(this.field)
+//                       console.log(this.field)
         },
         components: {},
         methods: {
             fieldValueChanged(value) {
-                if (this.field.onChanged) {
-                    this.field.onChanged({
-                        form: this.value,
-                        field: this.field,
-                        value
-                    })
+                let d = {
+                    form: this.value,
+                    field: this.field,
+                    value
                 }
+                if (this.field.onChanged) {
+                    this.field.onChanged(d)
+                }
+                this.$emit('change', d)
             },
             doNothing(){
                 console.log('do nothing')

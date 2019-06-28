@@ -33,6 +33,7 @@ function ModelAccount(appModelName) {
         rel: undefined,
         foreignKeys: [],
         plainFields: [],
+        defaults: {},
         model,
         key (d){
             return typeof d === 'object' ? JSON.stringify(d) : d
@@ -74,6 +75,7 @@ function ModelAccount(appModelName) {
         },
         async checkPk(series){
            let d = this.get(series)
+
             if(d.id){
                return d
             }
@@ -89,6 +91,10 @@ function ModelAccount(appModelName) {
                     d.id = -1
                     return d
                 }
+            }
+            if(this.insertMode === 'append'){
+                d.id = -1
+                return d
             }
             let q = Object.assign({}, d, rels)
             let o = await this.getRemote(q).catch(err => {})
@@ -116,7 +122,7 @@ function ModelAccount(appModelName) {
                     return d
                 }
             }
-            let q = Object.assign({}, d, rels)
+            let q = Object.assign({}, this.defaults, d, rels)
             let o = await this.postObject(q).catch(err => {})
             d.id =  o && o.id ? o.id : -1
             return d
@@ -209,6 +215,7 @@ export default {
         let r = ModelAccount(s.name)
         r.plainFields = s.plainFields
         r.rel = s.rel
+        r.insertMode = s.insertMode || 'ignore'
         if (s.foreignKeys) {
             s.foreignKeys.forEach(fk => {
                 let st = this.getStructure(fk)

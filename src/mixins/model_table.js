@@ -8,6 +8,7 @@ import TrueFlag from '../components/widgets/TrueFlag.vue'
 import ChoicesDisplay from '../components/widgets/ChoicesDisplay.vue'
 import Date2Now from '../components/widgets/Date2Now.vue'
 import ForeignKey from '../components/widgets/ForeignKey.vue'
+import {uniqueId} from 'lodash'
 export default {
     mixins: [model_view, table_view],
     props: {
@@ -190,8 +191,9 @@ export default {
                         a = i
                     }
                 }
-
-                a.widget = a.widget || this.tableDefaultWidget(a)
+                if (!a.useFormWidget) {
+                    a.widget = a.widget || this.tableDefaultWidget(a)
+                }
                 // console.log(a)
                 return a
             })
@@ -213,7 +215,7 @@ export default {
             return action_list.map((a) => {
                 if (typeof a === 'string') {
                     let d = this.modelTableAvairableActions[a]
-                    if (! d){
+                    if (!d) {
                         console.error(`find no avariable actions for ${a}`)
                     }
                     d.name = a
@@ -263,6 +265,15 @@ export default {
         },
         row_actions(){
             return this.get_actions(this.rowActionList)
+        }
+    },
+    watch: {
+        tableItems(val){
+            if (this.modelConfig.rest_options) {
+                this.modelTableItems = this.tableNormalizeItems(val)
+
+                this.modelTableItems.forEach(a => a.columnKey = uniqueId())
+            }
         }
     }
 }

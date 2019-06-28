@@ -3,7 +3,7 @@
         <!--<div class="csvinput-fields">-->
         <!--<el-tag class="csvinput-fields__item" v-for="f in field.items" :key="f.name">{{f.label}}</el-tag>-->
         <!--</div>-->
-        <el-input ref="content" type="textarea" :autosize="{ minRows: 24}" v-model="currentValue"
+        <el-input ref="content" type="textarea" :autosize="{ minRows: 16}" v-model="currentValue"
                   :placeholder="contentSample" @change="change"></el-input>
     </div>
 </template>
@@ -23,7 +23,7 @@
                 delimit: null,
                 matrix: [],
                 records: [],
-                currentValue: null,
+                currentValue: '',
                 allDelimits: {',': '逗号', '|': '竖线', '\t': 'Tab'}
             }
         },
@@ -46,28 +46,28 @@
                 })
             },
             guessDelimit(l){
-                if(this.delimit){
-                    return
-                }
+//                if(this.delimit){
+//                    return
+//                }
                 let ds = this.allDelimits
-                this.delimit = Object.keys(ds).map((a) => {
+                return Object.keys(ds).map((a) => {
                     return [l.split(a).length, a]
                 }).sort().reverse()[0][1]
             },
             genRecords: debounce(function () {
-                let s = this.currentValue.trim()
-                if (s.length == 0) {
-                    return []
+                let ls = this.lines
+                if (ls.length === 0) {
+                    this.matrix = []
+                }else{
+                    this.matrix = ls.map(a => a.split(this._delimit))
                 }
-                let ls = s.split('\n')
-                this.guessDelimit(ls[0])
-                this.matrix = ls.map(a => a.split(this.delimit))
+
                 this.records = this.matrix.map((l) => {
                     let d = {}
                     l.forEach((v, i) => {
                         let mx = this.fieldItems.length - 1
                         let fn = this.fieldItems[i <= mx ? i : mx].name
-                        d[fn] = d[fn] ? d[fn] + this.delimit + v : v
+                        d[fn] = d[fn] ? d[fn] + this._delimit + v : v
                     })
                     return d
                 })
@@ -92,9 +92,16 @@
             fieldNames(){
                 return this.fieldItems.map((a) => a.label || a.name)
             },
-            contentSample(){
-                return this.fieldNames.join(this.delimit || ',')
+            lines () {
+                let s = this.currentValue.trim()
+                return s.length>0 && s.split('\n') || []
             },
+            contentSample(){
+                return this.fieldNames.join(this._delimit || ',')
+            },
+            _delimit (){
+                return this.delimit || (this.lines.length>0 && this.guessDelimit(this.lines[0])) || ','
+            }
         },
         watch: {
             'value'(val, oldValue) {

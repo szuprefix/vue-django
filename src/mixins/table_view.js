@@ -62,7 +62,6 @@ export default{
             this.tablePageSize = val
         },
         tableDefaultWidget(f){
-
         }
     },
     computed: {
