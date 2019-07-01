@@ -5,7 +5,6 @@
     export default{
         props: {
             value: Object,
-            prop:String,
             field: Object
         },
         computed:{

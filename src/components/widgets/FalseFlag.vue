@@ -1,11 +1,11 @@
 <template>
-    <i class="fa fa-cross" v-if="!value[prop]"></i>
+    <i class="fa fa-cross" v-if="!value[field.name]"></i>
 </template>
 <script>
     export default{
         props: {
             value: Object,
-            prop:String
+            field: Object
         }
     }
 </script>

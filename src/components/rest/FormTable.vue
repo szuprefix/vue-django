@@ -1,35 +1,24 @@
 <template>
     <div>
-        <r-form :formUrl="formUrl" :formItems="formTableFormItems" v-model="formValue" ref="form" v-if="dialogVisible"
+        <r-form :formUrl="formUrl" :formItems="formTableFormItems" v-model="formValue" ref="form"
+                v-if="dialogVisible" formInline formNoLabel
                 :formMethod="formMethod" @form-posted="formTableOnFormPosted" :formSubmit="modelFormSubmit"
                 :formTextareaSize="formTextareaSize">
         </r-form>
-        <el-table :data="tableData" size="mini" v-loading="loading" :element-loading-text="loading"  @row-dblclick="tableOnRowSelect">
+        <el-table :data="tableData" size="mini" v-loading="loading" :element-loading-text="loading"
+                  @row-dblclick="tableOnRowSelect">
             <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
                              :class-name="`${f.type} field_${f.name}`" v-for="f in modelTableItems"
                              :key="f.name" :type="f.columnType || undefined">
                 <template slot-scope="{row}">
+                    <form-widget v-model="row" :field="f.field" v-if="f.useFormWidget"></form-widget>
                     <component :is="f.widget" v-model="row" :prop="f.name" :field="f.field"
-                               v-if="f.widget && typeof f.widget == 'object'"></component>
+                               v-else-if="f.widget && typeof f.widget == 'object'"></component>
                     <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
                     <template v-else>{{row[f.name]}}</template>
                 </template>
             </el-table-column>
-            <!--<el-table-column label="">-->
-            <!--<template slot="header">-->
-            <!--<el-button><i class="fa fa-plus"></i>产品 </el-button>-->
-            <!--</template>-->
-            <!--<template slot-scope="{row}">-->
-            <!--&lt;!&ndash;<el-button title="编辑" size="mini" @click="showEditForm(row)">&ndash;&gt;-->
-            <!--&lt;!&ndash;<i :class="`fa fa-pencil`"></i>&ndash;&gt;-->
-            <!--&lt;!&ndash;</el-button>&ndash;&gt;-->
-            <!--<el-button title="保存" size="mini" @click="saveRow(row)" v-if="readOnly == false">-->
-            <!--<i :class="`fa fa-save`"></i>-->
-            <!--</el-button>-->
-            <!--</template>-->
-            <!--</el-table-column>-->
-            <el-table-column :width="`${60*rowActionList.length}px`"
-                             align="right">
+            <el-table-column :width="`${60*rowActionList.length}px`" align="right">
                 <template slot="header" slot-scope="scope">
                     <el-button title="新增" size="small" @click="showEditForm()" v-if="readOnly == false">
                         <i class="fa fa-plus"></i>
@@ -58,20 +47,18 @@
             },
             value: Object,
             defaultCreateValue: {
-                type: Object, default: function () {
-                    return {}
+                type: Object,
+                default: () => {
                 }
             },
             dataUrl: String,
             editFields: {
-                type: Array, default: function () {
-                    return []
-                }
+                type: Array,
+                default: () => []
             },
             createFields: {
-                type: Array, default: function () {
-                    return []
-                }
+                type: Array,
+                default: () => []
             },
             readOnly: {
                 type: Boolean, default: false
@@ -81,7 +68,15 @@
 //            console.log(this.value)
             this.modelTableInit()
             this.modelFormInit()
-//            console.log(this.editFields)
+        },
+        created() {
+            this.modelTableAvairableActions['save'] = {
+                name: 'save',
+                icon: 'save',
+                title: '保存',
+                do: this.saveRow
+            }
+//            }
         },
         data () {
             return {
@@ -92,7 +87,7 @@
         },
         components: {FormWidget, RForm, Actions},
         methods: {
-            showEditForm(row){
+            showEditForm(row, show){
                 if (!row) {
                     this.modelData = Object.assign({}, this.modelEmptyDataFromOptions(this.modelFieldConfigs), this.defaultCreateValue)
                     this.formTableFormItems = this.formCreateItems
@@ -101,10 +96,11 @@
                     this.formTableFormItems = this.formEditItems
                 }
                 this.modelId = this.modelData.id
-                this.dialogVisible = true
+                this.dialogVisible = show === undefined ? true : show
             },
-            saveRow(row){
-                this.showEditForm(row)
+            saveRow({row}){
+                console.log(row)
+                this.showEditForm(row, false)
                 this.$nextTick(() => {
                     this.$refs.form.onSubmit()
                 })

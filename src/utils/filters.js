@@ -65,7 +65,9 @@ export function parseTime(time, cFormat) {
     })
     return time_str
 }
-
+export function localTimeStr(t) {
+    return new Date(t).toLocaleString()
+}
 export function formatTime(time, option) {
     // time = +time * 1000
     const d = new Date(time)
