@@ -8,13 +8,13 @@ import axios from '../configs/axios'
 import queueLimit from './async_queue'
 import {countBy, groupBy, merge, last, uniqueId} from 'lodash'
 
-function flatten(ns, children_field_name){
+function flatten(ns, children_field_name) {
     let r = []
     ns.forEach(a => {
         let sns = a[children_field_name]
-        if(sns){
+        if (sns) {
             r = r.concat(flatten(sns, children_field_name))
-        }else{
+        } else {
             let n = Object.assign({}, a)
             // delete n[children_field_name]
             r.push(n)
@@ -52,7 +52,7 @@ function ModelAccount(appModelName) {
         },
         async getPk(d){
             let pk = this.get(d)
-            if(pk){
+            if (pk) {
                 return pk
             }
             let rels = {}
@@ -74,31 +74,32 @@ function ModelAccount(appModelName) {
             return pk
         },
         async checkPk(series){
-           let d = this.get(series)
+            let d = this.get(series)
 
-            if(d.id){
-               return d
+            if (d.id) {
+                return d
             }
             let rels = {}
-            let p=0
+            let p = 0
             for (var i in this.foreignKeys) {
                 let a = this.foreignKeys[i]
                 let ses = series.slice(p, a.count)
                 let fd = await a.checkPk(ses)
-                if(fd.id && fd.id>0){
+                if (fd.id && fd.id > 0) {
                     rels[a.rel] = fd.id
-                }else{
+                } else {
                     d.id = -1
                     return d
                 }
             }
-            if(this.insertMode === 'append'){
+            if (this.insertMode === 'append') {
                 d.id = -1
                 return d
             }
             let q = Object.assign({}, d, rels)
-            let o = await this.getRemote(q).catch(err => {})
-            d.id =  o && o.id ? o.id : -1
+            let o = await this.getRemote(q).catch(err => {
+            })
+            d.id = o && o.id ? o.id : -1
             return d
         },
         postObject(d){
@@ -106,25 +107,26 @@ function ModelAccount(appModelName) {
         },
         async create(series){
             let d = this.get(series)
-            if(d.id>0){
+            if (d.id > 0) {
                 return d
             }
             let rels = {}
-            let p=0
+            let p = 0
             for (var i in this.foreignKeys) {
                 let a = this.foreignKeys[i]
                 let ses = series.slice(p, a.count)
                 let fd = await a.create(ses)
-                if(fd.id && fd.id>0){
+                if (fd.id && fd.id > 0) {
                     rels[a.rel] = fd.id
-                }else{
+                } else {
                     d.id = -1
                     return d
                 }
             }
             let q = Object.assign({}, this.defaults, d, rels)
-            let o = await this.postObject(q).catch(err => {})
-            d.id =  o && o.id ? o.id : -1
+            let o = await this.postObject(q).catch(err => {
+            })
+            d.id = o && o.id ? o.id : -1
             return d
 
         },
@@ -136,10 +138,10 @@ function ModelAccount(appModelName) {
             let pfs = this.plainFields
             let pfsc = pfs.length
             let r = this.get(series)
-            if(r){
+            if (r) {
                 return r
-            }else{
-                r=  {}
+            } else {
+                r = {}
             }
             let pfds = series.slice(c - pfsc)
             pfs.forEach((f, i) => {
@@ -161,24 +163,24 @@ function ModelAccount(appModelName) {
             return dataframe.map(s => this.genData(s))
         },
         getNotExists(){
-            return Object.keys(this.dmap).filter(a => this.dmap[a].id<0).map(a => this.dmap[a])
+            return Object.keys(this.dmap).filter(a => this.dmap[a].id < 0).map(a => this.dmap[a])
         },
         getFieldMap(){
-           return  model.config.rest_options.actions.POST
+            return model.config.rest_options.actions.POST
         },
         getTableItems() {
             let r = []
             let fmap = this.getFieldMap()
             this.foreignKeys.forEach(a => {
-                let i = Object.assign( {}, fmap[a.rel])
+                let i = Object.assign({}, fmap[a.rel])
                 i.subColumns = a.getTableItems()
-                i.name=`${model.name}.${a.rel}`
+                i.name = `${model.name}.${a.rel}`
                 i.modelVerboseName = a.model.verboseName
                 r.push(i)
-            } )
+            })
             this.plainFields.forEach(a => {
-                let i = Object.assign( {}, fmap[a])
-                i.name=`${model.name}.${a}`
+                let i = Object.assign({}, fmap[a])
+                i.name = `${model.name}.${a}`
                 i.modelVerboseName = model.verboseName
                 r.push(i)
             })
@@ -187,7 +189,7 @@ function ModelAccount(appModelName) {
         },
         getModelNames(){
             let mns = []
-            this.foreignKeys.forEach(a => mns=mns.concat(a.getModelNames()))
+            this.foreignKeys.forEach(a => mns = mns.concat(a.getModelNames()))
             mns.push(appModelName)
             return mns
         }
@@ -231,7 +233,7 @@ export default {
     },
 
     genCsvItems(tableItems) {
-        let ls =flatten(tableItems,'subColumns')
+        let ls = flatten(tableItems, 'subColumns')
         let lcs = countBy(ls, a => a.label)
         ls.forEach(a => {
             if (lcs[a.label] > 1) {
