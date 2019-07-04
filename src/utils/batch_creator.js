@@ -26,7 +26,7 @@ function flatten(ns, children_field_name) {
 function ModelAccount(appModelName) {
     // let model={}
     let model = Register.get(appModelName)
-    // model.loadOptions()
+    // console.log(model)
     return {
         dmap: {},
         count: 0,
@@ -166,7 +166,8 @@ function ModelAccount(appModelName) {
             return Object.keys(this.dmap).filter(a => this.dmap[a].id < 0).map(a => this.dmap[a])
         },
         getFieldMap(){
-            return model.config.rest_options.actions.POST
+            let actions = model.config.rest_options.actions
+            return actions.POST || actions.LIST
         },
         getTableItems() {
             let r = []

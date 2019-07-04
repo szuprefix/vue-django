@@ -1,26 +1,41 @@
 <template>
     <el-row>
-        <el-col :sm="c.sm || 24" :md="c.md || 12" :xl="c.xl || 8" v-for="c in items" :key="c.name" v-loading="loading" :element-loading-text="loading">
-            <chart v-if="chartData[c.name]" :options="chartOptions[c.name]" :auto-resize="true"></chart>
+        <el-col :sm="c.sm || 24" :md="c.md || 12" :xl="c.xl || 8" v-for="c in items" :key="c.name" v-loading="loading"
+                :element-loading-text="loading">
+           <template  v-if="chartData[c.name]">
+               <data-table v-if="c.type === 'table'" :group="true" :value="genTableData(c)" :fields="c.fields" :options="c.options || {}"></data-table>
+               <chart v-else :options="chartOptions[c.name]" :auto-resize="true"></chart>
+           </template>
         </el-col>
     </el-row>
 </template>
 <script>
     import Qs from 'qs'
     import server_response from 'vue-django/src/mixins/server_response'
+    import DataTable from 'vue-django/src/components/layout/table/DataTable.vue'
+    import {zipObject} from 'lodash'
     let OPTIONS_TOOLBOX = {
         show: true,
-        right:'5%',
-        feature : {
+        right: '5%',
+        feature: {
             dataView: {show: true, title: '数据视图', readOnly: true},
         }
     }
+    let COMMON_OPTIONS = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross'
+            }
+        },
+        toolbox: OPTIONS_TOOLBOX,
+    }
 
     export default{
-        mixins:[server_response],
+        mixins: [server_response],
         props: {
             period: Array,
-            url:String,
+            url: String,
             items: Array,
             base: String
         },
@@ -29,24 +44,23 @@
                 chartData: {}
             }
         },
-        components: {},
+        components: {DataTable},
         mounted() {
             this.loadTimeData(this.period)
         },
         methods: {
+            genTableData(c){
+                let fns = c.fields.map(f => f.name)
+                let data=this.chartData[c.name].map((d) => zipObject(fns, d))
+                console.log(data)
+                return data
+            },
             genDailyOption(item, data){
-                return {
+                return Object.assign({}, COMMON_OPTIONS, {
                     title: {
                         text: item.title
                     },
                     visualMap: item.visualMap,
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'cross'
-                        }
-                    },
-                    toolbox: OPTIONS_TOOLBOX,
                     xAxis: {
                         type: 'category',
                         data: data.map((a) => a[0])
@@ -60,7 +74,10 @@
                         name: item.title,
                         data: data.map((a) => a[1])
                     }]
-                }
+                })
+            },
+            genTreeMapOption(item, data){
+
             },
             genBarOption(item, data){
                 let dataZoom = []
@@ -76,18 +93,11 @@
                             end: 900 / data.length
                         })
                 }
-                return {
+                return Object.assign({}, COMMON_OPTIONS, {
                     title: {
                         text: item.title
                     },
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'cross'
-                        }
-                    },
                     dataZoom,
-                    toolbox: OPTIONS_TOOLBOX,
                     yAxis: {
                         type: 'category',
                         data: data.map((a) => a[0])
@@ -105,7 +115,7 @@
                         name: item.title,
                         data: data.map((a) => a[1])
                     }]
-                }
+                })
             },
             loadTimeData(period){
                 let context = {measures: this.items.map((a) => a.name), period: `${period[0]}至${period[1]}`}
@@ -114,8 +124,8 @@
                 this.$http.get(`${this.url}?${qs}`).then(({data}) => {
                     this.loading = false
                     let ds = data
-                    if(this.base){
-                        ds=ds[this.base]
+                    if (this.base) {
+                        ds = ds[this.base]
                     }
                     this.chartData = Object.assign({}, ds)
                 }).catch(this.onServerResponseError)
@@ -125,7 +135,7 @@
             chartOptions(){
                 let res = {}
                 this.items.forEach((a) => {
-                    let optionFunc = a.type == 'daily' ? this.genDailyOption: this.genBarOption
+                    let optionFunc = a.type == 'daily' ? this.genDailyOption : this.genBarOption
                     res[a.name] = optionFunc(a, this.chartData[a.name])
                 })
                 return res

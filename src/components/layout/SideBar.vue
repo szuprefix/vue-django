@@ -1,5 +1,5 @@
 <template>
-    <el-menu router :default-active="$route.path" :collapse="false" :default-openeds="['0']" class="sidebar">
+    <el-menu router :default-active="$route.path" :collapse="false" :default-openeds="defaultOpeneds" class="sidebar">
         <template v-for="mg,i in menus.items" v-if="!mg.hidden">
             <el-submenu :index="`${i}`" :key="mg.title" v-if="mg.items.length>1">
                 <template slot="title">
@@ -26,7 +26,10 @@
     export default {
         computed: mapState(['user']),
         data () {
-            return {menus}
+            return {
+                menus,
+                defaultOpeneds: ['0']
+            }
         },
         methods: {
             hasPerm(p){

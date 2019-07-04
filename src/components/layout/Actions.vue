@@ -3,7 +3,7 @@
         <el-button-group v-if="showActions.length>0">
             <template v-for="a in showActions">
                 <el-button :type="a.type" :title="a.title" size="small" @click="handleCommand(a.do)" v-if="!a.show || a.show()" :key="a.name">
-                    <i :class="`fa fa-${a.icon}`"></i>
+                    <i :class="`fa fa-${a.icon}`"></i>{{a.label}}
                 </el-button>
             </template>
         </el-button-group>
