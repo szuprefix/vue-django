@@ -3,7 +3,7 @@
         <el-col :sm="c.sm || 24" :md="c.md || 12" :xl="c.xl || 8" v-for="c in items" :key="c.name" v-loading="loading"
                 :element-loading-text="loading">
            <template  v-if="chartData[c.name]">
-               <data-table v-if="c.type === 'table'" :group="true" :value="genTableData(c)" :fields="c.fields" :options="c.options || {}"></data-table>
+               <data-table v-if="c.type === 'table'" :group="true" :value="genTableData(c)" :fields="c.fields" :options="Object.assign({maxHeight:500},c.options)"></data-table>
                <chart v-else :options="chartOptions[c.name]" :auto-resize="true"></chart>
            </template>
         </el-col>
@@ -52,7 +52,7 @@
             genTableData(c){
                 let fns = c.fields.map(f => f.name)
                 let data=this.chartData[c.name].map((d) => zipObject(fns, d))
-                console.log(data)
+//                console.log(data)
                 return data
             },
             genDailyOption(item, data){

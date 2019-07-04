@@ -13,9 +13,9 @@
           </span>
             <el-dropdown-menu slot="dropdown">
                 <template v-for="a in dropdownActions">
-                    <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name"
+                    <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
                                       :icon="`fa fa-${a.icon}`">
-                        {{a.title}}
+                        {{a.label}}
                     </el-dropdown-item>
                 </template>
             </el-dropdown-menu>

@@ -2,7 +2,7 @@
     <el-popover placement="right-start" trigger="hover">
         <actions :items="actions"></actions>
         <el-table slot="reference" :data="_value" ref="table" :span-method="spanMethod" v-loading="loading"
-                  :element-loading-text="loading" :cell-class-name="options.cellClassName">
+                  :element-loading-text="loading" :cell-class-name="options.cellClassName" :max-height="options.maxHeight">
             <template slot="left"></template>
             <data-table-column :field="f" v-for="f in _fields" :key="f.name"></data-table-column>
             <template slot="right"></template>
@@ -36,6 +36,7 @@
             group: false,
             options: {
                 type: Object, default: () => {
+                    return {}
                 }
             },
             fields: {
