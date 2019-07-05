@@ -4,6 +4,9 @@
 
 export default {
     mergeBlock(blocks, extras){
+        if (blocks.length === 0) {
+            return blocks
+        }
         let ds = []
         blocks.forEach((b, i) => {
             b.data.forEach((d, j) => {
@@ -14,8 +17,8 @@ export default {
         if (!fs.find(a => a.name === 'block')) {
             fs.push({name: 'block', type: 'string'})
         }
-        if(extras){
-            Object.keys(extras).forEach( k => {
+        if (extras) {
+            Object.keys(extras).forEach(k => {
                 if (!fs.find(a => a.name === k)) {
                     fs.push({name: k, type: typeof extras[k]})
                 }
@@ -25,11 +28,18 @@ export default {
     },
     mergeSheet(sheets){
         let data = []
-        let fields = sheets[0].blocks[0].fields
-        sheets.forEach((s,i) => {
-             let block = this.mergeBlock(s.blocks, {sheet:`sheet${1+i}`})[0]
-             data = data.concat(block.data)
+        let sheet = sheets.find( s => s.blocks && s.blocks.length>0)
+
+        let fields = sheet.blocks[0].fields
+        sheets.forEach((s, i) => {
+            let block = this.mergeBlock(s.blocks, {sheet: `sheet${1 + i}`})[0]
+            if (block) {
+                data = data.concat(block.data)
+            }
         })
-        return [{blocks:[{count:data.length, data, fields}]}]
+        return [{blocks: [{count: data.length, data, fields}], name:sheet.name}]
+    },
+    renameColumn(blocks, field){
+
     }
 }

@@ -78,7 +78,7 @@ export default {
                 },
                 'download': {
                     icon: 'download',
-                    title: '导出',
+                    label: '导出',
                     do: this.dumpExcelData
                 },
                 'batch': {

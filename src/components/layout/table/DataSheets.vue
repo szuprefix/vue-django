@@ -2,47 +2,33 @@
     <el-tabs tab-position="bottom" max-height="32rem">
         <el-tab-pane lazy v-for="s,i in value.sheets" :key="i">
             <template slot="label">
-
-                <el-dropdown>
-  <span class="el-dropdown-link">
-    <editable-label v-model="s.name"></editable-label>
-      <i class="el-icon-arrow-down el-icon--right"></i>
-  </span>
-                    <el-dropdown-menu slot="dropdown">
-                        <template v-for="a in sheetActions">
-                            <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
-                                              :icon="`fa fa-${a.icon}`">
-                                {{a.label}}
-                            </el-dropdown-item>
-                        </template>
-                    </el-dropdown-menu>
-                </el-dropdown>
+                <action-label v-model="s.name" :actions="actions"></action-label>
             </template>
             <div class="data-sheet-block" v-for="b,j in s.blocks" :key="j">
-                <data-table v-model="b.data" :fields="b.fields" :defaultWidget=""></data-table>
+                <data-block v-model="s.blocks[j]"></data-block>
             </div>
         </el-tab-pane>
     </el-tabs>
 </template>
 <script>
-    import DataTable from './DataTable.vue'
-    import Actions from '../Actions.vue'
-    import EditableLabel from '../../widgets/EditableLabel.vue'
+    import ActionLabel from './ActionLabel.vue'
+    import DataBlock from './DataBlock.vue'
     export default{
         props: {
             value: Array
         },
         data () {
             return {
-                sheetActions: [
+                ActionLabel,
+                actions: [
                     {name: 'delete', label: '删除'},
-                    {name: 'delete', label: '合并数据块'},
-                    {name: 'delete', label: '拆分行'},
-                ]
+                    {name: 'delete', label: '合并数据表'}
+                ],
             }
         },
-        components: {DataTable, Actions, EditableLabel},
-        methods: {},
+        components: { DataBlock,ActionLabel},
+        methods: {
+        },
         computed: {}
     }
 </script>

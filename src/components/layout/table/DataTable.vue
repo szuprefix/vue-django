@@ -1,13 +1,22 @@
 <template>
-    <el-popover placement="right-start" trigger="hover">
-        <actions :items="actions"></actions>
-        <el-table slot="reference" :data="_value" ref="table" :span-method="spanMethod" v-loading="loading"
-                  :element-loading-text="loading" :cell-class-name="options.cellClassName" :max-height="options.maxHeight">
-            <template slot="left"></template>
-            <data-table-column :field="f" v-for="f in _fields" :key="f.name"></data-table-column>
-            <template slot="right"></template>
-        </el-table>
-    </el-popover>
+    <el-table slot="reference" :data="_value" ref="table" :span-method="spanMethod" v-loading="loading"
+              :element-loading-text="loading" :cell-class-name="elOptions.cellClassName"
+              :height="elOptions.height" :max-height="elOptions.maxHeight" :stripe="elOptions.stripe"
+              :border="elOptions.border">
+        <template slot="left"></template>
+        <data-table-column :field="f" v-for="f in _fields" :key="f.name"></data-table-column>
+        <el-table-column label="" align="right" v-if="rowActions || topActions">
+            <template slot="header" slot-scope="scope" v-if="topActions">
+                <actions :items="topActions" :context="scope"></actions>
+            </template>
+            <template slot-scope="scope" v-if="rowActions">
+                <actions :items="rowActions" :context="scope" class="hover-show" trigger="hover"></actions>
+            </template>
+        </el-table-column>
+
+        <slot name="right">
+        </slot>
+    </el-table>
 </template>
 <script>
     import {percent, toThousandslsFilter} from '../../../utils/filters'
@@ -32,7 +41,8 @@
     export default{
         props: {
             value: Array,
-            defaultWidget: [Function, Object],
+            cellWidget: [Function, Object],
+            headerWidget: [Function, Object],
             group: false,
             options: {
                 type: Object, default: () => {
@@ -48,14 +58,14 @@
         data () {
             return {
                 loading: false,
-                actions:[{
+                topActions: [{
                     icon: 'download',
-                    label: '导出',
+                    title: '导出',
                     do: this.dumpExcelData
                 }]
             }
         },
-        components: {DataTableColumn,Actions},
+        components: {DataTableColumn, Actions},
         methods: {
             getGridData(data){
                 let ds = data.map((d) => {
@@ -101,7 +111,8 @@
                 }
                 f.type = f.type || 'string'
                 f.align = f.align || ['decimal', 'number', 'percent', 'integer'].includes(f.type) && 'right' || 'left'
-                f.widget = f.widget || this.defaultWidget
+                f.widget = f.widget || this.cellWidget
+                f.headerWidget = f.headerWidget || this.headerWidget
                 f.formatter = f.formatter || this.genDefaultFormater(f)
                 if (f.subColumns) {
                     f.subColumns = f.subColumns.map(i => this.normalizeField(i))
@@ -155,6 +166,9 @@
                     return sortBy(this.value, this.fieldNames)
                 }
                 return this.value
+            },
+            elOptions () {
+                return this.options.elTable || {}
             }
         }
     }
