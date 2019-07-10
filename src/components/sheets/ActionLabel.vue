@@ -3,7 +3,7 @@
         <editable-label v-model="value"></editable-label>
         <el-dropdown-menu slot="dropdown">
             <template v-for="a in actions">
-                <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
+                <el-dropdown-item :command="a.name" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
                                   :icon="`fa fa-${a.icon}`">
                     {{a.label}}
                 </el-dropdown-item>
@@ -12,7 +12,7 @@
     </el-dropdown>
 </template>
 <script>
-    import EditableLabel from '../../widgets/EditableLabel.vue'
+    import EditableLabel from '../widgets/EditableLabel.vue'
     export default{
         props: {
             value: String,
@@ -25,7 +25,8 @@
         components: {EditableLabel},
         methods: {
             handleCommand (command) {
-                command(this.context)
+                let action = this.actions.find(a => a.name === command)
+                action.do(Object.assign({action}, this.context))
             },
             setValue(v){
                 this.$emit('change', v)

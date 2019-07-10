@@ -1,5 +1,5 @@
 <template>
-  <span :contenteditable="editable" @dblclick="toEdit" @blur="changed" class="xyz-editable-span">
+  <span :contenteditable="editable" @dblclick.stop="toEdit" @blur="changed" class="xyz-editable-span">
   </span>
 </template>
 <script>
