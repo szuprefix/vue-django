@@ -3,8 +3,8 @@
  */
 
 import {set, unset, uniqueId, pick, range} from 'lodash'
-export default {
-    mergeColumn(block,mfns){
+export const ColumnUtil = {
+    merge (block,mfns){
         let fs = block.fields
         let bf = fs.find(a => a.name === mfns[0])
         let mfs = fs.filter(a => mfns.slice(1).includes(a.name))
@@ -28,66 +28,7 @@ export default {
         block.data = ds.concat(ds2)
         block.fields = cfs.concat([bf, nf])
     },
-    mergeBlock(blocks, extras){
-        if (blocks.length === 0) {
-            return blocks
-        }
-        let ds = []
-        let bb = blocks[0]
-        let fs = bb.fields
-        blocks.forEach((b, i) => {
-            if(i>0){
-                let pairs = b.fields.map((f,j) => [f.name, fs[j].name])
-                this.renameColumn(b, pairs)
-                console.log(pairs)
-            }
-            b.data.forEach((d, j) => {
-                ds.push(Object.assign({block: b.name }, extras, d))
-            })
-        })
-        if (!fs.find(a => a.name === 'block')) {
-            fs.push({name: 'block', type: 'string'})
-        }
-        if (extras) {
-            Object.keys(extras).forEach(k => {
-                if (!fs.find(a => a.name === k)) {
-                    fs.push({name: k, type: typeof extras[k]})
-                }
-            })
-        }
-        return [{count: ds.length, data: ds, fields: fs, name: bb.name}]
-    },
-    mergeSheet(sheets){
-        let data = []
-        let sheet = sheets.find(s => s.blocks && s.blocks.length > 0)
-
-        let fields = sheet.blocks[0].fields
-        sheets.forEach((s, i) => {
-            let block = this.mergeBlock(s.blocks, {sheet: s.name || `sheet${1 + i}`})[0]
-            if (block) {
-                data = data.concat(block.data)
-            }
-        })
-        return [{blocks: [{count: data.length, data, fields}], name: sheet.name}]
-    },
-    normalize(sheets){
-        sheets.forEach((s, i) => {
-            if (!s.name) {
-                s.name = `Sheet${1 + i}`
-            }
-            s.blocks.forEach((b, j) => {
-                if (!b.name) {
-                    b.name = `Block${1 + j}`
-                }
-                b.fields.forEach((f, k) => {
-                    if (!f.label) {
-                        f.label = f.name
-                    }
-                })
-            })
-        })
-    },
-    renameColumn(block, pairs){
+    rename(block, pairs){
         pairs = pairs.filter(p => p[0] !== p[1])
         if(pairs.length === 0){
             return
@@ -102,6 +43,10 @@ export default {
             let f = block.fields.find(f => f.name === p[0])
             f.label = f.name = p[1]
         })
+
+    },
+    drop (block, cns){
+        block.fields = block.fields.filter(a => !cns.includes(a.name))
     },
     splitLine2Column(block, spfns){
         let re = /\s+/g
@@ -155,4 +100,98 @@ export default {
         })
         block.data = nds
     }
+}
+
+export const BlockUtil={
+    merge(sheet, mbns, extras){
+        let bs = sheet.blocks
+        let mbs = bs.filter(b => mbns.includes(b.name))
+        let obs = bs.filter(b => !mbns.includes(b.name))
+        if (mbs.length === 0) {
+            return
+        }
+        let ds = []
+        let bb = mbs[0]
+        let fs = bb.fields
+        mbs.forEach((b, i) => {
+            if(i>0){
+                let pairs = b.fields.map((f,j) => [f.name, fs[j].name])
+                ColumnUtil.rename(b, pairs)
+            }
+            b.data.forEach((d, j) => {
+                ds.push(Object.assign({block: b.name }, d))
+            })
+        })
+        if (!fs.find(a => a.name === 'block')) {
+            fs.push({name: 'block', type: 'string'})
+        }
+        if (extras) {
+            ds.forEach((d, i) => {
+                 Object.assign(d, extras)
+            })
+            Object.keys(extras).forEach(k => {
+                if (!fs.find(a => a.name === k)) {
+                    fs.push({name: k, type: typeof extras[k]})
+                }
+            })
+        }
+        sheet.blocks = [{count: ds.length, data: ds, fields: fs, name: bb.name}].concat(obs)
+    },
+    drop(sheet, bns){
+        sheet.blocks = sheet.blocks.filter(a => !bns.includes(a.name))
+    }
+}
+export const SheetUtil = {
+    merge(book , msns){
+        let ss = book.sheets
+        let mss = ss.filter(s => msns.includes(s.name))
+        let oss = ss.filter(s => !msns.includes(s.name))
+        let blocks = []
+        ss.forEach((s, i) => {
+            blocks = blocks.concat( s.blocks)
+        })
+        book.sheets = [{blocks, name: mss[0].name}].concat(oss)
+    },
+    drop(book, sns){
+        book.sheets = book.sheets.filter(a => !sns.includes(a.name))
+    }
+}
+
+export default {
+
+
+    normalize(sheets){
+        sheets.forEach((s, i) => {
+            if (!s.name) {
+                s.name = `Sheet${1 + i}`
+            }
+            s.blocks.forEach((b, j) => {
+                if (!b.name) {
+                    b.name = `Block${1 + j}`
+                }
+                b.fields.forEach((f, k) => {
+                    if (!f.label) {
+                        f.label = f.name
+                    }
+                })
+            })
+        })
+    },
+    renameColumn(block, pairs){
+        pairs = pairs.filter(p => p[0] !== p[1])
+        if(pairs.length === 0){
+            return
+        }
+        block.data.forEach(d => {
+            pairs.forEach(p => {
+                d[p[1]] = d[p[0]]
+                delete d[p[0]]
+            })
+        })
+        pairs.forEach(p => {
+            let f = block.fields.find(f => f.name === p[0])
+            f.label = f.name = p[1]
+        })
+    },
+
 }

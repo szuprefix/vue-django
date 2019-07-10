@@ -19,10 +19,10 @@
     </el-table>
 </template>
 <script>
-    import {percent, toThousandslsFilter} from '../../../utils/filters'
+    import {percent, toThousandslsFilter} from '../../utils/filters'
     import {sortBy} from 'lodash'
     import DataTableColumn from './DataTableColumn.vue'
-    import Actions from '../Actions.vue'
+    import Actions from '../layout/Actions.vue'
     function flatten(ns, children_field_name) {
         let r = []
         ns.forEach(a => {

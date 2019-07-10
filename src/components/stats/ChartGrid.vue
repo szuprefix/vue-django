@@ -12,7 +12,7 @@
 <script>
     import Qs from 'qs'
     import server_response from 'vue-django/src/mixins/server_response'
-    import DataTable from 'vue-django/src/components/layout/table/DataTable.vue'
+    import DataTable from 'vue-django/src/components/table/DataTable.vue'
     import {zipObject} from 'lodash'
     let OPTIONS_TOOLBOX = {
         show: true,

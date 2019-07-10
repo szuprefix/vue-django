@@ -15,6 +15,7 @@
     import ActionLabel from './ActionLabel.vue'
     import select_actions from './mixins/select_action'
     import Sheet from './Sheet.vue'
+    import {SheetUtil} from '../../utils/sheets'
     export default{
         mixins: [select_actions],
         props: {
@@ -25,30 +26,28 @@
             return {
                 curSheet: this.value.sheets[0].name,
                 actions: [
-                    {name: 'delete', label: '删除数据表', postAction: this.deleteSheet, do: this.toDoSelectionAction},
-                    {name: 'merge', label: '合并数据表', postAction: this.splitLine2Column, do: this.toDoSelectionAction}
+                    {name: 'drop', label: '删除数据表', postAction: this.dropSheet, do: this.toDoSelectionAction},
+                    {name: 'merge', label: '合并数据表', postAction: this.mergeSheet, do: this.toDoSelectionAction}
                 ],
             }
         },
         components: { ActionLabel, Sheet},
         methods: {
 
-            deleteSheet(context){
+            dropSheet(){
                 if (this.selection.list.length === this.value.sheets.length) {
                     this.$message({message: '请至少留下一张数据表吧?'})
                     return
                 }
                 this.selection.show = false
-                this.value.sheets = this.value.sheets.filter(a => !this.selection.list.includes(a.name))
+                SheetUtil.drop(this.value, this.selection.list)
                 this.curSheet = this.value.sheets[0].name
             },
+            mergeSheet() {
+                this.selection.show = false
+                SheetUtil.merge(this.value, this.selection.list)
+            }
         },
         computed: {}
     }
 </script>
-<style>
-    .data-sheet-block {
-        margin-bottom: 8rem;
-    }
-
-</style>

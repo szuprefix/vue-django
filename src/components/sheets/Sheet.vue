@@ -16,7 +16,7 @@
     import ActionLabel from './ActionLabel.vue'
     import Block from './Block.vue'
     import select_actions from './mixins/select_action'
-    import sheets from '../../utils/sheets'
+    import {BlockUtil} from '../../utils/sheets'
     export default{
         mixins: [select_actions],
         props: {
@@ -26,7 +26,7 @@
             return {
                 activeNames: this.value.blocks.map(b => b.name),
                 actions: [
-                    {name: 'delete', label: '删除', postAction: this.deleteBlock, do: this.toDoSelectionAction},
+                    {name: 'drop', label: '删除', postAction: this.dropBlock, do: this.toDoSelectionAction},
                     {name: 'merge', label: '合并', postAction: this.mergeBlock, do: this.toDoSelectionAction},
 
                 ]
@@ -40,15 +40,17 @@
                 })
                 return fields
             },
-            deleteBlock(){
+            dropBlock(){
+                if (this.selection.list.length === this.value.blocks.length) {
+                    this.$message({message: '请至少留下一个数据块吧?'})
+                    return
+                }
                 this.selection.show = false
-                this.value.blocks = this.value.blocks.filter(a => !this.selection.list.includes(a.name))
+                BlockUtil.drop(this.value, this.selection.list)
             },
             mergeBlock() {
                 this.selection.show = false
-                let mbls = this.value.blocks.filter(a => this.selection.list.includes(a.name))
-                let nbs = sheets.mergeBlock(mbls)
-                this.value.blocks = this.value.blocks.filter(a => !this.selection.list.includes(a.name)).concat(nbs)
+                BlockUtil.merge(this.value, this.selection.list)
             }
         },
         computed: {

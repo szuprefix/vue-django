@@ -17,9 +17,10 @@ export default {
 
     methods: {
         toDoSelectionAction(context){
+            this.selection.first = context.name
             this.selection.list = [context.name]
             this.selection.actionName = context.action.label
-            this.selection.action = context.action.postAction
+            this.selection.action = this[context.action.name] //context.action.postAction
             this.selection.show = true
         },
     }

@@ -9,12 +9,12 @@
 
 </template>
 <script>
-    import DataTable from '../layout/table/DataTable.vue'
+    import DataTable from '../table/DataTable.vue'
     import ActionLabel from './ActionLabel.vue'
     import EditableLabel from '../widgets/EditableLabel.vue'
     import select_actions from './mixins/select_action'
     import {set, unset, uniqueId, pick, range} from 'lodash'
-    import sheets from '../../utils/sheets'
+    import {ColumnUtil} from '../../utils/sheets'
     export default{
         mixins: [select_actions],
         props: {
@@ -26,7 +26,7 @@
                 ActionLabel,
                 EditableLabel,
                 actions: [
-                    {name: 'delete', label: '删除整列', postAction: this.deleteColumn, do: this.toDoSelectionAction},
+                    {name: 'drop', label: '删除整列', postAction: this.dropColumn, do: this.toDoSelectionAction},
                     {name: 'merge', label: '合并字段', postAction: this.mergeColumn, do: this.toDoSelectionAction},
                     {
                         name: 'splitline2column',
@@ -53,7 +53,7 @@
                 return fields
             },
             headerChange ({context, newValue, oldValue}){
-                sheets.renameColumn(this.value, [oldValue, newValue])
+                ColumnUtil.rename(this.value, [oldValue, newValue])
             },
             mergeColumn(){
                 let fl = this.selection.list
@@ -63,20 +63,20 @@
                 }
                 this.selection.show = false
                 this.loading = '合并中...'
-                sheets.mergeColumn(this.value, fl)
+                ColumnUtil.merge(this.value, fl)
                 this.loading = false
             },
-            deleteColumn(){
+            dropColumn(){
                 this.selection.show = false
-                this.value.fields = this.value.fields.filter(a => !this.selection.list.includes(a.name))
+                ColumnUtil.drop(this.value, this.selection.list)
             },
             splitLine2Column(){
                 this.selection.show = false
-                sheets.splitLine2Column(this.value, this.selection.list) 
+                ColumnUtil.splitLine2Column(this.value, this.selection.list)
             },
             splitLine2Row(){
                 this.selection.show = false
-                sheets.splitLine2Row(this.value, this.selection.list)
+                ColumnUtil.splitLine2Row(this.value, this.selection.list)
             }
         },
         computed: {}
