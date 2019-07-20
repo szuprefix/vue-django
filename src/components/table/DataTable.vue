@@ -7,10 +7,11 @@
         <data-table-column :field="f" v-for="f in _fields" :key="f.name"></data-table-column>
         <el-table-column label="" align="right" v-if="rowActions || topActions">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="topActions" :context="scope"></actions>
+                <actions :items="topActions" :context="scope" :map="actionMap"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
-                <actions :items="rowActions" :context="scope" class="hover-show" trigger="hover"></actions>
+                <actions :items="rowActions" :context="scope" class="hover-show" trigger="hover"
+                         :map="actionMap"></actions>
             </template>
         </el-table-column>
 
@@ -54,15 +55,22 @@
                     return [{name: '__str__', label: '名称'}]
                 }
             },
+            topActions: {
+                type: Array, default: () => {
+                    return ['download']
+                }
+            }
         },
         data () {
             return {
                 loading: false,
-                topActions: [{
-                    icon: 'download',
-                    title: '导出',
-                    do: this.dumpExcelData
-                }]
+                actionMap: {
+                    'download': {
+                        icon: 'download',
+                        title: '导出',
+                        do: this.dumpExcelData
+                    }
+                }
             }
         },
         components: {DataTableColumn, Actions},

@@ -4,7 +4,7 @@
 
 import {set, unset, uniqueId, pick, range} from 'lodash'
 export const ColumnUtil = {
-    merge (block,mfns){
+    merge (block, mfns){
         let fs = block.fields
         let bf = fs.find(a => a.name === mfns[0])
         let mfs = fs.filter(a => mfns.slice(1).includes(a.name))
@@ -30,7 +30,7 @@ export const ColumnUtil = {
     },
     rename(block, pairs){
         pairs = pairs.filter(p => p[0] !== p[1])
-        if(pairs.length === 0){
+        if (pairs.length === 0) {
             return
         }
         block.data.forEach(d => {
@@ -39,6 +39,7 @@ export const ColumnUtil = {
                 delete d[p[0]]
             })
         })
+        // console.log([pairs, block.fields])
         pairs.forEach(p => {
             let f = block.fields.find(f => f.name === p[0])
             f.label = f.name = p[1]
@@ -92,7 +93,7 @@ export const ColumnUtil = {
                 ps.forEach(p => {
                     let d = {}
                     d[f.name] = p
-                    d = Object.assign(d,cps)
+                    d = Object.assign(d, cps)
                     nds.push(d)
                 })
 
@@ -102,7 +103,7 @@ export const ColumnUtil = {
     }
 }
 
-export const BlockUtil={
+export const BlockUtil = {
     merge(sheet, mbns, extras){
         let bs = sheet.blocks
         let mbs = bs.filter(b => mbns.includes(b.name))
@@ -114,12 +115,12 @@ export const BlockUtil={
         let bb = mbs[0]
         let fs = bb.fields
         mbs.forEach((b, i) => {
-            if(i>0){
-                let pairs = b.fields.map((f,j) => [f.name, fs[j].name])
+            if (i > 0) {
+                let pairs = b.fields.map((f, j) => [f.name, fs[j].name])
                 ColumnUtil.rename(b, pairs)
             }
             b.data.forEach((d, j) => {
-                ds.push(Object.assign({block: b.name }, d))
+                ds.push(Object.assign({block: b.name}, d))
             })
         })
         if (!fs.find(a => a.name === 'block')) {
@@ -127,7 +128,7 @@ export const BlockUtil={
         }
         if (extras) {
             ds.forEach((d, i) => {
-                 Object.assign(d, extras)
+                Object.assign(d, extras)
             })
             Object.keys(extras).forEach(k => {
                 if (!fs.find(a => a.name === k)) {
@@ -142,26 +143,22 @@ export const BlockUtil={
     }
 }
 export const SheetUtil = {
-    merge(book , msns){
+    merge(book, msns){
         let ss = book.sheets
         let mss = ss.filter(s => msns.includes(s.name))
         let oss = ss.filter(s => !msns.includes(s.name))
         let blocks = []
         ss.forEach((s, i) => {
-            blocks = blocks.concat( s.blocks)
+            blocks = blocks.concat(s.blocks)
         })
         book.sheets = [{blocks, name: mss[0].name}].concat(oss)
     },
     drop(book, sns){
         book.sheets = book.sheets.filter(a => !sns.includes(a.name))
-    }
-}
-
-export default {
-
-
-    normalize(sheets){
-        sheets.forEach((s, i) => {
+    },
+    normalize(book){
+        let ss = book.sheets
+        ss.forEach((s, i) => {
             if (!s.name) {
                 s.name = `Sheet${1 + i}`
             }
@@ -176,22 +173,9 @@ export default {
                 })
             })
         })
-    },
-    renameColumn(block, pairs){
-        pairs = pairs.filter(p => p[0] !== p[1])
-        if(pairs.length === 0){
-            return
-        }
-        block.data.forEach(d => {
-            pairs.forEach(p => {
-                d[p[1]] = d[p[0]]
-                delete d[p[0]]
-            })
-        })
-        pairs.forEach(p => {
-            let f = block.fields.find(f => f.name === p[0])
-            f.label = f.name = p[1]
-        })
-    },
+    }
+}
 
+export default {
+    ColumnUtil, BlockUtil, SheetUtil
 }

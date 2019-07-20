@@ -15,15 +15,18 @@
                   v-html="f.headerWidget(row)"></span>
             <template v-else>{{f.label || f.name}}</template>
         </template>
-        <template slot-scope="{row}">
-            <component :is="f.widget" v-model="row[f.name]" :context="row" :field="f"
-                       v-if="f.widget && typeof f.widget == 'object'"></component>
+        <template slot-scope="{row,$index}">
+            <form-widget v-if="f.useFormWidget" v-model="row" :field="f" :context="row"
+                         @change="onCellValueChange"></form-widget>
+            <component :is="f.widget" v-model="row[f.name]" :context="context(row, $index)" :field="f"
+                       v-else-if="f.widget && typeof f.widget == 'object'"></component>
             <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
             <template v-else>{{row[f.name]}}</template>
         </template>
     </el-table-column>
 </template>
 <script>
+    import FormWidget from '../widgets/FormWidget.vue'
     export default{
         name: 'DataTableColumn',
         props: {
@@ -32,8 +35,12 @@
         data () {
             return {}
         },
-        components: {},
-        methods: {},
+        components: {FormWidget},
+        methods: {
+            context(a, $index) {
+                return {...a, $index}
+            }
+        },
         computed: {
             f(){
                 return this.field
@@ -41,4 +48,4 @@
         }
     }
 </script>
-<style scoped></style>
+<style></style>

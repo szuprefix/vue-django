@@ -26,20 +26,10 @@
                 ActionLabel,
                 EditableLabel,
                 actions: [
-                    {name: 'drop', label: '删除整列', postAction: this.dropColumn, do: this.toDoSelectionAction},
-                    {name: 'merge', label: '合并字段', postAction: this.mergeColumn, do: this.toDoSelectionAction},
-                    {
-                        name: 'splitline2column',
-                        label: '分拆内容为新列',
-                        postAction: this.splitLine2Column,
-                        do: this.toDoSelectionAction
-                    },
-                    {
-                        name: 'splitline2row',
-                        label: '分拆内容为新行',
-                        postAction: this.splitLine2Row,
-                        do: this.toDoSelectionAction
-                    },
+                    {name: 'drop', label: '删除整列', do: this.toDoSelectionAction},
+                    {name: 'merge', label: '合并字段', do: this.toDoSelectionAction},
+                    {name: 'splitLine2Column', label: '分拆内容为新列', do: this.toDoSelectionAction},
+                    {name: 'splitLine2Row', label: '分拆内容为新行', do: this.toDoSelectionAction},
                 ]
             }
         },
@@ -53,9 +43,9 @@
                 return fields
             },
             headerChange ({context, newValue, oldValue}){
-                ColumnUtil.rename(this.value, [oldValue, newValue])
+                ColumnUtil.rename(this.value, [[oldValue, newValue.trim()]])
             },
-            mergeColumn(){
+            merge(){
                 let fl = this.selection.list
                 if (fl.length < 2) {
                     this.$message({type: 'info', message: '请选择至少两个字段'})
@@ -66,7 +56,7 @@
                 ColumnUtil.merge(this.value, fl)
                 this.loading = false
             },
-            dropColumn(){
+            drop(){
                 this.selection.show = false
                 ColumnUtil.drop(this.value, this.selection.list)
             },

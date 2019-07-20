@@ -26,8 +26,8 @@
             return {
                 activeNames: this.value.blocks.map(b => b.name),
                 actions: [
-                    {name: 'drop', label: '删除', postAction: this.dropBlock, do: this.toDoSelectionAction},
-                    {name: 'merge', label: '合并', postAction: this.mergeBlock, do: this.toDoSelectionAction},
+                    {name: 'drop', label: '删除', do: this.toDoSelectionAction},
+                    {name: 'merge', label: '合并', do: this.toDoSelectionAction},
 
                 ]
             }
@@ -40,7 +40,7 @@
                 })
                 return fields
             },
-            dropBlock(){
+            drop(){
                 if (this.selection.list.length === this.value.blocks.length) {
                     this.$message({message: '请至少留下一个数据块吧?'})
                     return
@@ -48,7 +48,7 @@
                 this.selection.show = false
                 BlockUtil.drop(this.value, this.selection.list)
             },
-            mergeBlock() {
+            merge() {
                 this.selection.show = false
                 BlockUtil.merge(this.value, this.selection.list)
             }
@@ -56,7 +56,7 @@
         computed: {
             blockSelections () {
                 return this.value.blocks.map(b => {
-                    return {name:b.name, label:`${b.name} : ${b.fields.map(f => f.name).join('|')}`}
+                    return {name: b.name, label: `${b.name} : ${b.fields.map(f => f.name).join('|')}`}
                 })
             }
         }

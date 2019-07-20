@@ -26,15 +26,15 @@
             return {
                 curSheet: this.value.sheets[0].name,
                 actions: [
-                    {name: 'drop', label: '删除数据表', postAction: this.dropSheet, do: this.toDoSelectionAction},
-                    {name: 'merge', label: '合并数据表', postAction: this.mergeSheet, do: this.toDoSelectionAction}
+                    {name: 'drop', label: '删除数据表', do: this.toDoSelectionAction},
+                    {name: 'merge', label: '合并数据表',   do: this.toDoSelectionAction}
                 ],
             }
         },
         components: { ActionLabel, Sheet},
         methods: {
 
-            dropSheet(){
+            drop(){
                 if (this.selection.list.length === this.value.sheets.length) {
                     this.$message({message: '请至少留下一张数据表吧?'})
                     return
@@ -43,7 +43,7 @@
                 SheetUtil.drop(this.value, this.selection.list)
                 this.curSheet = this.value.sheets[0].name
             },
-            mergeSheet() {
+            merge() {
                 this.selection.show = false
                 SheetUtil.merge(this.value, this.selection.list)
             }
