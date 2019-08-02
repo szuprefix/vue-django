@@ -1,19 +1,27 @@
 <template>
-    <div>
+    <div class="batch-creator">
         <template v-for="f in foreignKeys">
             <batch-creator :structure="f" :value="getForeignKeyData(f)"
-                           :appModelName="f.name" @optionLoaded="onForeignKeyLoaded"></batch-creator>
+                           :appModelName="f.name" @optionLoaded="onForeignKeyLoaded"
+                           :ref="f.name.split('.')[1]" @exists="onForeignkeyExists"></batch-creator>
 
         </template>
-
-        <h4>{{structure.label}}</h4>
-        <data-table :value="value" :fields="structure.tableItems" v-if="structure.tableItems && value && value.length>0" :topActions="[]" :options="{elTable:{maxHeight:400}}"></data-table>
+        <template v-if="records.length>0">
+            <el-budge :value="records.length"><h4>{{structure.label}} {{records.length}}</h4></el-budge>
+            <data-table :value="records" :fields="structure.tableItems" :cellWidget="TooltipCell"
+                        :topActions="[{name:'create',label:'批量创建',icon:'bolt',do:saveRecords}]"
+                        :options="{elTable:{maxHeight:400}}" ref="table"></data-table>
+        </template>
     </div>
 </template>
 <script>
     import DataTable from '../table/DataTable.vue'
-    import {pick, last, uniqWith, isEqual} from 'lodash'
+    import TooltipCell from '../table/widgets/TooltipCell.vue'
+    import {pick, last, uniqWith, isEqual, uniqueId, filter, forOwn} from 'lodash'
     import ModelView from '../../mixins/model_view'
+    import Qs from 'qs'
+    import queueLimit from '../../utils/async_queue'
+    import {Validator, genFieldRules} from '../../utils/validators'
     export default{
         name: 'BatchCreator',
         mixins: [ModelView],
@@ -24,7 +32,9 @@
         data () {
             return {
                 activeList: [],
-                loaded: false
+                records: [],
+                loaded: false,
+                TooltipCell
             }
         },
         components: {DataTable},
@@ -38,26 +48,117 @@
                 this.loaded = true
                 this.checkStatus()
             })
-//            console.log(this.plainFieldData)
         },
         methods: {
+            rowClassName({row, rowIndex}){
+                return row.id > 0 ? 'table__record-exists' : ''
+            },
             onForeignKeyLoaded(context){
                 let st = context.structure
-                Object.assign(this.structure.foreignKeys.find(fk => fk.name === st.name ), st)
+                Object.assign(this.structure.foreignKeys.find(fk => fk.name === st.name), st)
                 this.activeList.push(st)
                 this.checkStatus()
 
             },
+            onForeignkeyExists({data, structure}){
+                let rel = structure.rel
+                let id = data.id
+                let d = pick(data, structure.fieldNames)
+                forOwn(d, (v, k) => {
+                    d[`${rel}.${k}`] = d[k]
+                    delete d[k]
+                })
+                let fks = filter(this.value, d)
+                fks.forEach(v => {
+                    v[rel] = id
+                    this.checkExists(v)
+                })
+//                console.log([`onForeignKeysExists ${rel}`, data, d, fks])
+            },
             checkStatus() {
-                if(this.activeList.length=== this.foreignKeys.length && this.loaded){
-                    this.structure = Object.assign({}, this.structure, {
-                        tableItems:this.tableItems,
-                        count: this.activeList.map(a => a.count).reduce((a,b) => a+b, this.plainFields.length)
+                if (this.activeList.length === this.foreignKeys.length && this.loaded) {
+                    this.structure = Object.assign({insertMode: 'ignore'}, this.structure, {
+                        tableItems: this.tableItems,
+                        fieldNames: this.fieldNames,
+                        count: this.activeList.map(a => a.count).reduce((a, b) => a + b, this.plainFields.length)
                     })
 //                    console.log(this.structure)
                     this.$emit('optionLoaded', {structure: this.structure})
                 }
 //                console.log([this.activeList.length, this.foreignKeys.length, this.loaded])
+            },
+            checkExists(d){
+                let uns = this.modelOptions.unique_together
+                uns = uns && uns[0]
+                let fks = this.foreignKeys
+                fks = uns ? fks.filter(fk => uns.includes(fk.rel)) : fks
+                let b = fks.every(fk => d[fk.rel] > 0)
+                if (!b) {
+                    d.id = null
+//                    console.log([d.teacher, d.clazz, d.course])
+                    return Promise.resolve()
+                }
+                let ls = this.structure.lookups
+                let qs = pick(d, this.fieldNames)
+                if (ls) {
+                    forOwn(ls, (v, k) => {
+                        qs[`${k}__${v}`] = qs[k]
+                        delete qs[k]
+                    })
+                }
+
+                if (uns) {
+                    qs = pick(qs, uns)
+                }
+                return this.$http.get(`${this.modelListUrl}?${Qs.stringify(qs)}`).then(({data}) => {
+                    if (data.count === 1) {
+                        d.id = data.results[0].id
+                        this.$emit('exists', {data: d, structure: this.structure})
+                    } else {
+                        d.id = null
+                    }
+                })
+            },
+            checkExistsRecur(){
+                if (this.insertMode === 'append') {
+                    return Promise.resolve()
+                }
+                return queueLimit(this.activeList, 1, (fk) => {
+                    let rel = fk.name.split('.')[1]
+                    let com = this.$refs[rel][0]
+                    return com.checkExistsRecur()
+                }).then(() => {
+                    return queueLimit(this.value, 3, (d) => {
+                        return this.checkExists(d)
+                    })
+                }).then(() => {
+                    this.getRecords()
+                    return Promise.resolve(this.records)
+                })
+            },
+            saveRecords() {
+                return queueLimit(this.activeList, 1, (fk) => {
+                    let rel = fk.name.split('.')[1]
+                    let com = this.$refs[rel][0]
+                    return com.saveRecords()
+                }).then(() => {
+                    return queueLimit(this.records, 1, (d => {
+                        if (this.insertMode === 'append' || !d.id) {
+                            return this.$http.post(this.modelListUrl, d).then(({data}) => {
+                                this.$emit('exists', {data: d, structure: this.structure})
+                            })
+                        } else {
+                            return this.$http.put(this.modelGetDetailUrl(d.id), d).then(({data}) => {
+                            })
+                        }
+                    }))
+                }).then(() => {
+                    this.getRecords()
+                })
+            },
+            getRecords(){
+                let func = this.insertMode === 'ignore' ? (d => !d.id) : (d => true)
+                this.records = uniqWith(this.value.filter(func), isEqual)
             },
             normalizeStructure(){
                 let r = Object.assign({}, this.structure)
@@ -76,8 +177,7 @@
                 return r
             },
             getForeignKeyData(f){
-//                console.log(f)
-                if(!f.tableItems){
+                if (!f.tableItems) {
                     return []
                 }
                 let fns = []
@@ -87,45 +187,89 @@
                     fns.push(ofn)
                     pairs.push([ofn, ti.name])
                 })
-                let data = this.value.map(a =>pick(a, fns))
-                data.forEach(d => {
+                fns.push(f.rel)
+                pairs.push([f.rel, 'id'])
+                let data = this.value.map(a => {
+                    let d = pick(a, fns)
+                    let $errors={}
+                    let $es=a.$errors || {}
                     pairs.forEach(p => {
                         d[p[1]] = d[p[0]]
+                        let $e=$es[p[0]]
+                        if($e){
+                            $errors[p[1]]=$e
+                        }
                         delete d[p[0]]
                     })
+//                    console.log([a.$errors,$errors])
+                    if(Object.keys($errors).length>0){
+                        d.$errors=$errors
+                    }
+                    return d
                 })
-                console.log([pairs, fns, f])
-                return uniqWith(data, isEqual)
+                data = uniqWith(data, isEqual)
+                return data
             }
         },
         computed: {
+            insertMode () {
+                return this.structure.insertMode
+            },
             plainFields(){
                 return this.structure.plainFields || []
             },
             foreignKeys() {
                 return this.structure.foreignKeys || []
             },
+            fieldNames () {
+                return this.plainFields.concat(this.foreignKeys.map(fk => fk.rel))
+            },
             tableItems(){
                 let r = []
                 let fcs = this.modelFieldConfigs
-                let pfs = this.plainFields && this.plainFields.map(pf => fcs[pf])
-                let fks = this.foreignKeys && this.foreignKeys.map(fk => fcs[fk])
+                if(Object.keys(fcs).length === 0){
+                    return r
+                }
+                let vs = this.structure.validator || {}
+                let pfs = this.plainFields && this.plainFields.map(pf => {
+                        let rules = genFieldRules(fcs[pf])
+                        let vld = vs[pf]
+                        let format = undefined
+                        if (vld) {
+                            rules.push(vld)
+                            format = vld.format
+                        }
+                        return {...fcs[pf], rules, format}
+                    })
                 this.activeList.forEach(fk => {
                     fk.tableItems.forEach(ti => {
-                        let label = fk.count>1 ?`${fk.label}.${ti.label}`:`${fk.label}`
-                        let synonyms = fk.count>1 ? []: fk.synonyms
-                        let nti = Object.assign({}, ti, {name:`${fk.rel}.${ti.name}`, label, synonyms})
-//                        console.log(nti)
+                        let label = fk.count > 1 ? `${fk.label}.${ti.label}` : `${fk.label}`
+                        let synonyms = fk.count > 1 ? [] : fk.synonyms
+                        let nti = {...ti, name: `${fk.rel}.${ti.name}`, label, synonyms}
                         r.push(nti)
                     })
                 })
-                r=r.concat(pfs)
+                r = r.concat(pfs)
+//                console.log(r)
                 return r
-            },
-            plainFieldData(){
-                return this.value.map(a => pick(a, this.plainFields))
+            }
+        },
+        watch: {
+            value(v){
+//                let vconfig = this.structure.validator
+//                console.log([this.structure.name, vconfig])
+//                if (vconfig) {
+//                    let vld = Validator(vconfig)
+//                    v.forEach(d => {
+//                        vld.validate(d)
+//                    })
+//                }
             }
         }
     }
 </script>
-<style scoped></style>
+<style>
+    .batch-creator .table__record-exists {
+        background-color: lightyellow;
+    }
+</style>

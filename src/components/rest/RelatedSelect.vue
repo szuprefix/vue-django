@@ -29,6 +29,7 @@
         },
         created(){
             this.modelInit()
+            Object.assign(this.tableQueries, this.field.tableBaseQueries)
             this.tableUrl = this.modelListSubUrl && `${this.modelListUrl}${this.modelListSubUrl}/` || this.modelListUrl
             if (['number', 'string'].includes(typeof this.value)) {
                 this.tableLoad({'id': this.value}).then(() => {

@@ -1,6 +1,6 @@
 <template>
     <el-table slot="reference" :data="_value" ref="table" :span-method="spanMethod" v-loading="loading"
-              :element-loading-text="loading" :cell-class-name="elOptions.cellClassName"
+              :element-loading-text="loading" :cell-class-name="elOptions.cellClassName" :row-class-name="elOptions.rowClassName"
               :height="elOptions.height" :max-height="elOptions.maxHeight" :stripe="elOptions.stripe"
               :border="elOptions.border">
         <template slot="left"></template>

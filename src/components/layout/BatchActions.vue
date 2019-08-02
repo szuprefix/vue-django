@@ -1,6 +1,6 @@
 <template>
   <span>
-    <el-button plain :icon="a.icon" v-for="a in items" @click="onCommand(a.name)"
+    <el-button plain :icon="a.icon" v-for="a in items" @click="onCommand(a.name)" :title="a.notice"
                :disabled="count===0"
                :key="a.name">{{a.label}}
     </el-button>
@@ -25,12 +25,12 @@
             }
             let action = this.items.find((a) => a.name == name)
             if (action && action.do) {
-                this.$confirm(`确定要对勾选中的${rc}条记录执行"${action.label}"操作吗?`, action.notice, {type: 'warning'}).then(() => {
+                this.$confirm(action.notice, `确定要对勾选中的${rc}条记录执行"${action.label}"操作吗?`, {type: 'warning'}).then(() => {
                     action.do(name).then(({data}) => {
                         this.$message(`操作成功 ${data.rows}`)
                         this.$emit("done", data)
                     })
-                }).catch(this.onServerResponseError)
+                }).catch(this.onServerResponseError).catch(()=>{})
             }
             this.$emit("command", name)
         }

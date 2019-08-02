@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div id="app" v-cloak>
         <router-view v-if="layout === 'main'">
         </router-view>
         <template v-else>
@@ -65,5 +65,7 @@
 </script>
 
 <style>
-
+    [v-cloak] {
+        display: none;
+    }
 </style>

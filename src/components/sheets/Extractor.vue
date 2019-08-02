@@ -38,6 +38,7 @@
     import EditableLabel from '../widgets/EditableLabel.vue'
     import {SheetUtil, ColumnUtil} from '../../utils/sheets'
     import {uniqWith, isEqual, pick, zip} from 'lodash'
+    import {genValidatorFromTableItems} from "../../utils/validators";
 
     export default{
         props: {
@@ -100,6 +101,11 @@
                 })
 //                console.log([pairs, this.importData])
                 ColumnUtil.rename(this.block, pairs)
+                let validator = genValidatorFromTableItems(this.binding)
+                this.block.data.forEach(r => {
+                    validator.format(r)
+                    validator.validate(r)
+                })
                 this.$emit('input', this.block)
             }
         },
