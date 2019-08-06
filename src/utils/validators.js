@@ -29,7 +29,7 @@ export function unicode(v) {
     return '' + v
 }
 
-const NUM_STR_FORMATERS = [notFloat, unicode, banjiao, noSpace]
+export const NUM_STR_FORMATERS = [notFloat, unicode, banjiao, noSpace]
 
 export const HanName = {
     type: 'string',
@@ -126,6 +126,15 @@ export function getFieldRuleType(f) {
     return f.type
 }
 
+export function clear$Fields(d){
+    let r = {}
+    Object.keys(d).forEach(k => {
+        if(!k.startsWith('$')){
+            r[k] = d[k]
+        }
+    })
+    return r
+}
 export function genFieldRules(f) {
     let rs = []
     if (f.required) {

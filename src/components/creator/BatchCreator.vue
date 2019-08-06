@@ -17,14 +17,15 @@
 <script>
     import DataTable from '../table/DataTable.vue'
     import TooltipCell from '../table/widgets/TooltipCell.vue'
-    import {pick, last, uniqWith, isEqual, uniqueId, filter, forOwn} from 'lodash'
+    import {pick, last, uniqWith, isEqual, isEmpty, uniqueId, filter, forOwn, sortBy} from 'lodash'
     import ModelView from '../../mixins/model_view'
+    import server_response from '../../mixins/server_response'
     import Qs from 'qs'
     import queueLimit from '../../utils/async_queue'
-    import {Validator, genFieldRules} from '../../utils/validators'
+    import {Validator, genFieldRules, clear$Fields} from '../../utils/validators'
     export default{
         name: 'BatchCreator',
-        mixins: [ModelView],
+        mixins: [server_response, ModelView],
         props: {
             structure: Object,
             value: Array
@@ -144,8 +145,16 @@
                 }).then(() => {
                     return queueLimit(this.records, 1, (d => {
                         if (this.insertMode === 'append' || !d.id) {
+                            if(d.$errors){
+                                return Promise.resolve()
+                            }
                             return this.$http.post(this.modelListUrl, d).then(({data}) => {
                                 this.$emit('exists', {data: d, structure: this.structure})
+                            }).catch(e => {
+                                this.onServerResponseError(e)
+                                if(e.code === '400'){
+                                    d.$errors=e.msg
+                                }
                             })
                         } else {
                             return this.$http.put(this.modelGetDetailUrl(d.id), d).then(({data}) => {
@@ -158,7 +167,7 @@
             },
             getRecords(){
                 let func = this.insertMode === 'ignore' ? (d => !d.id) : (d => true)
-                this.records = uniqWith(this.value.filter(func), isEqual)
+                this.records = this.sortByErrors(uniqWith(this.value.filter(func), isEqual))
             },
             normalizeStructure(){
                 let r = Object.assign({}, this.structure)
@@ -176,10 +185,14 @@
                 }
                 return r
             },
+            sortByErrors(ds){
+               return sortBy(ds, a => a.$errors && Object.keys(a.$errors))
+            },
             getForeignKeyData(f){
                 if (!f.tableItems) {
                     return []
                 }
+                let fcs = this.modelFieldConfigs
                 let fns = []
                 let pairs = []
                 f.tableItems.forEach(ti => {
@@ -208,6 +221,8 @@
                     return d
                 })
                 data = uniqWith(data, isEqual)
+                let required = fcs[f.rel].required
+                data=data.filter(a =>  !Object.values(clear$Fields(a)).every(isEmpty))
                 return data
             }
         },
@@ -227,7 +242,7 @@
             tableItems(){
                 let r = []
                 let fcs = this.modelFieldConfigs
-                if(Object.keys(fcs).length === 0){
+                if(isEmpty(fcs)){
                     return r
                 }
                 let vs = this.structure.validator || {}
@@ -242,10 +257,18 @@
                         return {...fcs[pf], rules, format}
                     })
                 this.activeList.forEach(fk => {
+                    let required = fcs[fk.rel].required
                     fk.tableItems.forEach(ti => {
                         let label = fk.count > 1 ? `${fk.label}.${ti.label}` : `${fk.label}`
                         let synonyms = fk.count > 1 ? [] : fk.synonyms
                         let nti = {...ti, name: `${fk.rel}.${ti.name}`, label, synonyms}
+                        if(!required && fk.count ===1){
+                           nti.rules.forEach(r => {
+                               if(r.required){
+                                   r.required = false
+                               }
+                           })
+                        }
                         r.push(nti)
                     })
                 })

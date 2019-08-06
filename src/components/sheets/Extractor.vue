@@ -8,7 +8,7 @@
             <!--<el-step title="创建关联数据"></el-step>-->
         </el-steps>
 
-        <el-upload :action="actionUrl" v-if="step===0"
+        <el-upload :action="actionUrl" v-if="step===0" ref="uploader"
                    :show-file-list="false" :with-credentials="true" :auto-upload="false"
                    :on-change="submitUpload">
             <el-button size="small" type="primary">点击上传</el-button>
@@ -21,7 +21,7 @@
         </template>
         <div v-if="step===2">
             <el-button @click="step --">上一步</el-button>
-            <el-button @click="change(); step ++; ">确认</el-button>
+            <el-button @click="change(); step =0; ">确认</el-button>
             <column-bind v-model="fieldMap" :choices="bindChoices"></column-bind>
         </div>
         <!--<div v-if="step===3">-->
@@ -56,7 +56,7 @@
         components: {Book, EditableLabel, ColumnBind, DataTable},
         created () {
 
-        },
+        }, 
         methods: {
             genFieldMap(){
                 let d = {}
