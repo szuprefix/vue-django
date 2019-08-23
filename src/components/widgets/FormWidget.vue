@@ -45,7 +45,7 @@
         </component>
 
         <el-input v-else v-model="value[field.name]" :placeholder="field.placeholder || [field.label, field.help_text].join('\n')"
-                  @change="fieldValueChanged" :maxlength="field.max_length" :show-word-limit="value[field.name] && value[field.name].length>field.max_length*0.8 || false"
+                  @change="fieldValueChanged" :maxlength="field.max_length" :show-word-limit="value[field.name] && value[field.name].length>field.max_length*0.8 || false" :show-password="field.widget === 'password'"
                   :type="['password', 'textarea'].includes(field.widget)?field.widget:'text'"
                   v-on:keyup.enter="field.onEnter || doNothing" :disabled="field.disabled">
             <i slot="prefix"  v-if="field.icon" :class="`fa fa-${field.icon}`"></i>

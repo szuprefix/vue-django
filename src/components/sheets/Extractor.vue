@@ -1,21 +1,20 @@
 <template>
 
     <div v-loading="loading" :element-loading-text="loading">
-        <el-steps :active="step" finish-status="success">
+        <el-steps :active="step" finish-status="success"  simple>
             <el-step title="上传Excel"></el-step>
             <el-step title="整理数据"></el-step>
             <el-step title="绑定字段"></el-step>
-            <!--<el-step title="创建关联数据"></el-step>-->
         </el-steps>
 
-        <el-upload :action="actionUrl" v-if="step===0" ref="uploader"
+        <el-upload :action="actionUrl" ref="uploader" v-if="step === 0"
                    :show-file-list="false" :with-credentials="true" :auto-upload="false"
                    :on-change="submitUpload">
             <el-button size="small" type="primary">点击上传</el-button>
             <div slot="tip" class="el-upload__tip">只能上传excel文件，且不超过5MB</div>
         </el-upload>
         <template v-if="this.excelData && step===1">
-            <el-button @click="step --">上一步</el-button>
+            <!--<el-button @click="step &#45;&#45;">上一步</el-button>-->
             <el-button @click="genFieldMap(); step ++; ">下一步</el-button>
             <book v-model="this.excelData"></book>
         </template>
@@ -56,7 +55,7 @@
         components: {Book, EditableLabel, ColumnBind, DataTable},
         created () {
 
-        }, 
+        },
         methods: {
             genFieldMap(){
                 let d = {}
@@ -90,7 +89,7 @@
                     this.loading = false
                     SheetUtil.normalize(data)
                     this.excelData = data
-                    this.step++
+                    this.step=1
                 }).catch(this.onServerResponseError)
             },
             change(){

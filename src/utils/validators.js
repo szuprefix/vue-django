@@ -32,6 +32,7 @@ export function unicode(v) {
 export const NUM_STR_FORMATERS = [notFloat, unicode, banjiao, noSpace]
 
 export const HanName = {
+    synonyms: ['名字','姓名'],
     type: 'string',
     pattern: '^[·\u4e00-\u9fa5]{2,}$',
     message: '格式不正确',

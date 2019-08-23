@@ -23,6 +23,8 @@
     import Qs from 'qs'
     import queueLimit from '../../utils/async_queue'
     import {Validator, genFieldRules, clear$Fields} from '../../utils/validators'
+    import {Register} from '../../utils/app_model'
+
     export default{
         name: 'BatchCreator',
         mixins: [server_response, ModelView],
@@ -35,6 +37,7 @@
                 activeList: [],
                 records: [],
                 loaded: false,
+                fieldConfigs:{},
                 TooltipCell
             }
         },
@@ -46,6 +49,18 @@
                 if (!this.structure.rel) {
                     this.structure.rel = last(this.structure.name.split('.'))
                 }
+                this.fieldConfigs =  {...this.modelFieldConfigs}
+                let coms = this.structure.composites
+                if (coms) {
+                    return queueLimit(coms,1, (com) => {
+                        return Register.get(com).loadOptions().then(data => {
+                            com.fieldConfigs = data.actions.POST
+                        })
+                    })
+                }
+                return Promise.resolve()
+            }).then(() => {
+
                 this.loaded = true
                 this.checkStatus()
             })
@@ -145,25 +160,32 @@
                 }).then(() => {
                     return queueLimit(this.records, 1, (d => {
                         if (this.insertMode === 'append' || !d.id) {
-                            if(d.$errors){
+                            if (d.$errors) {
                                 return Promise.resolve()
                             }
                             return this.$http.post(this.modelListUrl, d).then(({data}) => {
+                                Object.assign(d, data)
                                 this.$emit('exists', {data: d, structure: this.structure})
                             }).catch(e => {
                                 this.onServerResponseError(e)
-                                if(e.code === '400'){
-                                    d.$errors=e.msg
+                                if (e.code === '400') {
+                                    d.$errors = e.msg
                                 }
                             })
                         } else {
                             return this.$http.put(this.modelGetDetailUrl(d.id), d).then(({data}) => {
+                                Object.assign(d, data)
                             })
                         }
                     }))
                 }).then(() => {
                     this.getRecords()
                 })
+            },
+            saveComposite(){
+               this.structure.composites.forEach(com => {
+
+               })
             },
             getRecords(){
                 let func = this.insertMode === 'ignore' ? (d => !d.id) : (d => true)
@@ -186,13 +208,13 @@
                 return r
             },
             sortByErrors(ds){
-               return sortBy(ds, a => a.$errors && Object.keys(a.$errors))
+                return sortBy(ds, a => a.$errors && Object.keys(a.$errors))
             },
             getForeignKeyData(f){
                 if (!f.tableItems) {
                     return []
                 }
-                let fcs = this.modelFieldConfigs
+                let fcs = this.fieldConfigs
                 let fns = []
                 let pairs = []
                 f.tableItems.forEach(ti => {
@@ -204,25 +226,25 @@
                 pairs.push([f.rel, 'id'])
                 let data = this.value.map(a => {
                     let d = pick(a, fns)
-                    let $errors={}
-                    let $es=a.$errors || {}
+                    let $errors = {}
+                    let $es = a.$errors || {}
                     pairs.forEach(p => {
                         d[p[1]] = d[p[0]]
-                        let $e=$es[p[0]]
-                        if($e){
-                            $errors[p[1]]=$e
+                        let $e = $es[p[0]]
+                        if ($e) {
+                            $errors[p[1]] = $e
                         }
                         delete d[p[0]]
                     })
 //                    console.log([a.$errors,$errors])
-                    if(Object.keys($errors).length>0){
-                        d.$errors=$errors
+                    if (Object.keys($errors).length > 0) {
+                        d.$errors = $errors
                     }
                     return d
                 })
                 data = uniqWith(data, isEqual)
                 let required = fcs[f.rel].required
-                data=data.filter(a =>  !Object.values(clear$Fields(a)).every(isEmpty))
+                data = data.filter(a => !Object.values(clear$Fields(a)).every(isEmpty))
                 return data
             }
         },
@@ -241,8 +263,8 @@
             },
             tableItems(){
                 let r = []
-                let fcs = this.modelFieldConfigs
-                if(isEmpty(fcs)){
+                let fcs = this.fieldConfigs
+                if (isEmpty(fcs)) {
                     return r
                 }
                 let vs = this.structure.validator || {}
@@ -250,11 +272,13 @@
                         let rules = genFieldRules(fcs[pf])
                         let vld = vs[pf]
                         let format = undefined
+                        let synonyms=undefined
                         if (vld) {
                             rules.push(vld)
                             format = vld.format
+                            synonyms = vld.synonyms
                         }
-                        return {...fcs[pf], rules, format}
+                        return {...fcs[pf], name:pf, rules, format, synonyms}
                     })
                 this.activeList.forEach(fk => {
                     let required = fcs[fk.rel].required
@@ -262,12 +286,12 @@
                         let label = fk.count > 1 ? `${fk.label}.${ti.label}` : `${fk.label}`
                         let synonyms = fk.count > 1 ? [] : fk.synonyms
                         let nti = {...ti, name: `${fk.rel}.${ti.name}`, label, synonyms}
-                        if(!required && fk.count ===1){
-                           nti.rules.forEach(r => {
-                               if(r.required){
-                                   r.required = false
-                               }
-                           })
+                        if (!required && fk.count === 1) {
+                            nti.rules.forEach(r => {
+                                if (r.required) {
+                                    r.required = false
+                                }
+                            })
                         }
                         r.push(nti)
                     })

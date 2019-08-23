@@ -10,7 +10,7 @@
     import BatchCreator from './BatchCreator.vue'
     export default{
         props:{
-            structure: Object,
+            structure: Object
         },
         data () {
             return {
@@ -27,6 +27,7 @@
         methods: {
             onOptionLoaded(context){
                 this.binding = context.structure.tableItems
+                console.log(this.binding)
                 this._structure = Object.assign(this.structure, context.structure)
             },
             checkExist(){

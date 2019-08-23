@@ -1,12 +1,12 @@
 <template>
     <span>
-        <el-select v-model="select_value" :disabled="field.disabled"
-                   :multiple="field.multiple" filterable @change="changed" remote clearable
+        <el-select v-model="selectedValue" :disabled="field.disabled"
+                   :multiple="field.multiple" filterable @change="changed" remote clearable reserve-keyword
                    :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
                    :loading="loading" :loading-text="loadingText"
                    :placeholder="field.placeholder || `请选择${field.label}`">
             <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
-                       v-for="c,i in tableData" :key="c.id || c.pk || c.url || c.name"></el-option>
+                       v-for="c,i in optionList" :key="c.id || c.pk || c.url || c.name"></el-option>
             <el-option v-if="tableCount>tablePageSize" value="" disabled>记录太多未展示完全,请输入关键字进行搜索</el-option>
 
         </el-select>
@@ -18,6 +18,8 @@
 <script>
     import model_view from '../../mixins/model_view'
     import table_view from '../../mixins/table_view'
+    import Qs from 'qs'
+    import {uniqWith, isEqual} from 'lodash'
     export default{
         mixins: [model_view, table_view],
         props: {
@@ -27,26 +29,49 @@
             value: [String, Number, Array],
             modelListSubUrl: String
         },
+        data() {
+            return {
+                selectedObjects:[],
+                selectedValue: this.value
+            }
+        },
         created(){
             this.modelInit()
             Object.assign(this.tableQueries, this.field.tableBaseQueries)
             this.tableUrl = this.modelListSubUrl && `${this.modelListUrl}${this.modelListSubUrl}/` || this.modelListUrl
-            if (['number', 'string'].includes(typeof this.value)) {
-                this.tableLoad({'id': this.value}).then(() => {
-                    this.tableUpdateQueries(this.field.queries)
-                })
-            } else if (this.value instanceof Array && this.value.length > 0) {
-                let qs = {}
-                qs['id__in'] = this.value.join(',')
-                qs['page_size'] = this.value.length
-                this.tableLoad(qs).then(() => {
-                    this.tableUpdateQueries(this.field.queries)
-                })
-            } else {
+//            if (['number', 'string'].includes(typeof this.value)) {
+//                this.tableLoad({'id': this.value}).then(() => {
+//                    this.tableUpdateQueries(this.field.queries)
+//                })
+//            } else if (this.value instanceof Array && this.value.length > 0) {
+//                let qs = {}
+//                qs['id__in'] = this.value.join(',')
+//                qs['page_size'] = this.value.length
+//                this.tableLoad(qs).then(() => {
+//                    this.tableUpdateQueries(this.field.queries)
+//                })
+//            } else {
+//                this.tableUpdateQueries(this.field.queries)
+//            }
+            this.loadValueObjects(this.value).then(()=>{
                 this.tableUpdateQueries(this.field.queries)
-            }
+            })
         },
         methods: {
+            loadValueObjects(v){
+                let qs = {}
+                if (['number', 'string'].includes(typeof v)){
+                    v=[v]
+                }
+                if(!v || v.length === 0){
+                    return Promise.resolve()
+                }
+                qs['id__in'] = v.join(',')
+                qs['page_size'] = v.length
+                return this.$http.get(`${this.tableUrl}?${Qs.stringify(qs)}`).then( ({data}) => {
+                    this.selectedObjects = data.results
+                })
+            },
             changed(value){
                 this.$emit('input', value)
             },
@@ -58,11 +83,6 @@
                 this.$router.push(this.resolveRoutePath(url))
             }
         },
-        data() {
-            return {
-                select_value: this.value
-            }
-        },
         computed: {
             _placeholder(){
                 let p = this.placeholder || `请选择${this.modelConfig.verboseName}`
@@ -71,6 +91,15 @@
                 } else {
                     return `请选择${p}`
                 }
+            },
+            optionList(){
+                return uniqWith(this.selectedObjects.concat(this.tableData),isEqual)
+            }
+
+        },
+        watch:{
+            selectedValue(v){
+                this.loadValueObjects(v)
             }
         }
     }
