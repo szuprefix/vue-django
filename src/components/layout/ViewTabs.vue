@@ -1,7 +1,9 @@
 <template>
     <el-tabs v-model="curTab" type="card" closable @tab-remove="tabRemove" class="viewtabs">
-        <el-tab-pane :name="t.name" v-for="t in tabs" :key="t.name">
-            <template slot="label"><i :class="`fa fa-${t.icon}`" v-if="t.icon"></i>{{t.title}}</template>
+        <el-tab-pane :name="t.name" v-for="t in tabs" :key="t.name" :label="t.title">
+            <template slot="label">
+                <i :class="`fa fa-${t.icon}`" v-if="t.icon"></i>{{ellipsis(t.title)}}
+            </template>
             <component :is="t.view" :tab="t"></component>
         </el-tab-pane>
     </el-tabs>
@@ -23,6 +25,9 @@
         },
         components: {},
         methods: {
+            ellipsis(s){
+                return s.length > 19 ? `${s.substr(0, 16)}...` : s
+            },
             clearTabs(){
                 this.curTab = '/'
                 this.tabs = [this.tabs.find((tab) => tab.name == this.curTab)]
@@ -67,14 +72,16 @@
 
                 let title = to.meta && to.meta.title || to.path
                 let tab = {
-                    title, icon:to.meta.icon, name: to.path, to, view: view.components.default
+                    title, icon: to.meta.icon, name: to.path, to, view: view.components.default
                 }
                 this.tabAdd(tab)
             }
         },
         watch: {
             curTab(){
-                this.$router.push(this.resolveRoutePath(this.curTab))
+                if (this.$route.path !== this.curTab) {
+                    this.$router.push(this.resolveRoutePath(this.curTab))
+                }
             },
             $route(newVal, oldVal){
                 this.changeRoute(newVal, oldVal)
@@ -85,6 +92,10 @@
 </script>
 <style>
     .viewtabs .el-tabs__item {
-        font-size: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .viewtabs .el-tabs__item .fa {
+        margin-right: 0.5rem;
     }
 </style>

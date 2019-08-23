@@ -1,54 +1,38 @@
 <template>
     <div>
-        <el-row :gutter="20" v-if="showTopBar" class="filterbox">
-            <el-col :span="16">
-                <el-input
-                        :placeholder="`搜索${modelTableSearchFieldNames}`"
-                        v-model="tableQueries.search"
-                        suffix-icon="el-icon-search"
-                        @change="tableOnSearch"
-                        clearable
-                        :style="`width:${80+15*modelTableSearchFieldNames.length}px`"
-                        v-if="modelTableSearchFields.length>0">
-                </el-input>
-                <template v-for="f in modelTableFilterFields" v-if="! (f.name in tableBaseQueries)">
-                    <el-select v-model="tableQueries[f.name]" clearable :placeholder="`请选择${f.label}`"
-                               v-if="f.type=='boolean'" @change="tableOnSearch">
-                        <el-option :label="f.label" :value="true"></el-option>
-                        <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
-                    </el-select>
-                    <!--<el-switch v-model="tableQueries[f.name]" :active-text="f.label" :inactive-value="null"-->
-                    <!--@change="tableUpdateQueries" v-if="f.type=='boolean'" :false-label="''">{{f.label}}-->
-                    <!--</el-switch>-->
-                    <related-select :field="f" v-model="tableQueries[f.name]" @input="tableOnSearch"
-                                    :showCreate="false"
-                                    v-if="f.model" :modelListSubUrl="modelListSubUrl"
-                                    :tablePageSize="100"></related-select>
-                    &nbsp;
-                </template>
-                <!--<el-button @click="tableLoad"-->
-                <!--v-if="modelTableSearchFields.length>0"><i class="fa fa-search"></i></el-button>-->
-            </el-col>
-            <el-col :span="8">
-                <div class="flex-right">
-                    <slot name="actions">
-                        <el-button-group>
-                            <el-button :title="a.title" size="small" @click="a.do" v-for="a in top_actions"
-                                       v-if="!a.show || a.show()" :key="a.name">
-                                <i :class="`fa fa-${a.icon}`"></i>
-                            </el-button>
-                        </el-button-group>
-                    </slot>
-                </div>
-            </el-col>
-        </el-row>
-        <div v-if="batchActionItems && batchActionItems.length>0">
-            <el-button plain :icon="a.icon" v-for="a in batchActionItems" @click="onCommand(a.name)"
-                       :disabled="selectionCount==0"
-                       :key="a.name">{{a.label}}
-            </el-button>
+        <div v-if="showTopBar">
+        <span>
+            <el-input
+                    :placeholder="`搜索${modelTableSearchFieldNames}`"
+                    v-model="tableQueries.search"
+                    suffix-icon="el-icon-search"
+                    @change="tableOnSearch"
+                    clearable
+                    :style="`width:${modelTableSearchFieldNames.length+5}rem;min-width:10rem;`"
+                    v-if="modelTableSearchFields.length>0">
+            </el-input>
+            <template v-for="f in modelTableFilterFields" v-if="! (f.name in tableBaseQueries)">
+                <el-select v-model="tableQueries[f.name]" clearable :placeholder="`请选择${f.label}`"
+                           v-if="f.type=='boolean'" @change="tableOnSearch">
+                    <el-option :label="f.label" :value="true"></el-option>
+                    <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
+                </el-select>
+                <related-select :field="f" v-model="tableQueries[f.name]" @input="tableOnSearch"
+                                :showCreate="false" :appModelName="f.model"
+                                v-if="f.model" :modelListSubUrl="modelListSubUrl"
+                                :tablePageSize="100"></related-select>
+                &nbsp;
+            </template>
+        </span>
+            <p v-if="batchActionItems && batchActionItems.length>0"/>
+            <batch-actions :items="batchActionItems" :count="selectionCount" @done="modelTableRefresh"
+                           v-if="batchActionItems"></batch-actions>
+            <slot name="actions">
+                <actions :items="top_actions" style="float: right"></actions>
+            </slot>
         </div>
-        <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange" :max-height="maxHeight"
+        <el-table :data="tableData" @row-dblclick="tableOnRowSelect" @sort-change="onSortChange" fixed
+                  :max-height="maxHeight"
                   @selection-change="onModelTableSelectionChange"
                   @filter-change="onFilterChanged" v-loading="loading" :element-loading-text="loadingText" ref="table">
             <slot name="left">
@@ -57,35 +41,33 @@
                              :min-width="f.min_width" :width="f.width" :fixed="f.fixed"
                              :align="['number','integer'].includes(f.type)?'right':'left'"
                              :sortable="modelTableOrderingFields.includes(f.name) && 'custom'" :class-name="f.type"
-                             :type="f.type" :filters="modelTableFilters[f.name]" v-for="f in modelTableItems"
+                             :type="f.columnType || undefined" :filters="modelTableFilters[f.name]"
+                             v-for="f in modelTableItems"
                              :filter-method="f.name in modelTableFilters?filterHandler:undefined"
-                             :key="f.name">
+                             :key="f.columnKey || f.name">
                 <template slot-scope="{row}">
-                    <component :is="f.widget" v-model="row" :prop="f.name" :field="f.field"
-                               v-if="f.widget && typeof f.widget == 'object'"></component>
+                    <form-widget v-if="f.useFormWidget" v-model="row" :field="f" :context="row"
+                                 @change="onCellValueChange"></form-widget>
+                    <component :is="f.widget" v-model="row[f.name]" :field="f.field" :context="row"
+                               v-else-if="f.widget && typeof f.widget == 'object'"></component>
                     <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
                     <template v-else>{{row[f.name]}}</template>
                 </template>
             </el-table-column>
             <el-table-column label="" :min-width="`${60*rowActionList.length}px`" align="right">
                 <template slot="header" slot-scope="scope">
-                    <el-button title="导出excel" @click="dumpExcelData"><i class="fa fa-download"></i></el-button>
+
                 </template>
-                <template slot-scope="{row}">
-                    <el-button-group class="hover-show">
-                        <el-button :title="a.title" size="small" @click="a.do(row)" v-for="a in row_actions"
-                                   v-if="!a.show || a.show()" :key="a.name">
-                            <i :class="`fa fa-${a.icon}`"></i>
-                        </el-button>
-                    </el-button-group>
+                <template slot-scope="scope">
+                    <actions :items="row_actions" :context="scope" class="hover-show" trigger="hover"></actions>
                 </template>
             </el-table-column>
 
             <slot name="right">
             </slot>
         </el-table>
-        <div class="stick-bottom model-table-pager-container">
-            <el-pagination v-if="showPagger"
+        <div class="model-table-pager-container">
+            <el-pagination v-if="tableCount>tablePageSize || showPagger"
                            background
                            layout="total, sizes, prev, pager, next, jumper"
                            :page-size="tablePageSize"
@@ -103,22 +85,28 @@
 </style>
 <script>
     import model_table from '../../mixins/model_table'
+    import Actions from '../layout/Actions.vue'
+    import FormWidget from '../widgets/FormWidget.vue'
+    import BatchActions from '../layout/BatchActions.vue'
     import RelatedSelect from './RelatedSelect.vue'
     //    import DownloadExcel from 'vue-json-excel'
-    import XLSX from 'xlsx'
     import Qs from 'qs'
     export default{
         mixins: [model_table],
 
         components: {
-            RelatedSelect//, DownloadExcel
+            RelatedSelect, Actions, BatchActions, FormWidget//, DownloadExcel
+        },
+        created () {
         },
         mounted (){
             this.modelTableInit()
         },
         data(){
             return {
-                selectionCount: 0
+                selectionCount: 0,
+                maxHeight: window.screen.availHeight - 100,
+                changedData: {}
             }
         },
         methods: {
@@ -127,10 +115,13 @@
                     return this.modelTableItems.map((a) => {
                         let v = d[a.name]
                         if (a.choices) {
-                            return a.choices[v]
+                            return a.choices.find(a => a.value===v).display_name
                         } else if (a.model) {
                             return d[`${a.name}_name`]
                         }
+//                        if(typeof v === 'object'){
+//                            return JSON.stringify(v)
+//                        }
                         return v
 
                     })
@@ -138,16 +129,18 @@
                 return [this.modelTableItems.map((a) => a.label)].concat(ds)
             },
             dumpExcelData(){
-                console.log('dumpExcelData')
+//                console.log('dumpExcelData')
                 let d = Object.assign({}, this.tableQueries, {page: 1, page_size: this.tableCount})
                 this.loading = true
                 this.loadingText = '正在导出'
                 this.$http.get(`${this.tableUrl}?${Qs.stringify(d)}`).then(({data}) => {
-                    let wb = XLSX.utils.book_new()
-                    let ws = XLSX.utils.aoa_to_sheet(this.getGridData(data.results))
-                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1')
-                    XLSX.writeFile(wb, `${this.modelTableTitle}.xlsx`)
-                    this.loading = false
+                    import('xlsx').then(XLSX => {
+                        let wb = XLSX.utils.book_new()
+                        let ws = XLSX.utils.aoa_to_sheet(this.getGridData(data.results))
+                        XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1')
+                        XLSX.writeFile(wb, `${this.modelTableTitle}.xlsx`)
+                        this.loading = false
+                    })
                 }).catch(this.onServerResponseError)
             },
             onModelTableSelectionChange(selection){
@@ -191,7 +184,7 @@
                         d[a] = v
                     }
                 })
-                console.log(d)
+//                console.log(d)
                 this.tableUpdateQueries(d)
             },
             onSortChange(payLoad){
@@ -200,8 +193,28 @@
             getBoolFieldFalseLabel(trueLabel){
                 let l = trueLabel
                 return l.startsWith('已') ? `未${l.substr(1)}` : (
-                    l.startsWith('有') ? `无${l.substr(1)}` : `非${l}`
+                    l.startsWith('有') ? `无${l.substr(1)}` : (
+                        l.startsWith('是') ? `非${l.substr(1)}` : `非${l}`
+                    )
                 )
+            },
+            onCellValueChange({form, field, value}){
+                let id = form.id
+                let fn = field.name
+                let d = this.changedData[id] || {}
+                d[fn] = value
+                this.changedData[id] = d
+                let pd = {}
+                this.patchFields.forEach(a => {
+                    pd[a.name] = form[a.name]
+                })
+                this.$http.patch(this.modelGetDetailUrl(id), pd).then(({data}) => {
+                    this.$message({message: '保存成功', type: 'success'})
+                    this.$emit('change', {data: this.tableData})
+                }).catch(error => {
+                    this.onServerResponseError(error)
+                    this.$message({message: '数据检验未通过，请修正.', type: 'error'})
+                })
             }
         },
         computed: {
@@ -211,8 +224,8 @@
             selectionIds(){
                 return this.selection.map((a) => a.id)
             },
-            maxHeight(){
-                return window.screen.availHeight
+            patchFields () {
+                return this.modelTableItems.filter(a => a.useFormWidget)
             }
         },
         watch: {
@@ -227,5 +240,9 @@
     .model-table-pager-container {
         background-color: white;
         right: 0px;
+    }
+
+    .el-table__row td.decimal {
+        text-align: right;
     }
 </style>

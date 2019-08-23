@@ -8,13 +8,10 @@ import TrueFlag from '../components/widgets/TrueFlag.vue'
 import ChoicesDisplay from '../components/widgets/ChoicesDisplay.vue'
 import Date2Now from '../components/widgets/Date2Now.vue'
 import ForeignKey from '../components/widgets/ForeignKey.vue'
+import {uniqueId} from 'lodash'
 export default {
     mixins: [model_view, table_view],
     props: {
-        appModelName: {
-            type: String,
-            default: () => ''
-        },
         tableItems: {
             type: Array, default: function () {
                 return [{name: '__str__', label: '名称'}]
@@ -23,12 +20,12 @@ export default {
         modelTableUrl: String,
         topActionList: {
             type: Array, default: function () {
-                return ['refresh', 'create']
+                return ['refresh', 'create', ['download']]
             }
         },
         rowActionList: {
             type: Array, default: function () {
-                return ['delete', 'edit']
+                return ['edit', ['delete']]
             }
         },
         showTopBar: {
@@ -44,9 +41,9 @@ export default {
         onTableDBClick: {
             type: Function, default: undefined
         },
-        modelListSubUrl:String,
+        modelListSubUrl: String,
         filterItems: Array,
-        batchActionItems: {type:Array, default: () => []}
+        batchActionItems: {type: Array, default: () => []}
     },
     data () {
         return {
@@ -78,6 +75,11 @@ export default {
                     title: '删除',
                     do: this.tableToDeleteModel,
                     show: () => this.modelCheckPermission('delete')
+                },
+                'download': {
+                    icon: 'download',
+                    label: '导出',
+                    do: this.dumpExcelData
                 },
                 'batch': {
                     icon: 'archive',
@@ -115,7 +117,8 @@ export default {
             })
         },
         modelTableOnModelPosted({model}){
-            if (model.fullName === this.appModelName || this.modelConfig.dependents && this.modelConfig.dependents.indexOf(model.fullName) >= 0) {
+            let dps = this.modelConfig.rest_options.dependencies
+            if (model.fullName === this.appModelName || dps && dps.includes(model.fullName)) {
                 this.tableLoad()
             }
         },
@@ -126,19 +129,19 @@ export default {
             if (this.onTableDBClick) {
                 this.onTableDBClick(row, column, cell, event)
             } else if (this.rowActionList.includes('edit') && this.modelCheckPermission('change')) {
-                this.tableToEditModel(row, column, cell, event)
+                this.tableToEditModel({row, column, cell, event})
             }
         },
 
-        tableToEditModel (row, ){
+        tableToEditModel ({row}){
             // wayky edit
             const path = this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`)
             this.$router.push(path)
             this.resolveCurrentTagLabel(path, `编辑${row.__str__}`)
         },
 
-        tableToDeleteModel (row){
-            return this.$confirm(`确定要删除${row.__str__}吗?`, {type:'warning'}).then(()=> {
+        tableToDeleteModel ({row}){
+            return this.$confirm(`确定要删除${row.__str__}吗?`, {type: 'warning'}).then(() => {
                 return this.modelDelete(row.id)
             }).catch(this.onServerResponseError)
         },
@@ -188,8 +191,9 @@ export default {
                         a = i
                     }
                 }
-
-                a.widget = a.widget || this.tableDefaultWidget(a)
+                if (!a.useFormWidget) {
+                    a.widget = a.widget || this.tableDefaultWidget(a)
+                }
                 // console.log(a)
                 return a
             })
@@ -209,13 +213,20 @@ export default {
         },
         get_actions(action_list){
             return action_list.map((a) => {
-                if (a instanceof Object) {
-                    return a
-                } else {
+                if (typeof a === 'string') {
                     let d = this.modelTableAvairableActions[a]
+                    if (!d) {
+                        console.error(`find no avariable actions for ${a}`)
+                    }
                     d.name = a
                     return d
                 }
+                else if (a instanceof Array) {
+                    return this.get_actions(a)
+                } else {
+                    return a
+                }
+
             })
         },
         getFilters(){
@@ -239,7 +250,7 @@ export default {
             let vns = []
             Object.keys(this.tableBaseQueries).forEach((a) => {
                 let c = this.modelFieldConfigs[a]
-                if(c){
+                if (c) {
                     vns.push(c.label)
                 }
             })
@@ -254,6 +265,15 @@ export default {
         },
         row_actions(){
             return this.get_actions(this.rowActionList)
+        }
+    },
+    watch: {
+        tableItems(val){
+            if (this.modelConfig.rest_options) {
+                this.modelTableItems = this.tableNormalizeItems(val)
+
+                this.modelTableItems.forEach(a => a.columnKey = uniqueId())
+            }
         }
     }
 }

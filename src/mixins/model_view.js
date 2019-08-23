@@ -13,9 +13,13 @@ export function joinErrors(errors) {
 }
 
 export default {
-    props:{
-
-        modelDefaultValues: {type:Object, default: () => { return {}}}
+    props: {
+        appModelName: String,
+        modelDefaultValues: {
+            type: Object, default: () => {
+                return {}
+            }
+        }
     },
     data () {
         return {
@@ -24,8 +28,7 @@ export default {
             modelFieldConfigs: {},
             modelOptions: {},
             modelErrors: {},
-            modelData: {},
-            // appModelName: null // wayky modified : model_table mixin already define props
+            modelData: {}
         }
     },
 
@@ -61,10 +64,15 @@ export default {
             })
         },
         modelEmptyDataFromOptions(m){
+            let dvs = {}
+            if (this.$route.query != null) {
+                Object.assign(dvs, this.$route.query)
+            }
+            Object.assign(dvs, this.modelDefaultValues)
             let r = {}
             Object.keys(m).forEach((k) => {
                 let f = m[k]
-                let v = this.modelDefaultValues[f.name]
+                let v = dvs[f.name]
                 r[k] = v !== undefined ? v : ( f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null )
             })
             return r
@@ -115,8 +123,12 @@ export default {
             return !this.modelId && `新增${this.modelConfig.verboseName}` || this.modelData['__str__']
         },
         modelCheckPermission(p){
+            let ps = this.$store.state.user.permissions
+            if (!ps) {
+                return false
+            }
             let pn = this.appModelName.replace('.', `.${p}_`)
-            return this.$store.state.user.permissions.includes(pn)
+            return ps.includes(pn)
         }
     },
     computed: {

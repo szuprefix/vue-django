@@ -1,16 +1,19 @@
 <template>
-    <span>{{now}}</span>
+    <span :title="localStr">{{now}}</span>
 </template>
 <script>
-    import {formatTime} from '../../utils/filters'
+    import {formatTime, localTimeStr} from '../../utils/filters'
     export default{
         props: {
-            value: Object,
-            prop:String
+            value: [String],
+            field: Object
         },
         computed:{
+            localStr (){
+               return this.value && localTimeStr(this.value)  || ''
+            },
             now(){
-                let s = this.value[this.prop]
+                let s = this.value
                 if(s == null){
                     return ""
                 }

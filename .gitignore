@@ -1,4 +1,6 @@
+package-lock.json
 node_modules
+_build
 .DS_Store
 npm-debug.log
 lerna-debug.log

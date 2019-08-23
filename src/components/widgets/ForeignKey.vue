@@ -1,18 +1,26 @@
 <template>
-    <div>
+    <a :href="`#/${field.model.replace('.','/')}/${value}/`" v-if="hasLink">
         {{theValue}}
-    </div>
+    </a>
+    <span v-else>
+        {{theValue}}
+    </span>
 </template>
 <script>
+    import {Register} from 'vue-django/src/utils/app_model'
     export default{
         props: {
-            value: Object,
-            prop: String
+            value: [String, Number],
+            field: Object ,
+            context: Object
         },
         computed: {
             theValue(){
-                let n = `${this.prop}_name`
-                return this.value[n] || this.value[this.prop]
+                let n = `${this.field.name}_name`
+                return this.context[n] || this.value
+            },
+            hasLink(){
+                return Register.configs[this.field.model]
             }
         }
     }
