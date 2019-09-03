@@ -1,10 +1,11 @@
 <template>
     <div>
         <el-drawer :visible.sync="editing" direction="rtl" title="新增" size="66%">
-            <model-form :appModelName="appModelName" :id="modelId" v-model="modelData" :formItems="formItems"
+            <slot name="create">
+                <model-form :appModelName="appModelName" :id="modelId" v-model="modelData" :formItems="formItems"
                         ref="form" :modelDefaultValues="modelDefaultValues" formInline
                         @form-posted="onFormPosted"></model-form>
-
+            </slot>
         </el-drawer>
         <model-table :appModelName="appModelName" :onTableDBClick="toEditModel" :tableItems="tableItems" ref="table"
                      :topActionList="defaultActions"
@@ -81,4 +82,3 @@
         }
     }
 </script>
-<style scoped></style>

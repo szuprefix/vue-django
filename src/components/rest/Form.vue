@@ -32,7 +32,7 @@
                 <slot name="submit">
                     <el-col :xs="formInline?12:24" :sm="formInline?8:24" :md="formInline?6:24" :lg="formInline?4:24" :xl="formInline?3:24">
                         <el-form-item>
-                            <el-button :type="a.type || 'primary'" @click="a.do" v-for="a in actionItems" :key="a.name">{{a.label}}</el-button>
+                            <el-button :type="a.type || 'primary'" @click="a.do" v-for="a in _actions" :key="a.name">{{a.label}}</el-button>
                         </el-form-item>
                     </el-col>
                 </slot>
@@ -67,7 +67,7 @@
             }
         },
         computed: {
-            actionItems () {
+            _actions () {
                 return this.actions || [{name:'submit',label:this.formSubmitName, do:this.onSubmit}]
             }
         }

@@ -6,7 +6,10 @@
                    :loading="loading" :loading-text="loadingText"
                    :placeholder="field.placeholder || `请选择${field.label}`">
             <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
-                       v-for="c,i in optionList" :key="c.id || c.pk || c.url || c.name"></el-option>
+                       v-for="c,i in optionList" :key="c.id || c.pk || c.url || c.name">
+                <span>{{c[selectOptionsFields[0]]}}</span>
+                <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
+            </el-option>
             <el-option v-if="tableCount>tablePageSize" value="" disabled>记录太多未展示完全,请输入关键字进行搜索</el-option>
 
         </el-select>
@@ -32,27 +35,17 @@
         data() {
             return {
                 selectedObjects:[],
+                selectOptionsFields: ['__str__'],
                 selectedValue: this.value
             }
         },
         created(){
             this.modelInit()
+            if(this.modelConfig.selectOptionsFields){
+                this.selectOptionsFields = this.modelConfig.selectOptionsFields
+            }
             Object.assign(this.tableQueries, this.field.tableBaseQueries)
             this.tableUrl = this.modelListSubUrl && `${this.modelListUrl}${this.modelListSubUrl}/` || this.modelListUrl
-//            if (['number', 'string'].includes(typeof this.value)) {
-//                this.tableLoad({'id': this.value}).then(() => {
-//                    this.tableUpdateQueries(this.field.queries)
-//                })
-//            } else if (this.value instanceof Array && this.value.length > 0) {
-//                let qs = {}
-//                qs['id__in'] = this.value.join(',')
-//                qs['page_size'] = this.value.length
-//                this.tableLoad(qs).then(() => {
-//                    this.tableUpdateQueries(this.field.queries)
-//                })
-//            } else {
-//                this.tableUpdateQueries(this.field.queries)
-//            }
             this.loadValueObjects(this.value).then(()=>{
                 this.tableUpdateQueries(this.field.queries)
             })
@@ -104,3 +97,8 @@
         }
     }
 </script>
+<style scoped>
+    .label-right{
+        float:right;color: #8492a6; font-size:0.8rem;
+    }
+</style>

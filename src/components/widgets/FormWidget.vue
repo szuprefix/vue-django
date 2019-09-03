@@ -40,6 +40,7 @@
                 @change="fieldValueChanged"
                 :placeholder="field.placeholder || field.label"
                 :appModelName="field.model"
+                :appModel="field.model"
                 :field="field"
                 :ref="field.ref">
         </component>

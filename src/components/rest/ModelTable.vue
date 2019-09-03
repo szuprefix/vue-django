@@ -115,7 +115,7 @@
                     return this.modelTableItems.map((a) => {
                         let v = d[a.name]
                         if (a.choices) {
-                            return a.choices.find(a => a.value===v).display_name
+                            return a.choices.find(a => a.value === v).display_name
                         } else if (a.model) {
                             return d[`${a.name}_name`]
                         }

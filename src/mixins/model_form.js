@@ -70,7 +70,7 @@ export default {
         {
             let a
             if (typeof i == 'string') {
-                a = this.modelFieldConfigs[i]
+                a = Object.assign({},this.modelFieldConfigs[i])
                 if (!a) {
                     console.error(i, " not found in ", this.modelFieldConfigs)
                 }
