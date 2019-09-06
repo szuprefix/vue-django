@@ -9,7 +9,7 @@
         <el-alert :title="errors.non_field_errors" type="error" v-if="errors.non_field_errors"
                   :closable="false"></el-alert>
         <el-row>
-            <template v-for="f in formItems">
+            <template v-for="f in formItems" v-if="canEdit(f)">
                 <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
                         :key="f.name" v-if="!elOptions.inline && !elOptions.oneColumn && f.widget !== 'hidden'">
                     <form-item :field="f" v-model="formValue" :options="options" :error="errors[f.name]"></form-item>
@@ -60,7 +60,8 @@
             submit: Function,
             submitName: {
                 type: String, default: '提交'
-            }
+            },
+            successInfo: String
         },
         components: {FormItem, Actions},
         data () {
@@ -87,11 +88,19 @@
                         return data
                     })
                 }
-
+            },
+            canEdit(f) {
+                return ! (f.widget instanceof Function)
+            },
+            genValuesWithFunctionWidget () {
+                let d  = this.formValue
+                this.formItems.filter(a => a.widget instanceof Function).forEach(a => {
+                    d[a.name] = a.widget(d)
+                })
             },
             onPosted(data){
                 this.loading = false
-                this.$message({message: `${this.submitName}成功`, type: 'success'})
+                this.$message({message: this.successInfo || `${this.submitName}成功`, type: 'success'})
                 this.$emit("form-posted", data)
                 return data
             },
@@ -101,6 +110,7 @@
                 }
             },
             onSubmit () {
+                this.genValuesWithFunctionWidget()
                 return this.$refs.form.validate().then(this.onValidated).then(this.doSubmit).then(this.onPosted).catch(e => {
                         if (e === false) {
                             this.$message({message: '表单检验未通过，请按提示修改', type: 'error'})

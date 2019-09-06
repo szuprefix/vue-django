@@ -92,17 +92,18 @@ export default function (appModel, defaults, eventor) {
             return promise.then(({data}) => {
                 this.id = data.id
                 this.data = Object.assign({}, this.data, data)
-                this.emitPosted()
+                this.emitPosted(this.id)
                 return data
             })//.catch((error) => this.onErrors(error))
         },
-        delete(id){
+        destroy(id){
+            id = id || this.id
             return axios.delete(this.getDetailUrl(id)).then(() => {
-                this.eventor.$emit('model-deleted', {model: this})
+                this.eventor.$emit('model-deleted', {appModel: this.appModel, id})
             })
         },
-        emitPosted(){
-            this.eventor.$emit('model-posted', {model: this})
+        emitPosted(id){
+            this.eventor.$emit('model-posted', {appModel: this.appModel, id})
         },
         onErrors(error){
             if (error.code === 400) {

@@ -18,7 +18,6 @@
             <model-select :field="f" v-model="value[f.name]" @input="onSearch"
                           :showCreate="false" :appModel="f.model"
                           v-if="f.model" :pageSize="100"></model-select>
-            &nbsp;
         </template>
     </div>
 </template>

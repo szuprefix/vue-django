@@ -20,19 +20,36 @@ export  default {
         ModelForm, ModelRelations
     },
     mounted(){
-        this.$refs.form.$on("form-posted", this.redirectToEdit)
+        this.$refs.form.$on("form-posted", this.onFormPosted)
+        this.$store.state.bus.$on('model-deleted', this.onModelDeleted)
+    },
+    beforeDestroy () {
+        this.$store.state.bus.$off('model-deleted', this.onModelDeleted)
     },
     methods: {
-        redirectToEdit(payLoad){
+        onFormPosted ({ intent}){
+            this.setTitle ()
+            console.log(intent, this.$route.params.id)
+            if (intent === 'save' && this.$route.params.id === 'create') {
+                this.redirectToEdit()
+            }
+            if (intent === 'saveAndAnother' && this.$route.params.id !== 'create') {
+                this.redirectToEdit('create')
+            }
+        },
+        redirectToEdit(id){
+
             let form = this.$refs.form
-            let p = form.model.getDetailUrl()
-            if (this.$route.params.id === 'create') {
-                if (this.tab) {
-                    this.tab.name = p
-                }
-                this.$router.replace(p)
-            } else {
-                this.setTitle(p)
+            let p = form.model.getDetailUrl(id)
+            if (this.tab) {
+                this.tab.name = p
+            }
+            this.$router.replace(p)
+        },
+        onModelDeleted ({appModel, id}) {
+            let m = this.$refs.form.model
+            if (appModel === m.appModel && id === m.id) {
+                this.destroy()
             }
         },
         setTitle(p){
@@ -42,8 +59,7 @@ export  default {
             this.$store.state.bus.$emit("tab-destroy", this.tab.name)
         }
     },
-    computed: {
-    },
+    computed: {},
     watch: {
 
         data (val) {

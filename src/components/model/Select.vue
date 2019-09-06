@@ -1,24 +1,28 @@
 <template>
-    <span>
-        <el-select v-model="selectedValue" :disabled="field.disabled"
-                   :multiple="field.multiple" filterable @change="changed" remote clearable reserve-keyword
-                   :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
-                   :loading="loading" :loading-text="loading"
-                   :placeholder="field.placeholder || `请选择${field.label}`">
-            <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
-                       v-for="c,i in optionList" :key="c.id || c.pk || c.url || c.name">
-                <span>{{c[selectOptionsFields[0]]}}</span>
-                <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
-            </el-option>
-            <el-alert type="info" v-if="moreThanOnePage" show-icon title="记录太多未展示完全,请输入关键字进行搜索" :closable="false">
-            </el-alert>
+    <el-select v-model="selectedValue" :disabled="field.disabled" ref="select" class="model-select"
+               :multiple="field.multiple" filterable @change="changed" remote clearable reserve-keyword
+               :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
+               :loading="loading" :loading-text="loading"
+               :placeholder="field.placeholder || `请选择${field.label}`">
+        <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
+                   v-for="c,i in optionList" :key="c.id || c.pk || c.url || c.name">
+            <span>{{c[selectOptionsFields[0]]}}</span>
+            <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
+        </el-option>
+        <el-alert type="info" v-if="moreThanOnePage" show-icon title="记录太多未展示完全,请输入关键字进行搜索" :closable="false">
+        </el-alert>
 
-            <el-alert v-if="showCreate" @click.native="toCreateModel" type="warning" center style="cursor: pointer" :closable="false">
+        <el-alert v-if="showCreate" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
+                  :closable="false">
+            <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
+        </el-alert>
+        <template #empty>
+            <el-alert v-if="showCreate" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
+                      :closable="false">
                 <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
-             </el-alert>
-        </el-select>
-
-    </span>
+            </el-alert>
+        </template>
+    </el-select>
 </template>
 <script>
     import {DEFAULT_PAGE_SIZE} from '../table/Table'
@@ -85,6 +89,7 @@
                 this.load({search})
             },
             toCreateModel(row){
+                this.$refs.select.blur()
                 let url = `${this.url}create/?${this.model.config.title_field || 'name'}=${this.search}`
                 this.$router.push(url)
             }
@@ -113,8 +118,8 @@
         }
     }
 </script>
-<style scoped>
-    .label-right {
+<style>
+    .el-select-dropdown__item .label-right {
         float: right;
         color: #8492a6;
         font-size: 0.8rem;

@@ -3,7 +3,7 @@
               :element-loading-text="loading" :cell-class-name="elOptions.cellClassName"
               :row-class-name="elOptions.rowClassName"  @row-dblclick="onRowDblClick"
               :height="elOptions.height" :max-height="elOptions.maxHeight" :stripe="elOptions.stripe"
-              :border="elOptions.border">
+              :border="elOptions.border" @selection-change="elOptions.onSelectionChange">
         <template slot="left"></template>
         <table-column :field="f" v-for="f in _items" :key="f.name"></table-column>
         <el-table-column label="" align="right" v-if="rowActions || topActions">

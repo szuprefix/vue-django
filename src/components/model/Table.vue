@@ -2,20 +2,17 @@
     <div>
         <search v-model="search" :options="searchOptions" :model="model" :exclude="_baseQueries" ref="search"
                 @change="onSearch"></search>
-        <div v-if="showTopBar">
-            <p v-if="batchActionItems && batchActionItems.length>0"/>
-            <batch-actions :items="batchActionItems" :count="selectionCount" @done="refresh"
-                           v-if="batchActionItems"></batch-actions>
+        <batch-actions :items="batchActionItems" :count="selection.length" @done="refresh" :context="{selection}"
+                       v-if="batchActionItems.length>0"></batch-actions>
+        <el-drawer :visible.sync="editing" direction="rtl" :title="`${parentMultipleRelationField?'添加':'创建'}${model.config.verbose_name}`" size="66%">
+            <slot name="edit">
+                <model-table :appModel="appModel" :options="{remoteTable:{table:{topActions:[], rowActions:[]}}}" :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', do:addToParent}]" v-if="parentMultipleRelationField"></model-table>
+                <component :is="creator" :appModel="appModel" :defaults="parentQueries" v-else :topActions="['saveAndAnother']"></component>
 
-        </div>
-        <el-drawer :visible.sync="editing" direction="rtl" title="新增" size="66%">
-            <slot name="create">
-                <component :is="creator" :appModel="model.appModel" :defaults="parentQueries"
-                           :topActions="['saveAndAnother']" @form-posted="editing=false"></component>
             </slot>
         </el-drawer>
 
-        <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" @loaded="onLoaded"
+        <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" @loaded="onLoaded" v-if="optionLoaded"
                       :baseQueries="_baseQueries"
                       :options="rtOptions"></remote-table>
     </div>
@@ -27,6 +24,7 @@
     import array_normalize from '../../utils/array_normalize'
     import server_response from '../../mixins/server_response'
     import Qs from 'qs'
+    import BatchActions from '../layout/BatchActions.vue'
 
     import TrueFlag from '../widgets/TrueFlag.vue'
     import ChoicesDisplay from '../widgets/ChoicesDisplay.vue'
@@ -35,6 +33,7 @@
     import Search from './Search.vue'
 
     export default{
+        name: 'ModelTable',
         mixins: [server_response],
         props: {
             appModel: String,
@@ -50,21 +49,32 @@
                 default: () => {
                     return {}
                 }
-            }
+            },
+            batchActions: Array
         },
         data () {
             return {
                 model: Model(this.appModel, {}, this.$store.state.bus),
                 tableItems: [],
                 search: {},
+                optionLoaded: false,
                 creator: undefined,
                 editing: false,
+                batchActionItems: [],
+                selection: [],
+                parentQueries : {},
                 avairableActions: {
                     'create': {
                         icon: 'plus',
                         title: '创建',
                         do: this.toCreateModel,
                         show: () => this.checkPermission('add')
+                    },
+                    'add': {
+                        icon: 'plus-square',
+                        label: '添加',
+                        do: this.addToParent,
+                        show: () => this.parent.checkPermission('add', this.$store.state.user.permissions)
                     },
                     'edit': {
                         icon: 'pencil',
@@ -87,8 +97,8 @@
                 }
             }
         },
-        components: {RemoteTable, Search},
-        created () {
+        components: {RemoteTable, Search, BatchActions},
+        mounted () {
             this.init()
             this.$store.state.bus.$on('model-posted', this.onModelPosted)
             this.$store.state.bus.$on('model-deleted', this.onModelPosted)
@@ -105,16 +115,13 @@
                     this.orderingFields = search.ordering_fields
                     return this.normalizeItems()
                 }).then(() => {
-                    this.$refs.table.updateQueries({})
+                    this.parentQueries = Object.assign({}, this.getParentQueries())
+                    this.optionLoaded = true
+//                    this.$refs.table.updateQueries({})
                 })
             },
-            getItems () {
-                if (this.items) {
-                    return Promise.resolve(this.items)
-                }
-                return import(`@/views${this.model.getListUrl()}config.js`).then(m => {
-                    return m.default.listItems
-                })
+            refresh () {
+                this.$refs.table.refresh()
             },
             onLoaded (v) {
                 this.$emit('loaded', v)
@@ -122,9 +129,9 @@
             onSearch () {
                 this.$refs.table.updateQueries(this.search)
             },
-            onModelPosted ({model}) {
+            onModelPosted ({appModel, id}) {
                 let dps = this.model.options.dependencies
-                if (model.appModel === this.appModel || dps && dps.includes(model.appModel)) {
+                if (appModel === this.appModel || dps && dps.includes(appModel)) {
                     this.$refs.table.load()
                 }
             },
@@ -137,14 +144,12 @@
             },
 
             toEditModel ({row}){
-                const path = this.model.getDetailUrl(row.id)
-                this.$router.push(path)
-//                this.resolveCurrentTagLabel(path, `编辑${row.__str__}`)
+                this.$router.push(this.model.getDetailUrl(row.id))
             },
 
             toDeleteModel ({row}){
                 return this.$confirm(`确定要删除${row.__str__}吗?`, {type: 'warning'}).then(() => {
-                    return this.model.delete(row.id)
+                    return this.model.destroy(row.id)
                 }).catch(this.onServerResponseError)
             },
 
@@ -160,19 +165,20 @@
                     this.creator = m.default
                     this.editing = true
                 })
-//                let createUrl = `${this.model.getListUrl()}create`
-//                if (!!this.model.config.title_field && !!this.queries.search) {
-//                    createUrl = `${createUrl}?${this.model.config.title_field}=${this.queries.search}`
-//                }
-//                const path = createUrl
-//                this.$router.push(path)
-//                this.resolveCurrentTagLabel(path, `新增${this.model.config.verbose_name}`)
             },
 
             normalizeItems(){
-                return this.getItems().then(items => {
+                this.getConfig().then(config => {
+
+                    this.batchActionItems = array_normalize(config.batchActions, this.avairableActions, (a) => {
+                        if (!a.do) {
+                            a.do = this.defaultBatchActionDo(a)
+                        }
+                        return a
+                    })
+
                     let qns = Object.keys(this._baseQueries)
-                    this.tableItems = array_normalize(items, this.model.fieldConfigs, (a) => {
+                    let rs = array_normalize(config.listItems, this.model.fieldConfigs, (a) => {
                         Object.assign(a, {field: this.model.fieldConfigs[a.name]})
 
                         if (!a.useFormWidget) {
@@ -180,9 +186,46 @@
                         }
                         return a
                     }).filter(a => !qns.includes(a.name))
+                    if (this.batchActionItems.length > 0) {
+                        rs = [{type: 'selection'}].concat(rs)
+                    }
+                    this.tableItems = rs
                 })
             },
+            defaultBatchActionDo (action) {
+                return ({selection}) => {
+                    let ids = selection.map((a) => a.id)
+                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/`, {id__in:ids,...action.context})
+                }
+            },
+            addToParent ({selection}) {
+                let d = {}
+                let fn = this.parentMultipleRelationField.name
+                let oids = this.parent.data[fn]
+                d[fn] = oids.concat(selection.map(a => a.id))
+                return this.$http.patch(this.parent.getDetailUrl(), d).then( ({data}) => {
+                    this.parent.data[fn] = data[fn]
+                    this.parentQueries = Object.assign({}, this.getParentQueries())
+                    return {data:{
+                        rows: data[fn].length - oids.length
+                    }}
+                })
+            },
+            getConfig () {
+                return import(`@/views${this.model.getListUrl()}config.js`).then(m => {
+                    return m.default
+                }).catch(() => {
+                    return {}
+                }).then(config => {
 
+                    let listItems = this.items || config.listItems || this.model.config.listItems || Object.values(this.model.fieldConfigs).filter(a => ['name', 'title'].includes(a.name))
+                    if (!listItems || listItems.length === 0) {
+                        listItems = ['__str__']
+                    }
+                    let batchActions = this.batchActions || config.batchActions || this.model.config.batchActions || []
+                    return {listItems, batchActions}
+                })
+            },
             defaultWidget(f){
                 // console.log(f)
                 return f.model ? ForeignKey :
@@ -211,49 +254,72 @@
             getParentQueries() {
                 let r = {}
                 if (this.parent) {
-                    let am = this.parent.appModel
-                    let pid = this.parent.data.id
-                    let fs = Object.values(this.model.fieldConfigs)
-                    let f = fs.find(a => a.model === am)
-                    if (f) {
-                        r[f.name] = pid
+                    let parent = this.parent
+                    let f = this.parentMultipleRelationField
+                    if(f) {
+                        let ids = parent.data[f.name]
+                        r['id__in'] = ids.length > 0 && ids || [0]
                     } else {
-                        f = fs.find(a => a.model === 'contenttypes.contenttype')
-                        if (f) {
-                            r[f.name] = this.parent.options.content_type_id
-                            r[`${f.name.replace('_type', '_id')}`] = pid
+                        let am = parent.appModel
+                        let pid = parent.data.id
+                        let fs = Object.values(this.model.fieldConfigs)
+                        let f = fs.find(a => a.model === am)
+                        if (f && f.multiple !== true) {
+                            r[f.name] = pid
+                        } else {
+                            f = fs.find(a => a.model === 'contenttypes.contenttype')
+                            if (f) {
+                                r[f.name] = this.parent.options.content_type_id
+                                r[`${f.name.replace('_type', '_id')}`] = pid
+                            }
                         }
+
                     }
                 }
-                console.log(r)
                 return r
+            },
+            onSelectionChange (selection) {
+                this.selection = selection
             }
         },
         computed: {
-
+            parentMultipleRelationField () {
+               if(this.parent) {
+                   let pfs = Object.values(this.parent.fieldConfigs)
+                   let f = pfs.find(a => a.model === this.model.appModel)
+                   if (f && f.multiple === true) {
+                       return f
+                   }
+               }
+            },
             rtOptions () {
                 return mergeOptions({
                     table: {
                         avairableActions: this.avairableActions,
                         excelFormat: this.excelFormat,
-                        topActions: ['refresh', 'download', 'create'],
-                        rowActions: ['edit', 'delete'],
+                        topActions: ['refresh', 'create', ['download']],
+                        rowActions: ['edit', ['delete']],
                         dblClickAction: 'edit',
-//                        elTable: {onRowDblClick:this.onRowSelect}
+                        elTable: {
+                            onSelectionChange: this.onSelectionChange
+                        }
                     }
                 }, this.options.remoteTable)
             },
-            parentQueries () {
-                return this.getParentQueries()
-            },
+//            parentQueries () {
+//                return this.getParentQueries()
+//            },
             _baseQueries () {
-                return {...this.parentQueries, ...this.baseQueries}
+                return  Object.assign({}, this.parentQueries, this.baseQueries)
             }
         },
         watch: {
             items (val) {
-                this.normalizeItems(val)
+                this.normalizeItems()
             },
+            batchActions (val) {
+                this.normalizeItems()
+            }
         }
     }
 </script>

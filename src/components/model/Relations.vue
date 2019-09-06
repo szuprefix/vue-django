@@ -1,5 +1,5 @@
 <template>
-    <el-tabs type="border-card">
+    <el-tabs type="border-card" v-if="items.length>0">
         <el-tab-pane lazy v-for="m in modelItems" :key="m.name">
             <template slot="label"><i :class="`fa fa-${m.icon}`"></i>{{m.label}}</template>
             <model-table :appModel="m.name" :baseQueries="m.baseQueries" :items="m.items" :parent="parent"
@@ -28,7 +28,6 @@
                 let m = a.model =  Model(a.name)
                 a.icon = m.config.icon
                 a.label = m.config.verbose_name
-                a.items = m.config.listItems || ['__str__']
                 return a
             })
         },

@@ -24,7 +24,21 @@ let router = new Router({
     routes: constRoutes
 })
 
+function import_edit(path){
+    return () => {
+        return import('@/views/' + path + '.vue').catch(() => {
+            return import('../components/model/EditPage.vue')
+        })
+    }
+}
 
+function import_list(path){
+    return () => {
+        return import('@/views/' + path + '.vue').catch(() => {
+            return import('../components/model/ListPage.vue')
+        })
+    }
+}
 export default router
 
 export var genModelRouters = function (apps, importFunc, defaultLayout) {
@@ -70,7 +84,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                     icon: model.icon,
                     permission: ['*']
                 },
-                component: _import(`${a}/${m}/list`)
+                component: import_list(`${a}/${m}/list`)
             })
             actions.forEach((action) => {
                 // console.log(`/${a}/${m}/${action.name}/`)
@@ -95,7 +109,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                     icon: model.icon,
                     permissions: ['change', 'add']
                 },
-                component: _import(`${a}/${m}/edit`)
+                component: import_edit(`${a}/${m}/edit`)
             })
             itemActions.forEach((action) => {
                 children.push({

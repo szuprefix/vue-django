@@ -1,7 +1,7 @@
 <template>
     <div>
         <x-table :items="items" :cellWidget="tOptions.cellWidget" v-model="data" v-loading="loading"
-                 :element-loading-text="loading" :topActions="topActions" :rowActions="rowActions"
+                 :element-loading-text="loading" :topActions="tOptions.topActions" :rowActions="tOptions.rowActions"
                  :headerWidget="tOptions.headerWidget" :group="group" :dblClickAction="tOptions.dblClickAction" :options="tOptions">
         </x-table>
         <!--<div class="pager-container">-->
@@ -21,8 +21,10 @@
     import {DEFAULT_PAGE_SIZE, mergeOptions} from './Table'
     import Qs from 'qs'
     import XTable from './Table.vue'
+    import server_response from '../../mixins/server_response'
     import array_normalize from '../../utils/array_normalize'
     export default{
+        mixins: [server_response],
         props: {
             items: {type: Array, default: () => []},
             value: Array,
@@ -59,9 +61,7 @@
         },
         components: {XTable},
         created () {
-            if (this.items.length > 0) {
-                this.updateQueries({})
-            }
+            this.updateQueries({})
         },
         methods: {
 
@@ -71,7 +71,7 @@
             load (queris) {
                 let d = queris || this.queries
                 this.loading = '查询中'
-                return this.$http.get(`${this.url}?${Qs.stringify(d)}`).then(({data}) => {
+                return this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
                     this.data = data.results
                     this.count = data.count
                     this.loading = false
@@ -93,29 +93,18 @@
             excelGetAllData(){
                 let d = Object.assign({}, this.queries, {page: 1, page_size: this.count})
                 this.loading = '正在获取数据'
-                return this.$http.get(`${this.url}?${Qs.stringify(d)}`).then(({data}) => {
+                return this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
                     this.loading = false
                     return data.results
                 }).catch(this.onServerResponseError)
             }
         },
         computed: {
-            topActions () {
-                return this.tOptions.topActions || ['refresh', 'download']
-            },
-            rowActions () {
-                return this.tOptions.rowActions
-            },
             tOptions () {
-//                let options = Object.assign({}, this.options.table, {
-//                        excelGetAllData: this.excelGetAllData
-//                    }
-//                )
-//                Object.assign(options.avairableActions, this.avairableActions)
-//                return options
                 return mergeOptions({
                     excelGetAllData: this.excelGetAllData,
-                    avairableActions: this.avairableActions
+                    avairableActions: this.avairableActions,
+                    topActions:['refresh', 'download']
                 }, this.options.table)
             },
 
@@ -129,6 +118,9 @@
             },
             queries(newVal, oldVal){
                 this.load(newVal)
+            },
+            baseQueries (val) {
+                this.updateQueries(val)
             }
         }
     }

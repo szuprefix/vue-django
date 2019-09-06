@@ -6,7 +6,7 @@ export const DEFAULT_PAGE_SIZE = 20
 
 function customizer(objValue, srcValue) {
     if (isArray(objValue)) {
-        return objValue
+        return srcValue
     }
 }
 

@@ -2,7 +2,7 @@
     <el-table-column :label="f.label" v-if="f.subColumns">
         <table-column :field="sf" v-for="sf in f.subColumns" :key="sf.name"></table-column>
     </el-table-column>
-
+    <el-table-column :type="f.type" v-else-if="f.type === 'selection'"></el-table-column>
     <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
                      :min-width="f.min_width" :width="f.width" :formater="f.formater"
                      :align="f.align" :class-name="f.type" :type="f.type" :key="f.name"

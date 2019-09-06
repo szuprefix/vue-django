@@ -1,16 +1,14 @@
 <template>
-    <div>
-        <el-button-group v-if="showActions.length>0">
-            <template v-for="a in showActions">
-                <el-button :type="a.type" :title="a.title" size="small" @click="handleCommand(a.do)"
-                           v-if="!a.show || a.show()" :key="a.name">
-                    <i :class="`fa fa-${a.icon}`"></i>{{a.label}}
-                </el-button>
-            </template>
-        </el-button-group>
-        <el-dropdown v-if="dropdownActions.length>0" @command="handleCommand" size="small" :trigger="trigger">
+    <el-button-group v-if="showActions.length>0">
+        <template v-for="a in showActions">
+            <el-button :type="a.type" :title="a.title" :size="size" @click="handleCommand(a.do)"
+                       v-if="!a.show || a.show()" :key="a.name">
+                <i :class="`fa fa-${a.icon}`"></i>{{a.label}}
+            </el-button>
+        </template>
+        <el-dropdown v-if="dropdownActions.length>0" @command="handleCommand" :size="size" :trigger="trigger">
           <span>
-            <i class="el-icon-arrow-down el-icon--right" style="margin-right: 1rem"></i>
+            <i class="el-icon-arrow-down el-icon--right" style="margin: 0 0.5rem;"></i>
           </span>
             <el-dropdown-menu slot="dropdown">
                 <template v-for="a in dropdownActions">
@@ -21,7 +19,7 @@
                 </template>
             </el-dropdown-menu>
         </el-dropdown>
-    </div>
+    </el-button-group>
 </template>
 <script>
     export default{
@@ -33,7 +31,8 @@
                 type: Object, default: () => {
                     return {}
                 }
-            }
+            },
+            size: {type: String, default: "small"}
         },
         data () {
             return {}
@@ -47,7 +46,7 @@
         computed: {
             _items (){
                 return this.items.map(a => {
-                    if(typeof a === 'string'){
+                    if (typeof a === 'string') {
                         a = this.map[a]
                     }
                     return a
@@ -68,6 +67,3 @@
         }
     }
 </script>
-<style scoped>
-
-</style>

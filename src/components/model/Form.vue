@@ -8,7 +8,7 @@
                 <actions :items="_topActions"></actions>
             </el-col>
         </el-row>
-        <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form"
+        <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form" :successInfo="successInfo"
                 :method="method" @form-posted="onPosted" :submit="submit">
             <span slot="submit" v-if="!options.inline"></span>
         </x-form>
@@ -19,10 +19,12 @@
     import {Register} from '../../utils/app_model'
     import XForm from '../form/Form.vue'
     import Model from './Model'
+    import server_response from '../../mixins/server_response'
     import array_normalize from '../../utils/array_normalize'
     import Actions from '../layout/Actions.vue'
     import RelatedSelect from './Select.vue'
     export default{
+        mixins: [server_response],
         components: {XForm, Actions},
         props: {
             appModel: String,
@@ -50,6 +52,8 @@
                 mid : undefined,
                 formItems: [],
                 formValue: {},
+                intent: '',
+                successInfo: undefined,
                 model: Model(this.appModel, this.defaults, this.$store.state.bus),
                 avairableActions: {
                     'save': {
@@ -97,7 +101,7 @@
                     this.formValue = Object.assign({},this.model.data)
                     this.normalizeItems()
                     this.$emit('loaded', this.model)
-                })
+                }).catch(this.onServerResponseError)
             },
             getId(){
                 let id = this.value && this.value.id ||
@@ -118,6 +122,8 @@
                 }
                 return import(`@/views${this.model.getListUrl()}config.js`).then(m => {
                     return m.default.formItems
+                }).catch(() => {}).then( items => {
+                    return items || this.model.config.formItems || Object.values(this.model.options.actions.POST).filter(a => a.read_only !== true)
                 })
             },
 
@@ -139,7 +145,7 @@
             },
             onPosted(data)
             {
-                let payLoad = {model: this.model.config, data}
+                let payLoad = {model: this.model.config, data, intent: this.intent}
                 this.$emit("form-posted", payLoad)
             },
             toDelete(){
@@ -150,17 +156,21 @@
                 this.mid = this.model.id = undefined
                 this.formValue = Object.assign({},this.model.data)
             },
+            onDelete(){
+                this.$confirm('确定要删除吗?', {type: 'warning'}).then(() => {
+                    return this.model.destroy()
+                }).catch(this.onServerResponseError)
+            },
             onSubmit (context) {
-                return this.$refs.form.onSubmit().then((data) => {
-                    if (data && data.id) {
-                        this.$router.replace(this.model.getDetailUrl(data.id))
-                    }
-                })
+                this.intent = 'save'
+                this.successInfo = '保存成功.'
+                return this.$refs.form.onSubmit()
             },
             saveAndAnother(){
+                this.intent = 'saveAndAnother'
+                this.successInfo = '保存成功, 继续添加下一个.'
                 this.$refs.form.onSubmit().then((data) => {
                     if (data && data.id) {
-                        this.$message({message: '继续创建下一个'})
                         this.clear()
                     }
                 })
