@@ -41,15 +41,12 @@
         </el-row>
     </div>
 </template>
-<script>
-    //    import {Paper} from '../../utils/paper'
-    //    import PaperView from './Paper.vue'
+<script> 
     import ForeignKeyTranslater from '../../utils/foreign_key_translater'
+    import Model from './Model'
     import {debounce} from 'lodash'
-    import model_view from '../../mixins/model_view'
     import Qs from 'qs'
     export default{
-        mixins: [model_view],
         model: {
             event: "change"
         },
@@ -59,11 +56,8 @@
                 default: ''
             },
             fields: Array,
-            appModelName: {
-              type: String,
-              default: () => ''
-            },
-            baseValues: {
+            appModel: String,
+            defaults: {
                 type: Object, default: () => {
                     return {}
                 }
@@ -72,6 +66,7 @@
         },
         data () {
             return {
+                model: Model(this.appModel, this.defaults, this.$store.state.bus),
                 edit: true,
                 view: true,
                 records: [],
@@ -87,12 +82,12 @@
         },
         mounted (){
             this.currentValue = this.value
-            this.modelLoadOptions().then(this.loadForeignKeyTranslater).then(this.genRecords)
+            this.model.loadOptions().then(this.loadForeignKeyTranslater).then(this.genRecords)
         },
         methods: {
             loadForeignKeyTranslater(){
-                Object.keys(this.modelFieldConfigs).forEach((fn) => {
-                    let f = this.modelFieldConfigs[fn]
+                Object.keys(this.model.fieldConfigs).forEach((fn) => {
+                    let f = this.model.fieldConfigs[fn]
                     if (f.model && f.multiple != true) {
                         ForeignKeyTranslater.getMap(f.model).then((rs) => {
                             let m = {}
@@ -164,17 +159,17 @@
             postOne(){
                 let qi = this.queueIndex
                 if (qi < this.records.length) {
-                    let a = Object.assign({}, this.baseValues, this.records[qi])
+                    let a = Object.assign({}, this.defaults, this.records[qi])
                     this.translateForeignKey(a)
                     let q = {}
-                    q[this.pk]=a[this.pk]
-                    this.$http.get(`${this.modelListUrl}?${Qs.stringify(q)}`).then(({data}) => {
-                        if(data.count>0){
+                    q[this.pk] = a[this.pk]
+                    this.$http.get(`${this.model.getListUrl()}?${Qs.stringify(q)}`).then(({data}) => {
+                        if (data.count > 0) {
                             let r = data.results[0]
                             a = Object.assign(r, a)
-                            return this.$http.put(`${this.modelListUrl}${a.id}/`, a)
-                        }else{
-                            return this.$http.post(`${this.modelListUrl}`,a)
+                            return this.$http.put(`${this.model.getListUrl()}${a.id}/`, a)
+                        } else {
+                            return this.$http.post(`${this.model.getListUrl()}`, a)
                         }
                     }).then((data) => {
                         this.setResult(qi, {status: 'success', info: '成功'})
@@ -184,7 +179,7 @@
                         this.postOne()
                     })
                 } else {
-                    this.modelEmitPosted()
+                    this.model.emitPosted()
                     console.log("batch done")
                 }
                 this.queueIndex += 1
@@ -192,7 +187,7 @@
         },
         computed: {
             loaded(){
-                return Object.keys(this.modelFieldConfigs).length > 0
+                return Object.keys(this.model.fieldConfigs).length > 0
             },
             editZoneSpan (){
                 return this.edit ? (this.view ? 10 : 24) : 0
@@ -212,7 +207,7 @@
             fieldItems(){
                 return this.fields.map((a) => {
                     if (typeof a == 'string') {
-                        return this.modelFieldConfigs[a]
+                        return this.model.fieldConfigs[a]
                     }
                     return a
                 })

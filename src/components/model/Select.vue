@@ -114,6 +114,9 @@
         watch: {
             selectedValue(v){
                 this.loadValueObjects(v)
+            },
+            value (v) {
+                this.selectedValue = v
             }
         }
     }

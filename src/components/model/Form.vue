@@ -155,6 +155,7 @@
                 this.model.clear()
                 this.mid = this.model.id = undefined
                 this.formValue = Object.assign({},this.model.data)
+                this.$nextTick(this.$refs.form.$refs.form.clearValidate)
             },
             onDelete(){
                 this.$confirm('确定要删除吗?', {type: 'warning'}).then(() => {

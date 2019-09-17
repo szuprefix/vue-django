@@ -96,6 +96,10 @@ export default function (appModel, defaults, eventor) {
                 return data
             })//.catch((error) => this.onErrors(error))
         },
+        removeRelateObject (rel, id) {
+            this.data[rel] = this.data[rel].filter(a => a !== id)
+            return this.save()
+        },
         destroy(id){
             id = id || this.id
             return axios.delete(this.getDetailUrl(id)).then(() => {

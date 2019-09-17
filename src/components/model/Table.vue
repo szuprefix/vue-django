@@ -4,10 +4,14 @@
                 @change="onSearch"></search>
         <batch-actions :items="batchActionItems" :count="selection.length" @done="refresh" :context="{selection}"
                        v-if="batchActionItems.length>0"></batch-actions>
-        <el-drawer :visible.sync="editing" direction="rtl" :title="`${parentMultipleRelationField?'添加':'创建'}${model.config.verbose_name}`" size="66%">
+        <el-drawer :visible.sync="editing" direction="rtl"
+                   :title="`${parentMultipleRelationField?'添加':'创建'}${model.config.verbose_name}`" size="66%">
             <slot name="edit">
-                <model-table :appModel="appModel" :options="{remoteTable:{table:{topActions:[], rowActions:[]}}}" :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', do:addToParent}]" v-if="parentMultipleRelationField"></model-table>
-                <component :is="creator" :appModel="appModel" :defaults="parentQueries" v-else :topActions="['saveAndAnother']"></component>
+                <model-table :appModel="appModel" :options="{remoteTable:{table:{topActions:[], rowActions:[]}}}"
+                             :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', confirm:false, do:addToParent}]"
+                             v-if="parentMultipleRelationField"></model-table>
+                <component :is="creator" :appModel="appModel" :defaults="parentQueries" v-else
+                           :topActions="['saveAndAnother']"></component>
 
             </slot>
         </el-drawer>
@@ -62,7 +66,7 @@
                 editing: false,
                 batchActionItems: [],
                 selection: [],
-                parentQueries : {},
+                parentQueries: {},
                 avairableActions: {
                     'create': {
                         icon: 'plus',
@@ -87,6 +91,12 @@
                         title: '删除',
                         do: this.toDeleteModel,
                         show: () => this.checkPermission('delete')
+                    },
+                    'removeFromParent': {
+                        icon: 'trash',
+                        title: '移除',
+                        do: this.removeFromParent,
+                        show: () => this.parent.checkPermission('add', this.$store.state.user.permissions)
                     },
                     'batch': {
                         icon: 'archive',
@@ -155,7 +165,7 @@
 
 
             toBatchCreateModel (){
-                this.$router.push(`${this.model.getListUrl()}batch?${this.model.config.title_field}=${this.queries.search}`)
+                this.$router.push(`${this.model.getListUrl()}batch?${this.model.config.title_field}=${this.search.search}`)
             },
 
             toCreateModel(){
@@ -195,7 +205,7 @@
             defaultBatchActionDo (action) {
                 return ({selection}) => {
                     let ids = selection.map((a) => a.id)
-                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/`, {id__in:ids,...action.context})
+                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/`, {id__in: ids, ...action.context})
                 }
             },
             addToParent ({selection}) {
@@ -203,12 +213,23 @@
                 let fn = this.parentMultipleRelationField.name
                 let oids = this.parent.data[fn]
                 d[fn] = oids.concat(selection.map(a => a.id))
-                return this.$http.patch(this.parent.getDetailUrl(), d).then( ({data}) => {
+                return this.$http.patch(this.parent.getDetailUrl(), d).then(({data}) => {
                     this.parent.data[fn] = data[fn]
                     this.parentQueries = Object.assign({}, this.getParentQueries())
-                    return {data:{
-                        rows: data[fn].length - oids.length
-                    }}
+                    return {
+                        data: {
+                            rows: data[fn].length - oids.length
+                        }
+                    }
+                })
+            },
+            removeFromParent({row}) {
+                let fn = this.parentMultipleRelationField.name
+                let d = {}
+                d[fn] = this.parent.data[fn].filter(a => a !== row.id)
+                return this.$http.patch(this.parent.getDetailUrl(), d).then(({data}) => {
+                    this.parent.data[fn] = data[fn]
+                    this.parentQueries = Object.assign({}, this.getParentQueries())
                 })
             },
             getConfig () {
@@ -256,7 +277,7 @@
                 if (this.parent) {
                     let parent = this.parent
                     let f = this.parentMultipleRelationField
-                    if(f) {
+                    if (f) {
                         let ids = parent.data[f.name]
                         r['id__in'] = ids.length > 0 && ids || [0]
                     } else {
@@ -284,21 +305,30 @@
         },
         computed: {
             parentMultipleRelationField () {
-               if(this.parent) {
-                   let pfs = Object.values(this.parent.fieldConfigs)
-                   let f = pfs.find(a => a.model === this.model.appModel)
-                   if (f && f.multiple === true) {
-                       return f
-                   }
-               }
+                if (this.parent) {
+                    let pfs = Object.values(this.parent.fieldConfigs)
+                    let f = pfs.find(a => a.model === this.model.appModel)
+                    if (f && f.multiple === true) {
+                        return f
+                    }
+                }
             },
             rtOptions () {
+                let bactions = {}
+                if (this.model.config.actions) {
+                    this.model.config.actions.forEach(a => {
+                        bactions[a.name] = a
+                        a.do = () => {
+                            this.$router.push(`${this.model.getListUrl()}${a.name}/`)
+                        }
+                    })
+                }
                 return mergeOptions({
                     table: {
-                        avairableActions: this.avairableActions,
+                        avairableActions: {...this.avairableActions, ...bactions},
                         excelFormat: this.excelFormat,
-                        topActions: ['refresh', 'create', ['download']],
-                        rowActions: ['edit', ['delete']],
+                        topActions: ['refresh', 'create', ['download'].concat(Object.keys(bactions))],
+                        rowActions: ['edit', [this.parentMultipleRelationField ? 'removeFromParent' : 'delete']],
                         dblClickAction: 'edit',
                         elTable: {
                             onSelectionChange: this.onSelectionChange
@@ -310,7 +340,7 @@
 //                return this.getParentQueries()
 //            },
             _baseQueries () {
-                return  Object.assign({}, this.parentQueries, this.baseQueries)
+                return Object.assign({}, this.parentQueries, this.baseQueries)
             }
         },
         watch: {
