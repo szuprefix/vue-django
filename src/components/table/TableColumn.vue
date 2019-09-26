@@ -24,7 +24,7 @@
                                  @change="onCellValueChange"></form-widget>
                     <component :is="f.widget" v-model="row[f.name]" :context="context(row, $index)" :field="f"
                                v-else-if="f.widget && typeof f.widget == 'object'"></component>
-                    <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
+                    <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget({value:row[f.name],field,row})"></span>
                     <template v-else>{{row[f.name]}}</template>
                     <span v-if="!row[f.name]" class="empty">&nbsp;</span>
                 </div>
@@ -34,7 +34,7 @@
                              @change="onCellValueChange"></form-widget>
                 <component :is="f.widget" v-model="row[f.name]" :context="context(row, $index)" :field="f"
                            v-else-if="f.widget && typeof f.widget == 'object'"></component>
-                <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
+                <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget({value:row[f.name],field,row})"></span>
                 <template v-else>{{row[f.name]}}</template>
 
             </template>

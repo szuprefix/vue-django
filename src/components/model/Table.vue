@@ -137,7 +137,7 @@
                 this.$emit('loaded', v)
             },
             onSearch () {
-                this.$refs.table.updateQueries(this.search)
+                this.$refs.table.updateQueries({...this.search, page: 1})
             },
             onModelPosted ({appModel, id}) {
                 let dps = this.model.options.dependencies
@@ -248,11 +248,19 @@
                 })
             },
             defaultWidget(f){
-                // console.log(f)
-                return f.model ? ForeignKey :
-                    (f.type == 'boolean' ? TrueFlag :
-                        ( ['datetime', 'date'].includes(f.type) ? Date2Now :
-                            f.choices ? ChoicesDisplay : undefined))
+                if (f.model) {
+                    return ForeignKey
+                } else if (f.type == 'boolean') {
+                    return TrueFlag
+                } else if (['datetime', 'date'].includes(f.type)) {
+                    return Date2Now
+                } else if (f.choices) {
+                    return ChoicesDisplay
+                } else if (f.child) {
+                    return function ({value}) {
+                        return value.map(a => Object.values(a).join(',')).join('\n')
+                    }
+                }
             },
             excelFormat(data){
                 let ds = data.map((d) => {
