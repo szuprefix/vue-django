@@ -99,7 +99,11 @@ export default{
                         errors.forEach((f) => {
                             let v = fs[f.field][0]
                             // v.focus() && v.blur()
-                            v.onBlur()
+                            try {
+                                v.onBlur()
+                            } catch (error) {
+                                console.error(error)
+                            }
                         })
                         valid = false
                     }
