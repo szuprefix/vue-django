@@ -28,7 +28,7 @@ router.beforeEach((to, from, next) => {
                     // router.addRoutes(asyncRouterMap) //todo: make dynamics routers
                     next({...to, replace: true}) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
                 }).catch((error) => {
-                    Vue.$message({message:'身份认证失败, 请重新登录', type:'error'})
+                    Vue.prototype.$message({message:'身份认证失败, 请重新登录', type:'error'})
                     next({path: loginUrl, query: {redirect: to.fullPath}})
                 })
             } else {
@@ -53,5 +53,5 @@ router.afterEach(() => {
 router.onError((err) => {
     NProgress.done()
     console.error(err)
-    Vue.$message({message:`发生异常:${err}`, type:'error'})
+    Vue.prototype.$message({message:`发生异常:${err}`, type:'error'})
 })
