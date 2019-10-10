@@ -340,7 +340,8 @@
                         dblClickAction: 'edit',
                         elTable: {
                             onSelectionChange: this.onSelectionChange
-                        }
+                        },
+                        title: this.model.config.verbose_name
                     }
                 }, this.options.remoteTable)
             },
