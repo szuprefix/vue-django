@@ -128,7 +128,7 @@
                     this.parentQueries = Object.assign({}, this.getParentQueries())
                     this.optionLoaded = true
 //                    this.$refs.table.updateQueries({})
-                })
+                }).catch(this.onServerResponseError)
             },
             refresh () {
                 this.$refs.table.refresh()
