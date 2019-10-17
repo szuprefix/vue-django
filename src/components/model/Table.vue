@@ -299,7 +299,14 @@
                             f = fs.find(a => a.model === 'contenttypes.contenttype')
                             if (f) {
                                 r[f.name] = this.parent.options.content_type_id
-                                r[`${f.name.replace('_type', '_id')}`] = pid
+                                let idf = `${f.name.replace('_type', '_id')}`   // todo: 要更严谨些
+                                if (!this.model.fieldConfigs[idf]) {
+                                    idf = 'object_id'
+                                }
+                                if(!this.model.fieldConfigs[idf] ){
+                                    throw Error('genric foreign key id field not found.')
+                                }
+                                r[idf] = pid
                             }
                         }
 

@@ -42,6 +42,7 @@
                 :appModelName="field.model"
                 :appModel="field.model"
                 :field="field"
+                :context="value"
                 :ref="field.ref">
         </component>
 

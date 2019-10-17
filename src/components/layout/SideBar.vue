@@ -11,7 +11,7 @@
                 </el-menu-item>
             </el-submenu>
             <template v-else>
-                <el-menu-item v-for="m,j in menus.items[0].items" :index="m.url" :key="m.name" v-if="!m.hidden">
+                <el-menu-item v-for="m,j in mg.items" :index="m.url" :key="m.name" v-if="!m.hidden">
                     <i :class="`fa fa-${m.icon}`"></i>{{m.name}}
                 </el-menu-item>
             </template>
