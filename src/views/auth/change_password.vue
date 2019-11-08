@@ -48,4 +48,3 @@
         computed: {}
     }
 </script>
-<style scoped></style> 

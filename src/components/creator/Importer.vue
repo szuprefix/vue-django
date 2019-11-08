@@ -48,4 +48,4 @@
         }
     }
 </script>
-<style scoped></style>
+

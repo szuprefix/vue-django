@@ -148,4 +148,4 @@
         }
     }
 </script>
-<style scoped></style>
+
