@@ -125,4 +125,4 @@
         }
     }
 </script>
-<style scoped></style>
+

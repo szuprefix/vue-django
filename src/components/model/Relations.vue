@@ -42,4 +42,4 @@
         }
     }
 </script>
-<style scoped></style>
+

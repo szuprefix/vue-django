@@ -105,4 +105,4 @@
         }
     }
 </script>
-<style scoped></style>
+

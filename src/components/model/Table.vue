@@ -90,6 +90,7 @@
                         icon: 'trash',
                         title: '删除',
                         do: this.toDeleteModel,
+                        type: 'danger',
                         show: () => this.checkPermission('delete')
                     },
                     'removeFromParent': {
