@@ -9,9 +9,9 @@
     </el-tabs>
 </template>
 <script>
-    import server_response from '../../mixins/server_response'
+    import serverResponse from '../../mixins/server_response'
     export default{
-        mixins: [server_response],
+        mixins: [serverResponse],
         data () {
             return {
                 tabs: [],
