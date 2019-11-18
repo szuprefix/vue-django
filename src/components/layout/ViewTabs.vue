@@ -9,30 +9,30 @@
     </el-tabs>
 </template>
 <script>
-    import server_response from '../../mixins/server_response'
+    import serverResponse from '../../mixins/server_response'
     export default{
-        mixins: [server_response],
+        mixins: [serverResponse],
         data () {
             return {
                 tabs: [],
                 curTab: '/'
             }
         },
-        created (){
+        created () {
             this.curTab = this.$route.path
             this.changeRoute(this.$route)
-            this.$store.state.bus.$on("tab-destroy", this.tabRemove)
+            this.$store.state.bus.$on('tab-destroy', this.tabRemove)
         },
         components: {},
         methods: {
-            ellipsis(s){
+            ellipsis (s) {
                 return s.length > 19 ? `${s.substr(0, 16)}...` : s
             },
-            clearTabs(){
+            clearTabs () {
                 this.curTab = '/'
                 this.tabs = [this.tabs.find((tab) => tab.name == this.curTab)]
             },
-            tabRemove(name){
+            tabRemove (name) {
                 let targetName = name
                 if (this.curTab === targetName) {
                     this.tabs.forEach((tab, index) => {
@@ -53,7 +53,7 @@
                 }
                 this.curTab = tab.name
             },
-            changeRoute(newVal, oldVal){
+            changeRoute (newVal, oldVal) {
 //                console.log(newVal)
 //                console.log(oldVal)
                 let to = newVal
@@ -78,12 +78,12 @@
             }
         },
         watch: {
-            curTab(){
+            curTab () {
                 if (this.$route.path !== this.curTab) {
                     this.$router.push(this.resolveRoutePath(this.curTab))
                 }
             },
-            $route(newVal, oldVal){
+            $route (newVal, oldVal) {
                 this.changeRoute(newVal, oldVal)
             }
         },
