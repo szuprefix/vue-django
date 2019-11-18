@@ -176,8 +176,9 @@
                     }
                 })
             },
-            checkPermission(p){
-                return this.model.checkPermission(p, this.$store.state.user.permissions)
+            checkPermission(p, m){
+                m = m || this
+                return this.$store.state.user.model_permissions[m.appModel].includes(p)
             }
         },
         computed: {

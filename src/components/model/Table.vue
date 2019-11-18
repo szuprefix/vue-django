@@ -72,19 +72,19 @@
                         icon: 'plus',
                         title: '创建',
                         do: this.toCreateModel,
-                        show: () => this.checkPermission('add')
+                        show: () => this.checkPermission('create')
                     },
                     'add': {
                         icon: 'plus-square',
                         label: '添加',
                         do: this.addToParent,
-                        show: () => this.parent.checkPermission('add', this.$store.state.user.permissions)
+                        show: () => this.checkPermission('create', this.parent)
                     },
                     'edit': {
                         icon: 'pencil',
                         title: '编辑',
                         do: this.toEditModel,
-                        show: () => this.checkPermission('change')
+                        show: () => this.checkPermission('update')
                     },
                     'delete': {
                         icon: 'trash',
@@ -97,13 +97,13 @@
                         icon: 'trash',
                         title: '移除',
                         do: this.removeFromParent,
-                        show: () => this.parent.checkPermission('add', this.$store.state.user.permissions)
+                        show: () => this.checkPermission('update', this.parent)
                     },
                     'batch': {
                         icon: 'archive',
                         title: '批量创建',
                         do: this.toBatchCreateModel,
-                        show: () => this.checkPermission('add')
+                        show: () => this.checkPermission('create')
                     }
                 }
             }
@@ -278,8 +278,9 @@
                 })
                 return [this.tableItems.map((a) => a.label)].concat(ds)
             },
-            checkPermission(p){
-                return this.model.checkPermission(p, this.$store.state.user.permissions)
+            checkPermission(p, m){
+                m = m || this
+                return this.$store.state.user.model_permissions[m.appModel].includes(p)
             },
             getParentQueries() {
                 let r = {}

@@ -14,7 +14,7 @@
                 <template v-for="a in dropdownActions">
                     <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
                                       :icon="`fa fa-${a.icon}`">
-                        {{a.label}}
+                        {{a.label||a.title}}
                     </el-dropdown-item>
                 </template>
             </el-dropdown-menu>

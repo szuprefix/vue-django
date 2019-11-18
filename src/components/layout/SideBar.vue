@@ -30,14 +30,6 @@
                 menus,
                 defaultOpeneds: ['0']
             }
-        },
-        methods: {
-            hasPerm(p){
-                if (p instanceof Array) {
-                    return p.find((a) => this.hasPerm(a))
-                }
-                return this.permissions.indexOf(p) >= 0
-            }
         }
     }
 </script>

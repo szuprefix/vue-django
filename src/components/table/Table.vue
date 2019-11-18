@@ -76,10 +76,13 @@
                 })
                 return [this.fieldNames].concat(ds)
             },
+            excelGetAllData () {
+                return Promise.resolve(this.value)
+            },
             dumpExcelData(){
                 this.loading = '正在导出'
                 let opts = this.options
-                let excelGetAllData = opts.excelGetAllData ||  Promise.resolve(this.value)
+                let excelGetAllData = opts.excelGetAllData ||  this.excelGetAllData
                 let excelFormat = opts.excelFormat || this.excelFormat
                 excelGetAllData().then((data) => {
                     this.loading = '正在加载excel模块'
