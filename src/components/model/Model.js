@@ -4,10 +4,10 @@
 import {Register} from '../../utils/app_model'
 import axios from '../../configs/axios'
 // import store from '../store'
-export function joinErrors(errors) {
+export function joinErrors (errors) {
     let es = {}
     for (let n in errors) {
-        es[n] = errors[n].join("")
+        es[n] = errors[n].join('')
     }
     return es
 }
@@ -43,7 +43,7 @@ export default function (appModel, defaults, eventor) {
                 })
             }
         },
-        loadOptions(){
+        loadOptions () {
             if (this.config.rest_options) {
                 this.cacheOptions(this.config.rest_options)
                 return Promise.resolve(this.config.rest_options)
@@ -54,14 +54,14 @@ export default function (appModel, defaults, eventor) {
                 return data
             })
         },
-        cacheOptions(options){
+        cacheOptions (options) {
             this.options = Object.assign({}, this.options, options)
             this.fieldConfigs = Object.assign({}, this.fieldConfigs, options.actions.LIST, options.actions.POST)
             Object.keys(this.fieldConfigs).forEach((a) => {
                 this.fieldConfigs[a].name = a
             })
         },
-        emptyDataFromOptions(m){
+        emptyDataFromOptions (m) {
             let dvs = {}
             Object.assign(dvs, this.defaults)
             let r = {}
@@ -72,16 +72,16 @@ export default function (appModel, defaults, eventor) {
             })
             return r
         },
-        load() {
-            return axios.all([this.loadData(), this.loadOptions()]).then(axios.spread((data, rest_options) => {
+        load () {
+            return axios.all([this.loadData(), this.loadOptions()]).then(axios.spread((data, restOptions) => {
                 if (!this.id) {
-                    data = this.emptyDataFromOptions(rest_options.actions.POST)
+                    data = this.emptyDataFromOptions(restOptions.actions.POST)
                 }
                 this.data = Object.assign({}, this.data, data)
-                return [data, rest_options]
+                return [data, restOptions]
             }))
         },
-        save(data){
+        save (data) {
             let d = Object.assign({}, this.defaults, this.data, data)
             let promise
             if (!this.id) {
@@ -94,44 +94,44 @@ export default function (appModel, defaults, eventor) {
                 this.data = Object.assign({}, this.data, data)
                 this.emitPosted(this.id)
                 return data
-            })//.catch((error) => this.onErrors(error))
+            }) // .catch((error) => this.onErrors(error))
         },
         removeRelateObject (rel, id) {
             this.data[rel] = this.data[rel].filter(a => a !== id)
             return this.save()
         },
-        destroy(id){
+        destroy (id) {
             id = id || this.id
             return axios.delete(this.getDetailUrl(id)).then(() => {
                 this.eventor.$emit('model-deleted', {appModel: this.appModel, id})
             })
         },
-        emitPosted(id){
+        emitPosted (id) {
             this.eventor.$emit('model-posted', {appModel: this.appModel, id})
         },
-        onErrors(error){
+        onErrors (error) {
             if (error.code === 400) {
                 this.errors = joinErrors(error.msg)
             }
             return Promise.reject(error)
         },
-        checkPermission(p, ps){
+        checkPermission (p, ps) {
             if (!ps) {
                 return false
             }
             let pn = this.appModel.replace('.', `.${p}_`)
             return ps.includes(pn)
         },
-        getListUrl(){
-            return `/${this.appModel.replace(".", "/")}/`
+        getListUrl () {
+            return `/${this.appModel.replace('.', '/')}/`
         },
-        getDetailUrl(id){
+        getDetailUrl (id) {
             let mid = id || this.id
             return `${this.getListUrl()}${mid}/`
         },
-        title(){
+        title () {
             return !this.id && `新增${this.config.verbose_name}` || this.data['__str__']
-        },
+        }
     }
     m.init()
     return m
