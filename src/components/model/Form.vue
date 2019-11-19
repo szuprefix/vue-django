@@ -8,7 +8,8 @@
                 <actions :items="_topActions"></actions>
             </el-col>
         </el-row>
-        <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form" :successInfo="successInfo"
+        <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form"
+                :successInfo="successInfo"
                 :method="method" @form-posted="onPosted" :submit="submit">
             <span slot="submit" v-if="!options.inline"></span>
         </x-form>
@@ -49,7 +50,7 @@
         },
         data () {
             return {
-                mid : undefined,
+                mid: undefined,
                 formItems: [],
                 formValue: {},
                 intent: '',
@@ -98,7 +99,7 @@
 //                this.formValue = this.value
                 this.model.load().then((data, options) => {
                     this.mid = this.model.id
-                    this.formValue = Object.assign({},this.model.data)
+                    this.formValue = Object.assign({}, this.model.data)
                     this.normalizeItems()
                     this.$emit('loaded', this.model)
                 }).catch(this.onServerResponseError)
@@ -121,9 +122,11 @@
                     return Promise.resolve(this.items)
                 }
                 return import(`@/views${this.model.getListUrl()}config.js`).then(m => {
-                    return m.default.formItems
-                }).catch(() => {}).then( items => {
-                    return items || this.model.config.formItems || Object.values(this.model.options.actions.POST).filter(a => a.read_only !== true)
+                    return m.default.form || {}
+                }).catch(() => {
+                    return {}
+                }).then(config => {
+                    return config.items || this.model.config.formItems || Object.values(this.model.options.actions.POST).filter(a => a.read_only !== true)
                 })
             },
 
@@ -154,7 +157,7 @@
             clear () {
                 this.model.clear()
                 this.mid = this.model.id = undefined
-                this.formValue = Object.assign({},this.model.data)
+                this.formValue = Object.assign({}, this.model.data)
                 this.$nextTick(this.$refs.form.$refs.form.clearValidate)
             },
             onDelete(){

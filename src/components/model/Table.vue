@@ -235,12 +235,12 @@
             },
             getConfig () {
                 return import(`@/views${this.model.getListUrl()}config.js`).then(m => {
-                    return m.default
+                    return m.default.list
                 }).catch(() => {
                     return {}
                 }).then(config => {
 
-                    let listItems = this.items || config.listItems || this.model.config.listItems || Object.values(this.model.fieldConfigs).filter(a => ['name', 'title'].includes(a.name))
+                    let listItems = this.items || config.items || this.model.config.listItems || Object.values(this.model.fieldConfigs).filter(a => ['name', 'title'].includes(a.name))
                     if (!listItems || listItems.length === 0) {
                         listItems = ['__str__']
                     }

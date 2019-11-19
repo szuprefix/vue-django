@@ -1,5 +1,5 @@
 <template>
-  <span :class="{hidden_lines:true, has_more: lines.length>1 && !show}" @dblclick="show = !show" :title="show?'双击折叠':'双击展开全部内容'">{{text}}</span>
+  <span :class="{hidden_lines:true, has_more: lines.length>1 && !show}" @dblclick="toggle" :title="show?'双击折叠':'双击展开全部内容'">{{text}}</span>
 </template>
 <script>
       export default{
@@ -10,6 +10,13 @@
           data () {
               return {
                   show: false
+              }
+          },
+          methods: {
+              toggle (event) {
+                  this.show = !this.show
+                  event.preventDefault()
+                  event.stopPropagation()
               }
           },
           computed : {
