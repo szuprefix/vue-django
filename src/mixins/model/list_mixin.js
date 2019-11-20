@@ -1,8 +1,8 @@
 /**
  * Created by denishuang on 2019/9/3.
  */
-import ModelTable from './Table.vue'
-import server_response from '../../mixins/server_response'
+import ModelTable from '../../components/model/Table.vue'
+import server_response from '../server_response'
 export  default {
     props: {
         tab: Object

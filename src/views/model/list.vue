@@ -2,7 +2,7 @@
     <model-table :appModel="appModel" v-model="data"  ref="table"></model-table>
 </template>
 <script>
-    import list_mixin from 'vue-django/src/components/model/list_mixin'
+    import list_mixin from 'vue-django/src/mixins/model/list_mixin'
     export default{
         mixins: [list_mixin],
         data () {

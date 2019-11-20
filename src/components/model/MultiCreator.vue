@@ -55,7 +55,7 @@
                 type: String,
                 default: ''
             },
-            fields: Array,
+            items: Array,
             appModel: String,
             defaults: {
                 type: Object, default: () => {
@@ -74,7 +74,8 @@
                 splitChar: '\t',
                 began: false,
                 queueIndex: 0,
-                tmap: {}
+                tmap: {},
+                fieldItems: []
             }
         },
         components: {
@@ -82,7 +83,10 @@
         },
         mounted (){
             this.currentValue = this.value
-            this.model.loadOptions().then(this.loadForeignKeyTranslater).then(this.genRecords)
+            this.model.loadOptionsAndViewsConfig()
+                .then(this.normalizeItems)
+                .then(this.loadForeignKeyTranslater)
+                .then(this.genRecords)
         },
         methods: {
             loadForeignKeyTranslater(){
@@ -122,6 +126,14 @@
                 if (value === this.currentValue) return
                 this.currentValue = value
             },
+            normalizeItems() {
+                this.fieldItems = (this.items || this.viewConfig.items).map((a) => {
+                    if (typeof a == 'string') {
+                        return this.model.fieldConfigs[a]
+                    }
+                    return a
+                })
+            },
             onEdit () {
                 this.edit = true
                 this.view = !this.view
@@ -158,11 +170,12 @@
             },
             postOne(){
                 let qi = this.queueIndex
+                let pkn = this.pk || this.viewConfig.pk
                 if (qi < this.records.length) {
                     let a = Object.assign({}, this.defaults, this.records[qi])
                     this.translateForeignKey(a)
                     let q = {}
-                    q[this.pk] = a[this.pk]
+                    q[pkn] = a[pkn]
                     this.$http.get(`${this.model.getListUrl()}?${Qs.stringify(q)}`).then(({data}) => {
                         if (data.count > 0) {
                             let r = data.results[0]
@@ -204,13 +217,8 @@
             contentSample(){
                 return this.fieldNames.join(this.splitChar)
             },
-            fieldItems(){
-                return this.fields.map((a) => {
-                    if (typeof a == 'string') {
-                        return this.model.fieldConfigs[a]
-                    }
-                    return a
-                })
+            viewConfig () {
+                return this.model.viewsConfig.batch
             }
         },
         watch: {
@@ -220,6 +228,9 @@
             currentValue () {
                 this.$emit('change', this.currentValue)
                 this.genRecords()
+            },
+            items (val) {
+                this.normalizeItems()
             },
             splitChar () {
                 this.genRecords()

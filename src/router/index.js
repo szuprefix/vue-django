@@ -24,21 +24,14 @@ let router = new Router({
     routes: constRoutes
 })
 
-function import_edit(path){
+function import_or_use_template(path, template){
     return () => {
         return import('@/views/' + path + '.vue').catch(() => {
-            return import('../components/model/EditPage.vue')
+            return import(`../views/model/${template}.vue`)
         })
     }
 }
 
-function import_list(path){
-    return () => {
-        return import('@/views/' + path + '.vue').catch(() => {
-            return import('../components/model/ListPage.vue')
-        })
-    }
-}
 export default router
 
 export var genModelRouters = function (apps, importFunc, defaultLayout) {
@@ -74,7 +67,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
             let model = models[m]
             let mname = model.verbose_name
             let actions = model.actions || []
-            let itemActions = model.item_actions || []
+            let itemActions = model.itemActions || []
             children.push({
                 path: `/${a}/${m}/`,
                 name: `${a}-${m}-list`,
@@ -84,7 +77,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                     icon: model.icon,
                     permission: ['*']
                 },
-                component: import_list(`${a}/${m}/list`)
+                component: import_or_use_template(`${a}/${m}/list`, 'list')
             })
             actions.forEach((action) => {
                 // console.log(`/${a}/${m}/${action.name}/`)
@@ -97,7 +90,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                         icon: model.icon,
                         permissions: action.permission || []
                     },
-                    component: _import(`${a}/${m}/${action.name}`)
+                    component: import_or_use_template(`${a}/${m}/${action.name}`, action.name)
                 })
             })
             children.push({
@@ -109,7 +102,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                     icon: model.icon,
                     permissions: ['change', 'add']
                 },
-                component: import_edit(`${a}/${m}/edit`)
+                component: import_or_use_template(`${a}/${m}/edit`, 'edit')
             })
             itemActions.forEach((action) => {
                 children.push({
@@ -121,7 +114,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                         icon: model.icon,
                         permissions: action.permission || []
                     },
-                    component: _import(`${a}/${m}/${action.name}`)
+                    component: import_or_use_template(`${a}/${m}/${action.name}`, action.name)
                 })
             })
         })

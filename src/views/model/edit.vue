@@ -7,7 +7,7 @@
     </model-form>
 </template>
 <script>
-    import edit_mixin from 'vue-django/src/components/model/edit_mixin'
+    import edit_mixin from 'vue-django/src/mixins/model/edit_mixin'
     export default{
         mixins: [edit_mixin],
         data () {

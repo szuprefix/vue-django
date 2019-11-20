@@ -4,7 +4,7 @@
 import {Register} from '../../utils/app_model'
 import axios from '../../configs/axios'
 // import store from '../store'
-export function joinErrors (errors) {
+export function joinErrors(errors) {
     let es = {}
     for (let n in errors) {
         es[n] = errors[n].join('')
@@ -24,6 +24,7 @@ export default function (appModel, defaults, eventor) {
         options: {},
         errors: {},
         data: {},
+        viewsConfig: undefined,
 
         init(){
             this.config = Register.getConfig(this.appModel)
@@ -131,6 +132,25 @@ export default function (appModel, defaults, eventor) {
         },
         title () {
             return !this.id && `新增${this.config.verbose_name}` || this.data['__str__']
+        },
+        loadViewsConfig () {
+            if (this.viewsConfig) {
+                return Promise.resolve(this.viewConfig)
+            }
+            return import(`@/views${this.getListUrl()}config.js`).then(m => {
+                return m.default || {}
+            }).catch((err) => {
+                console.error(err)
+                return {}
+            }).then(config => {
+                this.viewsConfig = config
+                return config
+            })
+        },
+        loadOptionsAndViewsConfig () {
+            return axios.all([this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((restOptions, config) => {
+                return [restOptions, config]
+            }))
         }
     }
     m.init()

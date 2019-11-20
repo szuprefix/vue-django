@@ -123,7 +123,7 @@
                 this.model.loadOptions().then((data) => {
                     let search = this.model.options.actions.SEARCH
                     this.$refs.search.init()
-                    this.orderingFields = search.ordering_fields
+//                    this.orderingFields = search.ordering_fields
                     return this.normalizeItems()
                 }).then(() => {
                     this.parentQueries = Object.assign({}, this.getParentQueries())
