@@ -1,19 +1,21 @@
 <template>
     <div>
-        <div v-if="editing" header="新增" style="margin-bottom: 2rem;">
-            <model-form :appModelName="appModelName" :id="modelId" v-model="modelData" :formItems="formItems"
+        <el-drawer :visible.sync="editing" direction="rtl" title="新增" size="66%">
+            <slot name="create">
+                <model-form :appModelName="appModelName" :id="modelId" v-model="modelData" :formItems="formItems"
                         ref="form" :modelDefaultValues="modelDefaultValues" formInline
-                         @form-posted="editing=false"></model-form>
-
-        </div>
-        <model-table :appModelName="appModelName" :onTableDBClick="toEditModel" :tableItems="tableItems" ref="table" :topActionList="defaultActions"
+                        @form-posted="onFormPosted"></model-form>
+            </slot>
+        </el-drawer>
+        <model-table :appModelName="appModelName" :onTableDBClick="toEditModel" :tableItems="tableItems" ref="table"
+                     :topActionList="defaultActions"
                      :rowActionList="rowActionList" :tableBaseQueries="_tableBaseQueries">
             <template slot="left">
                 <el-table-column type="expand">
                     <template slot-scope="{row}">
                         <model-form :appModelName="appModelName" :id="row.id" v-model="row" :formItems="formItems"
-                                      :modelDefaultValues="modelDefaultValues" formInline
-                                    ></model-form>
+                                    :modelDefaultValues="modelDefaultValues" formInline @form-posted="onFormPosted">
+                        </model-form>
 
                     </template>
                 </el-table-column>
@@ -56,7 +58,7 @@
 
             }
         },
-        components: { ModelForm, ModelTable},
+        components: {ModelForm, ModelTable},
         methods: {
             tableToCreateModel(){
                 this.modelId = 'create'
@@ -66,14 +68,17 @@
             },
             toEditModel(row, column){
                 this.$refs.table.toggleRowExpansion(row)
+            },
+            onFormPosted(context){
+                this.editing=false
+                this.$emit('form-posted', context)
             }
 
         },
-        computed:{
+        computed: {
             _tableBaseQueries(){
                 return Object.assign({}, this.modelDefaultValues, this.tableBaseQueries)
             }
         }
     }
 </script>
-<style scoped></style>

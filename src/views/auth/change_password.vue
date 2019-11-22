@@ -1,13 +1,13 @@
 <template>
-    <rest-form formUrl="/auth/user/change_password/" :formItems="fieldItems" v-model="form"
+    <rest-form url="/auth/user/change_password/" :items="items" v-model="form"
                formSubmitName="修改密码"></rest-form>
 </template>
 <script>
-    import RestForm from '../../components/rest/Form.vue'
+    import RestForm from '../../components/form/Form.vue'
     export default{
         data () {
             return {
-                fieldItems: [
+                items: [
                     {name: 'old_password', label: '原密码', required: true, widget: 'password', span: 24},
                     {name: 'new_password1', label: '新密码', required: true, widget: 'password', span: 24},
                     {
@@ -48,4 +48,3 @@
         computed: {}
     }
 </script>
-<style scoped></style> 

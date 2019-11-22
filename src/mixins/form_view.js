@@ -75,7 +75,12 @@ export default{
             let procedure = (valid) => {
                 if (valid) {
                     this.formErrors = {}
-                    this._formSubmit().catch(this.onServerResponseError)
+                    this._formSubmit().catch(e => {
+                        let error = this.onServerResponseError(e)
+                        if (error.code === 400) {
+                            this.formErrors = this.joinErrors(error.msg)
+                        }
+                    })
                 } else {
                     this.$message({message: '表单检验未通过，请按提示修改', type: 'error'})
                     return false
@@ -94,7 +99,11 @@ export default{
                         errors.forEach((f) => {
                             let v = fs[f.field][0]
                             // v.focus() && v.blur()
-                            v.onBlur()
+                            try {
+                                v.onBlur()
+                            } catch (error) {
+                                console.error(error)
+                            }
                         })
                         valid = false
                     }

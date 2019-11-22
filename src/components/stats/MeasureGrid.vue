@@ -28,4 +28,4 @@
         }
     }
 </script>
-<style scoped></style>
+

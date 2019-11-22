@@ -3,7 +3,7 @@
  */
 import Qs from 'qs'
 import filters from '../utils/filters'
-import server_response from './server_response'
+import ServerResponse from './server_response'
 import {Register} from '../utils/app_model'
 export default{
     props: {
@@ -21,9 +21,9 @@ export default{
             appModelName: null
         }
     },
-    mixins: [server_response],
+    mixins: [ServerResponse],
     modelTableFilters: filters,
-    created(){
+    created () {
         this.$store.state.bus.$on('model-posted', this.onModelPosted)
         this.$store.state.bus.$on('model-deleted', this.onModelPosted)
     },
@@ -40,12 +40,12 @@ export default{
     },
     components: {},
     methods: {
-        onModelPosted({model}){
-            if (model.fullName === this.model.fullName || this.model.dependents && this.model.dependents.indexOf(model.fullName) >= 0) {
+        onModelPosted ({model}) {
+            if (model.fullName === this.model.fullName || (this.model.dependents && this.model.dependents.indexOf(model.fullName) >= 0)) {
                 this.load()
             }
         },
-        updateQueries(d){
+        updateQueries (d) {
             this.queries = Object.assign({}, this.queries, d)
         },
         load () {
@@ -55,46 +55,45 @@ export default{
                 this.table = data.results
                 this.count = data.count
                 this.loading = false
-                this.$emit("loaded", data)
+                this.$emit('loaded', data)
                 this.onLoaded(data)
             }).catch(this.onServerResponseError)
         },
-        onLoaded(data){
-            console.log("onLoaded")
-
+        onLoaded (data) {
+            console.log('onLoaded')
         },
-        onSearch(){
+        onSearch () {
             this.updateQueries({})
         },
-        onRowSelect(row, column, cell, event){
+        onRowSelect (row, column, cell, event) {
             this.toEditModel(row, column, cell, event)
         },
-        toEditModel (row, column, cell, event){
-          const path = this.resolveRoutePath(`${row.id}`)
-          this.$router.replace(path)
-          this.resolveCurrentTagLabel(path, `${row.__str__}`)
+        toEditModel (row, column, cell, event) {
+            const path = this.resolveRoutePath(`${row.id}`)
+            this.$router.replace(path)
+            this.resolveCurrentTagLabel(path, `${row.__str__}`)
         },
-        toCreateModel(){
-          let url = `/${this.model.listUrl}create?${this.model.title_field}=${this.queries.search}`
-          this.$router.push(this.resolveRoutePath(url))
-          this.resolveCurrentTagLabel(url, `新增${this.model.verbose_name}`)
+        toCreateModel () {
+            let url = `/${this.model.listUrl}create?${this.model.title_field}=${this.queries.search}`
+            this.$router.push(this.resolveRoutePath(url))
+            this.resolveCurrentTagLabel(url, `新增${this.model.verbose_name}`)
         },
         onPageChanged (val) {
             this.page = val
         },
-        onPageSizeChanged (val){
+        onPageSizeChanged (val) {
             this.pageSize = val
         }
     },
     computed: {},
     watch: {
-        page(newVal, oldVal){
+        page (newVal, oldVal) {
             this.updateQueries({page: newVal})
         },
-        pageSize(newVal, oldVal){
+        pageSize (newVal, oldVal) {
             this.updateQueries({page_size: newVal})
         },
-        queries(newVal, oldVal){
+        queries (newVal, oldVal) {
             this.load()
         }
     }

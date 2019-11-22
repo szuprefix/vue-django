@@ -2,6 +2,7 @@
  * Created by denishuang on 2017/11/29.
  */
 import axios from '../configs/axios'
+import Qs from 'qs'
 export function joinErrors(errors) {
     let es = {}
     for (let n in errors) {
@@ -31,6 +32,24 @@ export function AppModel(config) {
         loadObject(id){
             return axios.get(`${this.listUrl}${id}/`).then(({data}) => {
                 return data
+            })
+        },
+        updateOrCreate(s, d){
+            return axios.get(`${this.listUrl}?${Qs.stringify(s)}`).then(({data}) => {
+                if (data.count === 1){
+                    id = data.results[0].id
+                    return Promise.resolve(id)
+                }else if (data.count > 1){
+                    return Promise.reject('不是唯一')
+                }else{
+                    return Promise.resolve(undefined)
+                }
+            }).then(id => {
+                if(id){
+                    return axios.put(`${this.listUrl}${id}/`, d)
+                }else{
+                    return axios.post(this.listUrl, d)
+                }
             })
         },
         genEmptyDataFromRestOptions(m){

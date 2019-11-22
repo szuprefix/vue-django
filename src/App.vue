@@ -1,11 +1,13 @@
 <template>
-    <div id="app"  v-cloak>
+    <div id="app" v-cloak>
         <router-view v-if="layout === 'main'">
         </router-view>
         <template v-else>
             <el-menu class="el-menu-demo" mode="horizontal" router>
-                <el-menu-item index="/" class="brand"><img :src="logo" height="32"><b
-                        v-if="user.as_saas_worker">{{user.as_saas_worker.party}}</b>{{system_name}}
+                <el-menu-item index="/" class="brand">
+                    <img :src="logo" height="32">
+                    <b v-if="user.as_saas_worker">{{user.as_saas_worker.party}}</b>
+                    {{system_name}}
                 </el-menu-item>
                 <el-submenu index="2" style="float:right">
                     <template slot="title">{{user.name}}</template>
@@ -63,5 +65,7 @@
 </script>
 
 <style>
-
+    [v-cloak] {
+        display: none;
+    }
 </style>

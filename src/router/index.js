@@ -24,6 +24,13 @@ let router = new Router({
     routes: constRoutes
 })
 
+function import_or_use_template(path, template){
+    return () => {
+        return import('@/views/' + path + '.vue').catch(() => {
+            return import(`../views/model/${template}.vue`)
+        })
+    }
+}
 
 export default router
 
@@ -60,7 +67,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
             let model = models[m]
             let mname = model.verbose_name
             let actions = model.actions || []
-            let itemActions = model.item_actions || []
+            let itemActions = model.itemActions || []
             children.push({
                 path: `/${a}/${m}/`,
                 name: `${a}-${m}-list`,
@@ -70,7 +77,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                     icon: model.icon,
                     permission: ['*']
                 },
-                component: _import(`${a}/${m}/list`)
+                component: import_or_use_template(`${a}/${m}/list`, 'list')
             })
             actions.forEach((action) => {
                 // console.log(`/${a}/${m}/${action.name}/`)
@@ -78,12 +85,12 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                     path: `/${a}/${m}/${action.name}/`,
                     name: `${a}-${m}-${action.name}`,
                     meta: {
-                        title: `${action.verbose_name}${mname}`,
+                        title: `${action.verbose_name || action.title}${mname}`,
                         model,
                         icon: model.icon,
                         permissions: action.permission || []
                     },
-                    component: _import(`${a}/${m}/${action.name}`)
+                    component: import_or_use_template(`${a}/${m}/${action.name}`, action.name)
                 })
             })
             children.push({
@@ -95,19 +102,19 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                     icon: model.icon,
                     permissions: ['change', 'add']
                 },
-                component: _import(`${a}/${m}/edit`)
+                component: import_or_use_template(`${a}/${m}/edit`, 'edit')
             })
             itemActions.forEach((action) => {
                 children.push({
                     path: `/${a}/${m}/:id/${action.name}/`,
                     name: `${a}-${m}-${action.name}`,
                     meta: {
-                        title: `${action.verbose_name}${mname}`,
+                        title: `${action.verbose_name || action.title}${mname}`,
                         model,
                         icon: model.icon,
                         permissions: action.permission || []
                     },
-                    component: _import(`${a}/${m}/${action.name}`)
+                    component: import_or_use_template(`${a}/${m}/${action.name}`, action.name)
                 })
             })
         })

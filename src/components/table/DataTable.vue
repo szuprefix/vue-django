@@ -1,21 +1,36 @@
 <template>
-    <el-table :data="_value" ref="table" :span-method="spanMethod" :cell-class-name="options.cellClassName">
+    <el-table slot="reference" :data="_value" ref="table" :span-method="spanMethod" v-loading="loading"
+              :element-loading-text="loading" :cell-class-name="elOptions.cellClassName" :row-class-name="elOptions.rowClassName"
+              :height="elOptions.height" :max-height="elOptions.maxHeight" :stripe="elOptions.stripe"
+              :border="elOptions.border">
         <template slot="left"></template>
         <data-table-column :field="f" v-for="f in _fields" :key="f.name"></data-table-column>
-        <template slot="right"></template>
+        <el-table-column label="" align="right" v-if="rowActions || topActions">
+            <template slot="header" slot-scope="scope" v-if="topActions">
+                <actions :items="topActions" :context="scope" :map="actionMap"></actions>
+            </template>
+            <template slot-scope="scope" v-if="rowActions">
+                <actions :items="rowActions" :context="scope" class="hover-show" trigger="hover"
+                         :map="actionMap"></actions>
+            </template>
+        </el-table-column>
+
+        <slot name="right">
+        </slot>
     </el-table>
 </template>
 <script>
-    import {percent, toThousandslsFilter} from '../../../utils/filters'
+    import {percent, toThousandslsFilter} from '../../utils/filters'
     import {sortBy} from 'lodash'
     import DataTableColumn from './DataTableColumn.vue'
-    function flatten(ns, children_field_name){
+    import Actions from '../layout/Actions.vue'
+    function flatten(ns, children_field_name) {
         let r = []
         ns.forEach(a => {
             let sns = a[children_field_name]
-            if(sns){
+            if (sns) {
                 r = r.concat(flatten(sns, children_field_name))
-            }else{
+            } else {
                 let n = Object.assign({}, a)
                 // delete n[children_field_name]
                 r.push(n)
@@ -27,22 +42,60 @@
     export default{
         props: {
             value: Array,
-            defaultWidget: [Function, Object],
+            cellWidget: [Function, Object],
+            headerWidget: [Function, Object],
             group: false,
-            options:{type:Object, default:() => {}},
+            options: {
+                type: Object, default: () => {
+                    return {}
+                }
+            },
             fields: {
                 type: Array, default: function () {
                     return [{name: '__str__', label: '名称'}]
                 }
             },
+            topActions: {
+                type: Array, default: () => {
+                    return ['download']
+                }
+            }
         },
         data () {
-            return {}
+            return {
+                loading: false,
+                actionMap: {
+                    'download': {
+                        icon: 'download',
+                        title: '导出',
+                        do: this.dumpExcelData
+                    }
+                }
+            }
         },
-        components: {DataTableColumn},
+        components: {DataTableColumn, Actions},
         methods: {
+            getGridData(data){
+                let ds = data.map((d) => {
+                    return this.fieldNames.map((a) => d[a])
+                })
+                return [this.fieldNames].concat(ds)
+            },
+            dumpExcelData(){
+                this.loading = '正在导出'
+                let data = this.value
+                import('xlsx').then(XLSX => {
+                    let wb = XLSX.utils.book_new()
+                    let sds = this.getGridData(data)
+                    let ws = XLSX.utils.aoa_to_sheet(sds)
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1')
+                    XLSX.writeFile(wb, `${this.options.title || '导出数据'}.xlsx`)
+                    this.loading = false
+                })
+
+            },
             doLayout () {
-              this.$refs.table.doLayout()
+                this.$refs.table.doLayout()
             },
             spanMethod ({row, column, rowIndex, columnIndex}){
                 if (!this.group) {
@@ -66,7 +119,8 @@
                 }
                 f.type = f.type || 'string'
                 f.align = f.align || ['decimal', 'number', 'percent', 'integer'].includes(f.type) && 'right' || 'left'
-                f.widget = f.widget || this.defaultWidget
+                f.widget = f.widget || this.cellWidget
+                f.headerWidget = f.headerWidget || this.headerWidget
                 f.formatter = f.formatter || this.genDefaultFormater(f)
                 if (f.subColumns) {
                     f.subColumns = f.subColumns.map(i => this.normalizeField(i))
@@ -120,8 +174,11 @@
                     return sortBy(this.value, this.fieldNames)
                 }
                 return this.value
+            },
+            elOptions () {
+                return this.options.elTable || {}
             }
         }
     }
 </script>
-<style scoped></style>
+

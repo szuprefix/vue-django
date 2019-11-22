@@ -74,7 +74,6 @@
             return {
                 edit: true,
                 view: true,
-                showAnswer: false,
                 records: [],
                 currentValue: null,
                 splitChar: '\t',
@@ -233,7 +232,3 @@
         }
     }
 </script>
-<style scoped>
-
-
-</style>

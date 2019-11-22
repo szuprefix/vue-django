@@ -11,7 +11,7 @@
         <r-form :formUrl="formUrl" :formItems="modelFormItems" v-model="formValue" ref="form"
                 @beforesubmit="onBeforeSubmit" :formInline="formInline"
                 :formMethod="formMethod" @form-posted="modelFormOnPosted" :formSubmit="modelFormSubmit"
-                :formTextareaSize="formTextareaSize">
+                :formTextareaSize="formTextareaSize" :options="restFormOptions">
             <span slot="submit" v-if="!formInline"></span>
         </r-form>
     </div>
@@ -32,6 +32,10 @@
                 type: Array, default: function () {
                     return ['delete', 'save']
                 }
+            },
+            options: {
+                type:Object,
+                default: () => { return {}}
             }
         },
         data () {
@@ -78,6 +82,9 @@
         computed: {
             top_actions(){
                 return this.get_actions(this.topActionList)
+            },
+            restFormOptions () {
+                return Object.assign({}, this.options && this.options.restForm)
             }
         },
         watch: {
@@ -91,4 +98,4 @@
         }
     }
 </script>
-<style scoped></style>
+

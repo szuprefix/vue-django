@@ -14,7 +14,7 @@
 <script>
     import BatchCreator from '../../utils/batch_creator'
     import CsvInput from '../widgets/CsvInput.vue'
-    import DataTable from '../layout/table/DataTable.vue'
+    import DataTable from '../table/DataTable.vue'
     import queue_limit from '../../utils/async_queue'
     export default{
         props: {

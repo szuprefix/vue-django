@@ -1,7 +1,6 @@
 import router from './index'
 import {asyncRouterMap} from './index'
 import store from '../store'
-import {Message} from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css'// progress bar style
 import {getToken, setToken, getLoginMode, removeToken} from '../utils/auth' // getToken from cookie
@@ -29,7 +28,7 @@ router.beforeEach((to, from, next) => {
                     // router.addRoutes(asyncRouterMap) //todo: make dynamics routers
                     next({...to, replace: true}) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
                 }).catch((error) => {
-                    Message.error('身份认证失败, 请重新登录')
+                    Vue.prototype.$message({message:'身份认证失败, 请重新登录', type:'error'})
                     next({path: loginUrl, query: {redirect: to.fullPath}})
                 })
             } else {
@@ -54,5 +53,5 @@ router.afterEach(() => {
 router.onError((err) => {
     NProgress.done()
     console.error(err)
-    Message.error(`发生异常:${err}`)
+    Vue.prototype.$message({message:`发生异常:${err}`, type:'error'})
 })

@@ -7,8 +7,13 @@ import server_response from './server_response'
 export  default {
     props: {
         tab: Object,
+        id: [Number, String],
         default: () => {
             return {}
+        },
+        options: {
+            type:Object,
+            default: () => { return {}}
         }
     },
     data () {
@@ -59,6 +64,9 @@ export  default {
     computed: {
         modelDetailUrl(){
             return this.$refs.form.modelDetailUrl
+        },
+        modelFormOptions(){
+            return Object.assign({}, options && options.modelForm)
         }
     },
     watch: {

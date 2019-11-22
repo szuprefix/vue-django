@@ -46,7 +46,7 @@ export default{
         getWidget (f) {
             return f.type == 'boolean' ? 'checkbox' : ( f.type == 'decimal' ? 'number' : 'text')
         },
-        _submit () {
+        doSubmit () {
             this.$emit('beforesubmit', this.values)
             this.loading = `正在${this.submitName}`
             if (this.submit) {
@@ -69,7 +69,7 @@ export default{
             let procedure = (valid) => {
                 if (valid) {
                     this.errors = {}
-                    this._submit()
+                    this.doSubmit()
                 } else {
                     this.$message({message: '表单检验未通过，请按提示修改', type: 'error'})
                     return false

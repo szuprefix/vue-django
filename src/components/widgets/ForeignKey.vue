@@ -1,5 +1,5 @@
 <template>
-    <a :href="`#/${field.model.replace('.','/')}/${value[prop]}/`" v-if="hasLink">
+    <a :href="`#/${field.model.replace('.','/')}/${value}/`" v-if="hasLink">
         {{theValue}}
     </a>
     <span v-else>
@@ -10,14 +10,14 @@
     import {Register} from 'vue-django/src/utils/app_model'
     export default{
         props: {
-            value: Object,
-            field: Object,
-            prop: String
+            value: [String, Number],
+            field: Object ,
+            context: Object
         },
         computed: {
             theValue(){
-                let n = `${this.prop}_name`
-                return this.value[n] || this.value[this.prop]
+                let n = `${this.field.name}_name`
+                return this.context[n] || this.value
             },
             hasLink(){
                 return Register.configs[this.field.model]

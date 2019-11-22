@@ -1,59 +1,95 @@
 <template>
-    <div>
-        <el-button-group v-if="showActions.length>0">
-            <template v-for="a in showActions">
-                <el-button :type="a.type" :title="a.title" size="small" @click="handleCommand(a.do)" v-if="!a.show || a.show()" :key="a.name">
-                    <i :class="`fa fa-${a.icon}`"></i>
-                </el-button>
-            </template>
-        </el-button-group>
-        <el-dropdown v-if="dropdownActions.length>0" @command="handleCommand" size="small" :trigger="trigger">
+    <el-button-group v-if="showActions.length>0">
+        <template v-for="a in showActions">
+            <el-button :type="a.type" :title="a.title" :size="size" @click="handleCommand(a.do)"
+                       v-if="!a.show || a.show()" :key="a.name">
+                <i :class="`fa fa-${a.icon}`"></i>{{a.label}}
+            </el-button>
+        </template>
+        <el-dropdown v-if="dropdownActions.length>0" @command="handleCommand" :size="size" :trigger="trigger">
           <span>
-            <i class="el-icon-arrow-down el-icon--right" style="margin-right: 1rem"></i>
+            <i class="el-icon-arrow-down el-icon--right" style="margin: 0 0.5rem;"></i>
           </span>
             <el-dropdown-menu slot="dropdown">
                 <template v-for="a in dropdownActions">
-                    <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name"
+                    <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
                                       :icon="`fa fa-${a.icon}`">
-                        {{a.title}}
+                        {{a.label || a.title}}
                     </el-dropdown-item>
                 </template>
             </el-dropdown-menu>
         </el-dropdown>
-    </div>
+    </el-button-group>
 </template>
 <script>
+    import array_normalize from '../../utils/array_normalize'
     export default{
         props: {
             items: Array,
             context: Object,
-            trigger: {type: String, default: "hover"}
+            trigger: {type: String, default: "hover"},
+            map: {
+                type: Object, default: () => {
+                    return {}
+                }
+            },
+            permissionFunction: Function,
+            size: {type: String, default: "small"}
         },
         data () {
-            return {}
+            return {
+                _items: []
+            }
         },
         components: {},
+        created () {
+            this.normalizeItems()
+        },
         methods: {
             handleCommand (command) {
                 command(this.context)
-            }
+            },
+            normalizeItem(a)
+            {
+                if(a instanceof Array) {
+                    return array_normalize(a, this.map, this.normalizeItem)
+                }
+                if (!a.show && this.permissionFunction && a.permission) {
+                    a.show = () => this.permissionFunction(a.permission)
+//                    console.log(a)
+                }
+                return a
+            },
+            normalizeItems() {
+                this._items = array_normalize(this.items, this.map, this.normalizeItem)
+            },
         },
         computed: {
+//            _items (){
+//                return this.items.map(a => {
+//                    if (typeof a === 'string') {
+//                        a = this.map[a]
+//                    }
+//                    return a
+//                })
+//            },
             showActions () {
-                return this.items.filter((a) => {
+                return this._items.filter((a) => {
                     return !(a instanceof Array)
                 })
             },
             dropdownActions () {
-                return this.items.filter((a) => {
+                return this._items.filter((a) => {
                     return (a instanceof Array)
                 }).reduce((a, b) => a.concat(b), []).filter((a) => {
                     return !a.show || a.show()
                 })
             }
+        },
+        watch: {
+            items () {
+                this.normalizeItems()
+            }
         }
     }
 </script>
-<style scoped>
-
-</style>

@@ -17,7 +17,7 @@
                   :format="field.widget=='datetime'?'YYYY-MM-DD HH:mm':'YYYY-MM-DD'"
                   v-else-if="field.widget in ['date','datetime']"></datetime>
         <x-textarea :title="field.label" v-model="value[field.name]" :required="field.required"
-                    :placeholder="field.help_text"
+                    :placeholder="field.help_text" autosize
                     v-else-if="field.widget === 'textarea'"></x-textarea>
         <component :title="field.label" :is="extraWidgets[f.widget]" v-else-if="field.widget in extraWidgets"
                    v-model="value[field.name]"></component>
@@ -79,4 +79,4 @@
         computed: {}
     }
 </script>
-<style scoped></style>
+

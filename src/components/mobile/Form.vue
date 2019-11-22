@@ -31,8 +31,9 @@
                            :ref="field.name"
                            :placeholder="field.label" v-model="formValue[field.name]" :field="field"></component>
                 <x-input :title="field.label" v-else v-model="formValue[field.name]" :required="field.required"
-                         :placeholder="field.help_text"
-                         :ref="field.name"
+                         :placeholder="field.help_text" :equal-with="field.equalWith"
+                         :icon-type="formErrors[field.name]?'error':null"
+                         :ref="field.name" :keyboard="field.keyboard" @on-click-error-icon="showError(field)"
                          :is-type="field.isType" :mask="field.mask" :max="field.max"
                          :type="field.widget == 'password'?field.widget:'text'"></x-input>
             </template>
@@ -44,7 +45,7 @@
     </div>
 </template>
 <script>
-    import form_view from '../../mixins/form_view'
+    import formView from '../../mixins/form_view'
     import {
         Group,
         Cell,
@@ -60,7 +61,7 @@
     } from 'vux'
     export default{
         mixins: [
-            form_view
+            formView
         ],
 
         props: {
@@ -80,15 +81,28 @@
             XButton,
             Box
         },
-        created(){
+        created () {
             this.formValue = this.value
         },
+        methods: {
+            showError (field) {
+                this.$message({message: this.formErrors[field.name], type: 'error'})
+            }
+        },
         watch: {
-            value(val){
+            value (val) {
                 this.formValue = val
-
+            },
+            formErrors (val) {
+                if ((val instanceof Object) && !(val instanceof Array)) {
+                    Object.keys(val).forEach(k => {
+                        let f = this.$refs[k][0]
+                        f.$data.errors.invalid = val[k]
+                        f.$data.valid = false
+                    })
+                }
             }
         }
     }
 </script>
-<style scoped></style>
+

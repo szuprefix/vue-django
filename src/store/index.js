@@ -11,33 +11,32 @@ const state = {
     user: {},
     apps,
     system_name: '',
-    logo:require('../assets/logo.png'),
+    logo: require('../assets/logo.png')
 }
-
 
 var store = new Vuex.Store({
     state: state,
     mutations: {
-        setUser(state, payload){
+        setUser (state, payload) {
             // console.log(payload)
             state.user = payload
-            state.bus.$emit("get-user-info", payload)
+            state.bus.$emit('get-user-info', payload)
         },
-        clearUser(state){
+        clearUser (state) {
             state.user = {}
-            state.bus.$emit("user-logout")
+            state.bus.$emit('user-logout')
         }
     },
     actions: {
-        getUserInfo (context){
-            return Vue.http.get("/auth/user/current/").then(({data}) => {
-                context.commit("setUser", data)
+        getUserInfo (context) {
+            return Vue.http.get('/auth/user/current/').then(({data}) => {
+                context.commit('setUser', data)
                 return data
             })
         },
-        logout (context){
+        logout (context) {
             return logout().then((data) => {
-                context.commit("clearUser")
+                context.commit('clearUser')
                 return data
             })
         }
@@ -45,5 +44,5 @@ var store = new Vuex.Store({
     plugins: []
 })
 // Vue.prototype.$store = Vue.store =store
-// store.dispatch("getUserInfo").catch((e) => {console.error(e)})
+// store.dispatch('getUserInfo').catch((e) => {console.error(e)})
 export default store

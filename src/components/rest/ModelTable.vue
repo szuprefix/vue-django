@@ -46,9 +46,9 @@
                              :filter-method="f.name in modelTableFilters?filterHandler:undefined"
                              :key="f.columnKey || f.name">
                 <template slot-scope="{row}">
-                    <form-widget v-if="f.useFormWidget" v-model="row" :field="f"
+                    <form-widget v-if="f.useFormWidget" v-model="row" :field="f" :context="row"
                                  @change="onCellValueChange"></form-widget>
-                    <component :is="f.widget" v-model="row" :prop="f.name" :field="f.field"
+                    <component :is="f.widget" v-model="row[f.name]" :field="f.field" :context="row"
                                v-else-if="f.widget && typeof f.widget == 'object'"></component>
                     <span v-else-if="f.widget && typeof f.widget == 'function'" v-html="f.widget(row)"></span>
                     <template v-else>{{row[f.name]}}</template>
@@ -115,7 +115,7 @@
                     return this.modelTableItems.map((a) => {
                         let v = d[a.name]
                         if (a.choices) {
-                            return a.choices.find(a => a.value===v).display_name
+                            return a.choices.find(a => a.value === v).display_name
                         } else if (a.model) {
                             return d[`${a.name}_name`]
                         }

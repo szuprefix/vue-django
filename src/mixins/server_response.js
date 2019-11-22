@@ -66,12 +66,12 @@ export default  {
             if(error == 'cancel'){  // confirm dialog cancel ?
                return
             }
-            if ([404,403,405,429].includes(error.code) && error.msg.detail) {
+            if ([404,403,405,429, 537].includes(error.code) && error.msg.detail) {
                 error.msg = error.msg.detail
             }
             console.log(error)
             if (error.code === 400) {
-                this.errors = this.formErrors = joinErrors(error.msg)
+                // this.errors = this.formErrors = joinErrors(error.msg)
             } else if (error.code === 401) {
                 this.$store.state.bus.$emit("user-logout")
             } else if (error.code === 502){
@@ -79,7 +79,8 @@ export default  {
             } else {
                 this.alertError(error)
             }
-            this.server_response_error = error
+            return error
+            // this.server_response_error = error
         },
 
         resolveRoutePath(path) {
