@@ -36,7 +36,7 @@
         methods : {
             reload () {
                 this.menu = Object.assign({}, reload(this.user.model_permissions))
-                console.log(this.menu)
+//                console.log(this.menu)
             }
         },
         created () {
