@@ -22,6 +22,8 @@
 <script>
     import {mapState} from 'vuex'
     import menus from '@/configs/menus'
+    import {reload} from '@/configs/menus'
+    import {genMenusFromApps} from 'vue-django/src/configs/menus'
 
     export default {
         computed: mapState(['user']),
@@ -30,6 +32,15 @@
                 menus,
                 defaultOpeneds: ['0']
             }
+        },
+        methods : {
+            reload () {
+                this.menu = Object.assign({}, reload(this.user.model_permissions))
+                console.log(this.menu)
+            }
+        },
+        created () {
+            this.$store.state.bus.$on('get-user-info', this.reload)
         }
     }
 </script>

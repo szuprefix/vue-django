@@ -62,7 +62,7 @@
                     return {}
                 }
             },
-            pk: {type: String, default: 'code'}
+            pk: {type: String}
         },
         data () {
             return {
@@ -170,7 +170,7 @@
             },
             postOne(){
                 let qi = this.queueIndex
-                let pkn = this.pk || this.viewConfig.pk
+                let pkn = this.pk || this.viewConfig.pk || 'code'
                 if (qi < this.records.length) {
                     let a = Object.assign({}, this.defaults, this.records[qi])
                     this.translateForeignKey(a)

@@ -8,7 +8,7 @@
         <table-column :field="f" v-for="f in _items" :key="f.name"></table-column>
         <el-table-column label="" align="right" v-if="rowActions || topActions">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="_topActions" :context="scope" :map="avairableActions"></actions>
+                <actions :items="_topActions" :context="scope" :permissionFunction="options.permissionFunction" :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
                 <actions :items="_rowActions" :context="scope" class="hover-show" trigger="hover"

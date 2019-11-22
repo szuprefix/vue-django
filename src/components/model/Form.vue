@@ -62,6 +62,7 @@
                         title: '保存',
                         label: '',
                         do: this.onSubmit,
+                        show: () => this.checkPermission('create') || this.checkPermission('update'),
                         type: 'primary'
                     },
                     'refresh': {
@@ -77,13 +78,14 @@
                         label: '',
                         do: this.toDelete,
                         type: 'danger',
-                        show: () => this.mid && this.checkPermission('delete')
+                        show: () => this.mid && this.checkPermission('destroy')
                     },
                     'saveAndAnother': {
                         icon: 'floppy-o',
                         label: '+',
                         title: '保存并新增另一个',
-                        do: this.saveAndAnother
+                        do: this.saveAndAnother,
+                        show: () => this.checkPermission('create') || this.checkPermission('update')
                     }
                 }
             }
@@ -126,7 +128,7 @@
                 }).catch(() => {
                     return {}
                 }).then(config => {
-                    return config.items || this.model.config.formItems || Object.values(this.model.options.actions.POST).filter(a => a.read_only !== true)
+                    return config.items || Object.values(this.model.options.actions.POST).filter(a => a.read_only !== true)
                 })
             },
 
@@ -157,7 +159,7 @@
             clear () {
                 this.model.clear()
                 this.mid = this.model.id = undefined
-                this.formValue = Object.assign({}, this.model.data)
+                this.formValue = Object.assign({}, this.model.data, this.defaults)
                 this.$nextTick(this.$refs.form.$refs.form.clearValidate)
             },
             onDelete(){

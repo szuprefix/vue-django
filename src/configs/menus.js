@@ -9,7 +9,7 @@
  course:null
  }
  */
-export function genMenusFromApps(apps, menus) {
+export function genMenusFromApps(apps, menus, modelPermissions) {
     if (!menus) {
         menus = Object.keys(apps)
     } else if (typeof menus == 'object') {
@@ -29,13 +29,19 @@ export function genMenusFromApps(apps, menus) {
             let menu = m
             if (typeof m == 'string') {
                 let model = app.models[m]
-                menu = {name: model.verbose_name, icon: model.icon || 'file', url: `/${a}/${m}/`, hidden:model.hidden}
+                let mn = `${a}.${m}`
+                let hidden = model.hidden
+                if(hidden === undefined &&  modelPermissions) {
+                    hidden = (mn in modelPermissions)? false:true
+                }
+                menu = {name: model.verbose_name, icon: model.icon || 'file', url: `/${a}/${m}/`, hidden}
             }
             return menu
         })
         return {name: app.verbose_name, items, icon:app.icon || 'file', hidden:app.hidden}
     })
 }
+
 let menus = {
     items: []
 }

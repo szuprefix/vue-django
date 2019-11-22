@@ -14,7 +14,7 @@
                 <template v-for="a in dropdownActions">
                     <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
                                       :icon="`fa fa-${a.icon}`">
-                        {{a.label||a.title}}
+                        {{a.label || a.title}}
                     </el-dropdown-item>
                 </template>
             </el-dropdown-menu>
@@ -22,6 +22,7 @@
     </el-button-group>
 </template>
 <script>
+    import array_normalize from '../../utils/array_normalize'
     export default{
         props: {
             items: Array,
@@ -32,26 +33,46 @@
                     return {}
                 }
             },
+            permissionFunction: Function,
             size: {type: String, default: "small"}
         },
         data () {
-            return {}
+            return {
+                _items: []
+            }
         },
         components: {},
+        created () {
+            this.normalizeItems()
+        },
         methods: {
             handleCommand (command) {
                 command(this.context)
-            }
+            },
+            normalizeItem(a)
+            {
+                if(a instanceof Array) {
+                    return array_normalize(a, this.map, this.normalizeItem)
+                }
+                if (!a.show && this.permissionFunction && a.permission) {
+                    a.show = () => this.permissionFunction(a.permission)
+//                    console.log(a)
+                }
+                return a
+            },
+            normalizeItems() {
+                this._items = array_normalize(this.items, this.map, this.normalizeItem)
+            },
         },
         computed: {
-            _items (){
-                return this.items.map(a => {
-                    if (typeof a === 'string') {
-                        a = this.map[a]
-                    }
-                    return a
-                })
-            },
+//            _items (){
+//                return this.items.map(a => {
+//                    if (typeof a === 'string') {
+//                        a = this.map[a]
+//                    }
+//                    return a
+//                })
+//            },
             showActions () {
                 return this._items.filter((a) => {
                     return !(a instanceof Array)
@@ -63,6 +84,11 @@
                 }).reduce((a, b) => a.concat(b), []).filter((a) => {
                     return !a.show || a.show()
                 })
+            }
+        },
+        watch: {
+            items () {
+                this.normalizeItems()
             }
         }
     }

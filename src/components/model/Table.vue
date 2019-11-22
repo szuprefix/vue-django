@@ -1,6 +1,6 @@
 <template>
     <div>
-        <search v-model="search" :options="searchOptions" :model="model" :exclude="_baseQueries" ref="search"
+        <search v-model="search" :model="model" :exclude="_baseQueries" ref="search"
                 @change="onSearch"></search>
         <batch-actions :items="batchActionItems" :count="selection.length" @done="refresh" :context="{selection}"
                        v-if="batchActionItems.length>0"></batch-actions>
@@ -78,7 +78,7 @@
                         icon: 'plus-square',
                         label: '添加',
                         do: this.addToParent,
-                        show: () => this.checkPermission('create', this.parent)
+                        show: () => this.checkPermission('create') && this.checkPermission('update', this.parent)
                     },
                     'edit': {
                         icon: 'pencil',
@@ -91,7 +91,7 @@
                         title: '删除',
                         do: this.toDeleteModel,
                         type: 'danger',
-                        show: () => this.checkPermission('delete')
+                        show: () => this.checkPermission('destroy')
                     },
                     'removeFromParent': {
                         icon: 'trash',
@@ -120,10 +120,8 @@
         },
         methods: {
             init () {
-                this.model.loadOptions().then((data) => {
-                    let search = this.model.options.actions.SEARCH
+                this.model.loadOptionsAndViewsConfig().then((data) => {
                     this.$refs.search.init()
-//                    this.orderingFields = search.ordering_fields
                     return this.normalizeItems()
                 }).then(() => {
                     this.parentQueries = Object.assign({}, this.getParentQueries())
@@ -234,19 +232,13 @@
                 })
             },
             getConfig () {
-                return import(`@/views${this.model.getListUrl()}config.js`).then(m => {
-                    return m.default.list
-                }).catch(() => {
-                    return {}
-                }).then(config => {
-
-                    let listItems = this.items || config.items || this.model.config.listItems || Object.values(this.model.fieldConfigs).filter(a => ['name', 'title'].includes(a.name))
-                    if (!listItems || listItems.length === 0) {
-                        listItems = ['__str__']
-                    }
-                    let batchActions = this.batchActions || config.batchActions || this.model.config.batchActions || []
-                    return {listItems, batchActions}
-                })
+                let config = this.model.viewsConfig.list || {}
+                let listItems = this.items || config.items || Object.values(this.model.fieldConfigs).filter(a => ['name', 'title'].includes(a.name))
+                if (!listItems || listItems.length === 0) {
+                    listItems = ['__str__']
+                }
+                let batchActions = this.batchActions || config.batchActions || []
+                return Promise.resolve({listItems, batchActions})
             },
             defaultWidget(f){
                 if (f.model) {
@@ -298,17 +290,14 @@
                         if (f && f.multiple !== true) {
                             r[f.name] = pid
                         } else {
-                            f = fs.find(a => a.model === 'contenttypes.contenttype')
-                            if (f) {
-                                r[f.name] = this.parent.options.content_type_id
-                                let idf = `${f.name.replace('_type', '_id')}`   // todo: 要更严谨些
-                                if (!this.model.fieldConfigs[idf]) {
-                                    idf = 'object_id'
+                            let popt = this.model.options
+                            if (popt.generic_foreign_key) {
+                                let {ct_field, fk_field} = popt.generic_foreign_key
+                                r[ct_field] = this.parent.options.content_type_id
+                                if (!this.model.fieldConfigs[fk_field]) {
+                                    throw Error(`genric foreign key id_field:${id_field} not found.`)
                                 }
-                                if(!this.model.fieldConfigs[idf] ){
-                                    throw Error('genric foreign key id field not found.')
-                                }
-                                r[idf] = pid
+                                r[fk_field] = pid
                             }
                         }
 
@@ -340,23 +329,23 @@
                         }
                     })
                 }
-                return mergeOptions({
+                let dopt = this.model.viewsConfig.list
+                dopt = dopt && dopt.options && dopt.options.remoteTable || {}
+                return mergeOptions(mergeOptions({
                     table: {
                         avairableActions: {...this.avairableActions, ...bactions},
                         excelFormat: this.excelFormat,
                         topActions: ['refresh', 'create', ['download'].concat(Object.keys(bactions))],
                         rowActions: ['edit', [this.parentMultipleRelationField ? 'removeFromParent' : 'delete']],
                         dblClickAction: 'edit',
+                        permissionFunction: this.checkPermission,
                         elTable: {
                             onSelectionChange: this.onSelectionChange
                         },
                         title: this.model.config.verbose_name
                     }
-                }, this.options.remoteTable)
+                }, dopt), this.options.remoteTable)
             },
-//            parentQueries () {
-//                return this.getParentQueries()
-//            },
             _baseQueries () {
                 return Object.assign({}, this.parentQueries, this.baseQueries)
             }
