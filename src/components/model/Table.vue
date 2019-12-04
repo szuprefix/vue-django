@@ -17,8 +17,15 @@
         </el-drawer>
 
         <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" @loaded="onLoaded" v-if="optionLoaded"
-                      :baseQueries="_baseQueries"
-                      :options="rtOptions"></remote-table>
+                      :baseQueries="_baseQueries" v-bind="rtAttrs" v-on="$listeners">
+
+            <template slot="left" v-if="$slots.left">
+                <slot name="left"></slot>
+            </template>
+            <template slot="right" v-if="$slots.right">
+                <slot name="right"></slot>
+            </template>
+        </remote-table>
     </div>
 </template>
 <script>
@@ -104,7 +111,8 @@
                         title: '批量创建',
                         do: this.toBatchCreateModel,
                         show: () => this.checkPermission('create')
-                    }
+                    },
+                    ...this.$attrs.avairableActions
                 }
             }
         },
@@ -319,7 +327,7 @@
                     }
                 }
             },
-            rtOptions () {
+            rtAttrs () {
                 let bactions = {}
                 if (this.model.config.actions) {
                     this.model.config.actions.forEach(a => {
@@ -329,22 +337,17 @@
                         }
                     })
                 }
-                let dopt = this.model.viewsConfig.list
-                dopt = dopt && dopt.options && dopt.options.remoteTable || {}
-                return mergeOptions(mergeOptions({
-                    table: {
-                        avairableActions: {...this.avairableActions, ...bactions},
-                        excelFormat: this.excelFormat,
-                        topActions: ['refresh', 'create', ['download'].concat(Object.keys(bactions))],
-                        rowActions: ['edit', [this.parentMultipleRelationField ? 'removeFromParent' : 'delete']],
-                        dblClickAction: 'edit',
-                        permissionFunction: this.checkPermission,
-                        elTable: {
-                            onSelectionChange: this.onSelectionChange
-                        },
-                        title: this.model.config.verbose_name
-                    }
-                }, dopt), this.options.remoteTable)
+                return {
+                    topActions: ['refresh', 'create', ['download'].concat(Object.keys(bactions))],
+                    rowActions: ['edit', [this.parentMultipleRelationField ? 'removeFromParent' : 'delete']],
+                    excelFormat: this.excelFormat,
+                    permissionFunction: this.checkPermission,
+                    dblClickAction: 'edit',
+                    'selection-change': this.onSelectionChange,
+                    title: this.model.config.verbose_name,
+                    ...this.$attrs,
+                    avairableActions: this.avairableActions
+                }
             },
             _baseQueries () {
                 return Object.assign({}, this.parentQueries, this.baseQueries)

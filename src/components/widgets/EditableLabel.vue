@@ -1,14 +1,15 @@
 <template>
-  <span :contenteditable="editable" @dblclick.stop="toEdit" @blur="changed" class="xyz-editable-span">
+  <span :contenteditable="editable" @dblclick.stop="toEdit" @keyup="onInput" @focus="onFocus" @blur="checkChanged"
+        class="xyz-editable-span">
   </span>
 </template>
 <script>
-    function setCaretPosition(textDom, pos){
-        if(textDom.setSelectionRange) {
+    function setCaretPosition(textDom, pos) {
+        if (textDom.setSelectionRange) {
             // IE Support
             textDom.focus();
             textDom.setSelectionRange(pos, pos);
-        }else if (textDom.createTextRange) {
+        } else if (textDom.createTextRange) {
             // Firefox support
             var range = textDom.createTextRange();
             range.collapse(true);
@@ -25,45 +26,80 @@
                 type: Object, default: () => {
                     return {}
                 }
-            }
+            },
+            always: false
         },
         data () {
             return {
-                editable: false
+                _value: undefined,
+                lastValue: undefined,
+                editable: this.always || this.field.alwaysEditable
             }
         },
         components: {},
         mounted() {
-            this.setValue(this.value)
+            this.$el.innerText = this._value = this.formatValue(this.value)
         },
         methods: {
-            setValue(v){
-                this.$el.innerText = v
+            onInput () {
+                let v = this.parseValue(this.$el.innerText)
+                let t = this.formatValue(v)
+                if (t !== this.$el.innerText) {
+                    this.$el.innerText = t
+                }
+
+                this.$emit('input', v)
             },
-            changed(){
-                let v = this.$el.innerText
+            formatValue (v) {
+                return [undefined, null].includes(v) ? '' : String(v)
+            },
+//            setValue(v){
+//                this._value = this.formatValue(v)
+////                if (this.$el.innerText !== v) {
+////                    this.lastValue = this.$el.innerText = v
+////                }
+//            },
+            parseValue (v) {
                 let t = this.field.type
                 if (t === 'integer') {
-                    v = Number.parseInt(v)
-                } else if (['number','decimal','float'].includes(t)) {
-                    v = Number.parseFloat(v)
+                    v = v !== undefined && Number.parseInt(v) || undefined
+                } else if (['number', 'decimal', 'float'].includes(t)) {
+                    v = v !== undefined && Number.parseFloat(v) || undefined
                 }
-                this.$emit('input', v)
-                this.editable = false
+                return v
+            },
+            onFocus () {
+                this.lastValue = this._value
+            },
+            checkChanged () {
+                if (this.lastValue !== this._value) {
+                    this.changed()
+                }
+            },
+            changed(){
+                let v = this.parseValue(this._value)
+                this.$emit('change', v)
+                this.editable = this.always || this.field.alwaysEditable
             },
             toEdit() {
-                this.editable = true
-                setTimeout( () => {
-                    this.$el.focus()
+                if (!this.editable) {
+                    this.editable = true
+                    setTimeout(() => {
+                        this.$el.focus()
 //                    let l = this.value && this.value.length || 0
 //                    setCaretPosition(this.$el,l)
-                }, 50)
+                    }, 50)
+                }
             }
         },
         computed: {},
         watch: {
             value(val){
-                this.setValue(val)
+                this._value = this.formatValue(val)
+            },
+            _value(val) {
+                this.$el.innerText = val
+                this.$emit('change', this.parseValue(val))
             }
         }
     }
@@ -71,6 +107,9 @@
 <style>
     .xyz-editable-span {
         display: inline-block;
-        min-width: 4rem;
+        min-width: 6rem;
     }
+  .integer .xyz-editable-span {
+    min-width: 2rem;
+  }
 </style>
