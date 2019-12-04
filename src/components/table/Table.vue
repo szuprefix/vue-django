@@ -116,13 +116,19 @@
                 })
             },
             normalizeItem(f){
+                if(typeof f === 'string'){
+                    f = {name:f}
+                }
                 f.type = f.type || 'string'
                 f.align = f.align || ['decimal', 'number', 'percent', 'integer'].includes(f.type) && 'right' || 'left'
                 f.widget = f.widget || this.cellWidget
                 f.headerWidget = f.headerWidget || this.headerWidget
                 f.formatter = f.formatter || this.genDefaultFormater(f)
                 if (f.subColumns) {
-                    f.subColumns = f.subColumns.map(i => this.normalizeField(i))
+                    f.subColumns = f.subColumns.map(i => this.normalizeItem(i))
+                }
+                if (f.rows) {
+                    f.rows = f.rows.map(i => this.normalizeItem(i))
                 }
                 return f
             },

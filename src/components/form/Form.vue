@@ -12,9 +12,9 @@
             <template v-for="f in formItems" v-if="canEdit(f)">
                 <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
                         :key="f.name" v-if="!elOptions.inline && !elOptions.oneColumn && f.widget !== 'hidden'">
-                    <form-item :field="f" v-model="formValue" :options="options" :error="errors[f.name]"></form-item>
+                    <item :field="f" v-model="formValue" :options="options" :error="errors[f.name]"></item>
                 </el-col>
-                <form-item :field="f" v-model="formValue" :options="options" :error="errors[f.name]" v-else></form-item>
+                <item :field="f" v-model="formValue" :options="options" :error="errors[f.name]" v-else></item>
 
             </template>
             <slot name="submit">
@@ -35,7 +35,7 @@
 <script>
     import server_response from '../../mixins/server_response'
     import schema from 'async-validator'
-    import FormItem from './FormItem.vue'
+    import Item from './Item.vue'
     import Form from './Form'
     import Actions from '../layout/Actions.vue'
     export default{
@@ -63,7 +63,7 @@
             },
             successInfo: String
         },
-        components: {FormItem, Actions},
+        components: {Item, Actions},
         data () {
             return {
                 errors: {},
