@@ -22,7 +22,7 @@
                      :controls="field.type === 'integer'" @change="fieldValueChanged">
     </el-input-number>
     <el-date-picker v-model="value[field.name]" :type="field.widget" value-format="yyyy-MM-ddTHH:mm:ss"
-                    :placeholder="field.placeholder || field.label"
+                    :placeholder="field.placeholder || field.label" :readonly="field.read_only"
                     v-else-if="['date','datetime'].includes(field.widget)"
                     @change="fieldValueChanged" :disabled="field.disabled">
     </el-date-picker>

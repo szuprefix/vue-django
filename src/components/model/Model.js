@@ -3,6 +3,7 @@
  */
 import {Register} from '../../utils/app_model'
 import axios from '../../configs/axios'
+import Qs from 'qs'
 // import store from '../store'
 export function joinErrors(errors) {
     let es = {}
@@ -96,6 +97,20 @@ export default function (appModel, defaults, eventor) {
                 this.emitPosted(this.id)
                 return data
             }) // .catch((error) => this.onErrors(error))
+        },
+        selectOrCreate (d) {
+            let url = this.getListUrl()
+            return axios.get(`${url}?${Qs.stringify(d)}`).then(({data}) => {
+                if(data.count === 1) {
+                    return data.results[0]
+                } else if (data.count === 0 ) {
+                    return axios.post(url, d). then(({data}) => {
+                        return data
+                    })
+                } else {
+                    throw Error('记录不唯一')
+                }
+            })
         },
         removeRelateObject (rel, id) {
             this.data[rel] = this.data[rel].filter(a => a !== id)

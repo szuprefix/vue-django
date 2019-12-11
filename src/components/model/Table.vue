@@ -1,6 +1,6 @@
 <template>
     <div>
-        <search v-model="search" :model="model" :exclude="_baseQueries" ref="search"
+        <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search" v-if="showSearch"
                 @change="onSearch"></search>
         <batch-actions :items="batchActionItems" :count="selection.length" @done="refresh" :context="{selection}"
                        v-if="batchActionItems.length>0"></batch-actions>
@@ -16,8 +16,8 @@
             </slot>
         </el-drawer>
 
-        <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" @loaded="onLoaded" v-if="optionLoaded"
-                      :baseQueries="_baseQueries" v-bind="rtAttrs" v-on="$listeners">
+        <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" v-if="optionLoaded"
+                      v-bind="rtAttrs" v-on="$listeners">
 
             <template slot="left" v-if="$slots.left">
                 <slot name="left"></slot>
@@ -49,6 +49,8 @@
         props: {
             appModel: String,
             items: Array,
+            searchItems: Array,
+            showSearch: true,
             baseQueries: {
                 type: Object, default: () => {
                     return {}
@@ -129,12 +131,13 @@
         methods: {
             init () {
                 this.model.loadOptionsAndViewsConfig().then((data) => {
-                    this.$refs.search.init()
+                    if(this.$refs.search) {
+                        this.$refs.search.init()
+                    }
+                    this.parentQueries = Object.assign({}, this.getParentQueries())
                     return this.normalizeItems()
                 }).then(() => {
-                    this.parentQueries = Object.assign({}, this.getParentQueries())
                     this.optionLoaded = true
-//                    this.$refs.table.updateQueries({})
                 }).catch(this.onServerResponseError)
             },
             refresh () {
@@ -346,6 +349,7 @@
                     'selection-change': this.onSelectionChange,
                     title: this.model.config.verbose_name,
                     ...this.$attrs,
+                    baseQueries: this._baseQueries,
                     avairableActions: this.avairableActions
                 }
             },

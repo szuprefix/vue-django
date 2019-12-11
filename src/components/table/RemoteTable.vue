@@ -9,7 +9,7 @@
             </template>
         </x-table>
         <!--<div class="pager-container">-->
-        <el-pagination v-if="count>pageSize || showPagger"
+        <el-pagination v-if="showPagger && count>pageSize"
                        background
                        layout="total, sizes, prev, pager, next, jumper"
                        :page-size="pageSize"
@@ -38,6 +38,11 @@
                 }
             },
             url: String,
+            showPagger: {
+                type: Boolean, default: function () {
+                    return true
+                }
+            },
             pageSize: {type: Number, default: () => DEFAULT_PAGE_SIZE},
         },
         data () {
