@@ -7,6 +7,7 @@
                 @change="onSearch"
                 clearable
                 :style="`width:${searchFieldNames.length+5}rem;min-width:10rem;`"
+                ref="search"
                 v-if="searchFields.length>0">
         </el-input>
         <template v-for="f in filterFields" v-if="! (f.name in exclude)">

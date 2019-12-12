@@ -1,11 +1,15 @@
 <template>
-    <div>
-        <x-table :items="items" :cellWidget="tOptions.cellWidget" v-model="data" v-loading="loading"
-                 :element-loading-text="loading" :topActions="tOptions.topActions" :rowActions="tOptions.rowActions"
-                 :headerWidget="tOptions.headerWidget" :group="group" :dblClickAction="tOptions.dblClickAction" :options="tOptions">
+    <div v-loading="loading" :element-loading-text="loading">
+        <x-table :items="items" v-model="data" v-on="$listeners" v-bind="tAttrs">
+            <template slot="left" v-if="$slots.left">
+                <slot name="left"></slot>
+            </template>
+            <template slot="right" v-if="$slots.right">
+                <slot name="right"></slot>
+            </template>
         </x-table>
         <!--<div class="pager-container">-->
-        <el-pagination v-if="count>pageSize || showPagger"
+        <el-pagination v-if="showPagger && count>pageSize"
                        background
                        layout="total, sizes, prev, pager, next, jumper"
                        :page-size="pageSize"
@@ -33,13 +37,12 @@
                     return {}
                 }
             },
-            options: {
-                type: Object,
-                default: () => {
-                    return {}
+            url: String,
+            showPagger: {
+                type: Boolean, default: function () {
+                    return true
                 }
             },
-            url: String,
             pageSize: {type: Number, default: () => DEFAULT_PAGE_SIZE},
         },
         data () {
@@ -56,6 +59,7 @@
                         title: '刷新',
                         do: this.refresh
                     },
+                    ...this.$attrs.avairableActions
                 }
             }
         },
@@ -100,12 +104,13 @@
             }
         },
         computed: {
-            tOptions () {
-                return mergeOptions({
+            tAttrs () {
+                return {
                     excelGetAllData: this.excelGetAllData,
-                    avairableActions: this.avairableActions,
-                    topActions:['refresh', 'download']
-                }, this.options.table)
+                    topActions: ['refresh', 'download'],
+                    ...this.$attrs,
+                    avairableActions: this.avairableActions
+                }
             },
 
         },

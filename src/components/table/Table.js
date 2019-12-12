@@ -13,7 +13,8 @@ function customizer(objValue, srcValue) {
 export function mergeOptions(a, b) {
     return mergeWith(a, b, customizer)
 }
-export function genSpanMap(data, fields) {
+
+export function genSpanMap(data, fields, group) {
     let vs = data
     let fs = fields
     let m = {}
@@ -23,10 +24,11 @@ export function genSpanMap(data, fields) {
         m[i] = {}
         let b = true
         fs.forEach((f, j) => {
-            if (b == false) {
-                lm[f] = undefined
+            if (group > 0 && j >= group) {
+                m[i][j] = 1
+                return
             }
-            if (r[f] !== lm[f]) {
+            if (b === false || r[f] !== lm[f]) {
                 let c = pm[f] || 0
                 m[i - c][j] = c
                 pm[f] = 0
@@ -60,6 +62,7 @@ export function flatten(ns, children_field_name) {
     return r
 }
 
+
 export function csv2array(s, delimiter) {
     delimiter = delimiter || '\t'
     return s.split('\n').map(l => l.split(delimiter))
@@ -70,4 +73,32 @@ export function guessDelimit(l, allDelimits){
     return allDelimits.map((a) => {
         return [l.split(a).length, a]
     }).sort().reverse()[0][1]
+
+export function rowIsEmpty(obj) {
+    return Object.values(obj).find(a => a === 0 || ![undefined, null, ''].includes(a)) === undefined
+}
+
+export function clearEmptyRow(table) {
+    return table.filter(r => !rowIsEmpty(r))
+}
+
+export function autoFill(table, items, group) {
+    let lr = undefined
+    table.forEach(r => {
+        if (lr) {
+            let b = true
+            items.forEach((i, j) => {
+                if (group > 0 && j >= group) {
+                    return
+                }
+                if ( b && [undefined, null, ''].includes(r[i.name])) {
+                    r[i.name] = lr[i.name]
+                } else {
+                    b = false
+                }
+            })
+        }
+        lr = r
+    })
+    return table
 }

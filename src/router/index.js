@@ -24,10 +24,16 @@ let router = new Router({
     routes: constRoutes
 })
 
-function import_or_use_template(path, template){
+function import_or_use_template(path, template) {
     return () => {
-        return import('@/views/' + path + '.vue').catch(() => {
-            return import(`../views/model/${template}.vue`)
+        return import('@/views/' + path + '.vue').catch((e) => {
+            let b = e.toString().includes('Cannot find module')
+            if (b) {
+                return import(`../views/model/${template}.vue`)
+            }
+            else {
+                throw e
+            }
         })
     }
 }

@@ -11,12 +11,12 @@
         </template>
         <template slot="label" v-else><span></span></template>
         <template>
-            <form-widget v-model="value" :field="field"></form-widget>
+            <widget v-model="value" :field="field"></widget>
         </template>
     </el-form-item>
 </template>
 <script>
-    import FormWidget from '../widgets/FormWidget.vue'
+    import Widget from './Widget.vue'
     export default{
         props: {
             field: Object,
@@ -33,7 +33,7 @@
             return {}
         },
         components: {
-            FormWidget,
+            Widget,
         },
         methods: {},
         computed: {}

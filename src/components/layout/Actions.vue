@@ -3,7 +3,7 @@
         <template v-for="a in showActions">
             <el-button :type="a.type" :title="a.title" :size="size" @click="handleCommand(a.do)"
                        v-if="!a.show || a.show()" :key="a.name">
-                <i :class="`fa fa-${a.icon}`"></i>{{a.label}}
+                <i :class="getIconClass(a.icon)" v-if="a.icon"></i>{{a.label}}
             </el-button>
         </template>
         <el-dropdown v-if="dropdownActions.length>0" @command="handleCommand" :size="size" :trigger="trigger">
@@ -13,7 +13,7 @@
             <el-dropdown-menu slot="dropdown">
                 <template v-for="a in dropdownActions">
                     <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
-                                      :icon="`fa fa-${a.icon}`">
+                                      :icon="getIconClass(a.icon)">
                         {{a.label || a.title}}
                     </el-dropdown-item>
                 </template>
@@ -59,6 +59,9 @@
 //                    console.log(a)
                 }
                 return a
+            },
+            getIconClass (icon) {
+                return icon && (icon.includes(' ') ? icon : `fa fa-${icon}`) || undefined
             },
             normalizeItems() {
                 this._items = array_normalize(this.items, this.map, this.normalizeItem)
