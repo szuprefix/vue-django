@@ -10,10 +10,10 @@ function customizer(objValue, srcValue) {
     }
 }
 
-export function mergeOptions (a, b) {
+export function mergeOptions(a, b) {
     return mergeWith(a, b, customizer)
 }
-export function genSpanMap (data, fields) {
+export function genSpanMap(data, fields) {
     let vs = data
     let fs = fields
     let m = {}
@@ -58,4 +58,16 @@ export function flatten(ns, children_field_name) {
         }
     })
     return r
+}
+
+export function csv2array(s, delimiter) {
+    delimiter = delimiter || '\t'
+    return s.split('\n').map(l => l.split(delimiter))
+}
+
+export function guessDelimit(l, allDelimits){
+    allDelimits = allDelimits || [',','\t', '|']
+    return allDelimits.map((a) => {
+        return [l.split(a).length, a]
+    }).sort().reverse()[0][1]
 }
