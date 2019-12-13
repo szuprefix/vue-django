@@ -26,9 +26,11 @@
     import Actions from '../layout/Actions.vue'
     import {genSpanMap, flatten} from './Table'
     import array_normalize from '../../utils/array_normalize'
+    import serverResponse from '../../mixins/server_response'
 
 
     export default{
+        mixins: [serverResponse],
         props: {
             value: Array,
             cellWidget: [Function, Object],
@@ -79,6 +81,10 @@
                 let excelGetAllData = this.$attrs.excelGetAllData || this.excelGetAllData
                 let excelFormat = this.$attrs.excelFormat || this.excelFormat
                 excelGetAllData().then((data) => {
+                    if(data === undefined) {
+                        this.loading = false
+                        return
+                    }
                     this.loading = '正在加载excel模块'
                     import('xlsx').then(XLSX => {
                         this.loading = '正在导出excel'
@@ -89,7 +95,7 @@
                         XLSX.writeFile(wb, `${this.$attrs.title || '导出数据'}.xlsx`)
                         this.loading = false
                     })
-                })
+                }).catch(this.onServerResponseError)
 
 
             },

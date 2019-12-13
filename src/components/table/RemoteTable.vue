@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading" :element-loading-text="loading">
-        <x-table :items="items" v-model="data" v-on="$listeners" v-bind="tAttrs">
+        <x-table :items="items" v-model="data" v-on="$listeners" v-bind="tAttrs" @sort-change="onSortChange">
             <template slot="left" v-if="$slots.left">
                 <slot name="left"></slot>
             </template>
@@ -22,13 +22,15 @@
 
 </template>
 <script>
-    import {DEFAULT_PAGE_SIZE, mergeOptions} from './Table'
+    import {DEFAULT_PAGE_SIZE, DEFAULT_MAX_PAGE_SIZE, mergeOptions} from './Table'
     import Qs from 'qs'
     import XTable from './Table.vue'
-    import server_response from '../../mixins/server_response'
+    import serverResponse from '../../mixins/server_response'
     import array_normalize from '../../utils/array_normalize'
+    import queueLimit from '../../utils/async_queue'
+    import {range} from 'lodash'
     export default{
-        mixins: [server_response],
+        mixins: [serverResponse],
         props: {
             items: {type: Array, default: () => []},
             value: Array,
@@ -44,6 +46,7 @@
                 }
             },
             pageSize: {type: Number, default: () => DEFAULT_PAGE_SIZE},
+            maxPageSize: {type: Number, default: () => DEFAULT_MAX_PAGE_SIZE}
         },
         data () {
             return {
@@ -95,12 +98,33 @@
                 this.load()
             },
             excelGetAllData(){
-                let d = Object.assign({}, this.queries, {page: 1, page_size: this.count})
-                this.loading = '正在获取数据'
-                return this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
+                let promise = Promise.resolve()
+                let page = Math.ceil(this.count/this.maxPageSize)
+                if(page>1) {
+                    promise = this.$confirm(`此次导出记录数预计${this.count},超出最大限制${this.maxPageSize},基于网络性能考虑,程序会尝试分${page}页每次请求${this.maxPageSize}条记录的方式下载数据, 最终合并数据导出. 若期间后台数据有更新的话,则最终下载的数据可能会有重复或缺漏等风险,请注意检查.`,'分页导出提醒', {type:'warning', confirmButtonText:'好的,开始分页导出'})
+                }
+                let downloadFunc  = (page) => {
+                    let d = Object.assign({}, this.queries, {page, page_size: this.maxPageSize})
+                    return this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
+                        return data.results
+                    })
+                }
+                let allData = []
+                return promise.then( () => {
+                    this.loading = '正在获取数据'
+                    return queueLimit(range(1, page+1),1,(p) => {
+                        if(p>1){
+                            this.loading = `第${p}页`
+                        }
+                        return downloadFunc(p).then(table => allData=allData.concat(table))
+                    })
+                }).then(() => {
                     this.loading = false
-                    return data.results
+                    return allData
                 }).catch(this.onServerResponseError)
+            },
+            onSortChange ({order, prop}) {
+                this.updateQueries({ordering: (order == 'descending' ? '-' : '') + prop})
             }
         },
         computed: {

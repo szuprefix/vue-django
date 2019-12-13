@@ -11,7 +11,7 @@
     </el-table-column>
     <el-table-column :type="f.type" v-else-if="f.type === 'selection'"></el-table-column>
     <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
-                     v-bind="f" :class-name="f.type" :key="f.name"
+                     v-bind="f" :class-name="f.type" :key="f.name" :sortable="f.sortable"
                      v-else>
 
         <template slot="header" slot-scope="scope">
