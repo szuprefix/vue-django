@@ -4,7 +4,8 @@
 
 </template>
 <script>
-    import load from 'load.js'
+    //    import load from 'load.js'
+    import $script from 'scriptjs'
     export default{
         props: {
             fileID: String,
@@ -18,21 +19,31 @@
         },
         components: {},
         created () {
-            this.loadLib()
+            this.init()
         },
         methods: {
-            async loadLib() {
-                if (!window.TCPlayer) {
-                    await load.parallel([
-                        '//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.css',
-                        '//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.min.js',
-                    ])
-                    this.libLoaded = true
-                }
+            loadStyle (href) {
+                var link = document.createElement('link')
+                link.rel = 'stylesheet'
+                link.type = 'text/css'
+                link.href = href
+                document.getElementsByTagName('head')[0].appendChild(link)
+            },
+            createPlayer () {
                 this.player = window.TCPlayer(this.$el, {
                     fileID: this.fileID,
                     appID: this.appID
                 })
+            },
+            init () {
+                if (!window.TCPlayer) {
+                    this.loadStyle('//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.css')
+                    $script('//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.min.js', () => {
+                        this.createPlayer()
+                    })
+                } else {
+                    this.createPlayer()
+                }
             }
         },
         computed: {}
