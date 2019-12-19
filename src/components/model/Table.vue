@@ -1,6 +1,7 @@
 <template>
     <div>
-        <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search" v-if="showSearch"
+        <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search"
+                v-if="showSearch"
                 @change="onSearch"></search>
         <batch-actions :items="batchActionItems" :count="selection.length" @done="refresh" :context="{selection}"
                        v-if="batchActionItems.length>0"></batch-actions>
@@ -17,7 +18,7 @@
         </el-drawer>
 
         <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" v-if="optionLoaded"
-                      v-bind="rtAttrs" v-on="$listeners">
+                      v-bind="rtAttrs" v-on="$listeners" @selection-change="onSelectionChange">
 
             <template slot="left" v-if="$slots.left">
                 <slot name="left"></slot>
@@ -35,6 +36,7 @@
     import array_normalize from '../../utils/array_normalize'
     import server_response from '../../mixins/server_response'
     import Qs from 'qs'
+    import {get} from 'lodash'
     import BatchActions from '../layout/BatchActions.vue'
 
     import TrueFlag from '../widgets/TrueFlag.vue'
@@ -50,7 +52,7 @@
             appModel: String,
             items: Array,
             searchItems: Array,
-            showSearch: true,
+            showSearch: {type: Boolean, default: true},
             baseQueries: {
                 type: Object, default: () => {
                     return {}
@@ -131,7 +133,7 @@
         methods: {
             init () {
                 this.model.loadOptionsAndViewsConfig().then((data) => {
-                    if(this.$refs.search) {
+                    if (this.$refs.search) {
                         this.$refs.search.init()
                     }
                     this.parentQueries = Object.assign({}, this.getParentQueries())
@@ -198,11 +200,15 @@
                     })
 
                     let qns = Object.keys(this._baseQueries)
+                    let orderingFields = get(this.model.options, 'actions.SEARCH.ordering_fields', [])
                     let rs = array_normalize(config.listItems, this.model.fieldConfigs, (a) => {
                         Object.assign(a, {field: this.model.fieldConfigs[a.name]})
 
                         if (!a.useFormWidget) {
                             a.widget = a.widget || this.defaultWidget(a)
+                        }
+                        if (orderingFields.includes(a.name)) {
+                            a.sortable = true
                         }
                         return a
                     }).filter(a => !qns.includes(a.name))
@@ -340,17 +346,17 @@
                         }
                     })
                 }
+                let avairableActions = {...this.avairableActions, ...bactions}
                 return {
                     topActions: ['refresh', 'create', ['download'].concat(Object.keys(bactions))],
                     rowActions: ['edit', [this.parentMultipleRelationField ? 'removeFromParent' : 'delete']],
                     excelFormat: this.excelFormat,
                     permissionFunction: this.checkPermission,
                     dblClickAction: 'edit',
-                    'selection-change': this.onSelectionChange,
                     title: this.model.config.verbose_name,
                     ...this.$attrs,
                     baseQueries: this._baseQueries,
-                    avairableActions: this.avairableActions
+                    avairableActions
                 }
             },
             _baseQueries () {

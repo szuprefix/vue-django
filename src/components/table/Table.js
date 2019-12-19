@@ -3,6 +3,7 @@
  */
 import {mergeWith, isArray} from 'lodash'
 export const DEFAULT_PAGE_SIZE = 20
+export const DEFAULT_MAX_PAGE_SIZE = 1000
 
 function customizer(objValue, srcValue) {
     if (isArray(objValue)) {
@@ -13,6 +14,7 @@ function customizer(objValue, srcValue) {
 export function mergeOptions(a, b) {
     return mergeWith(a, b, customizer)
 }
+
 export function genSpanMap(data, fields, group) {
     let vs = data
     let fs = fields
@@ -59,6 +61,19 @@ export function flatten(ns, children_field_name) {
         }
     })
     return r
+}
+
+
+export function csv2array(s, delimiter) {
+    delimiter = delimiter || '\t'
+    return s.split('\n').map(l => l.split(delimiter))
+}
+
+export function guessDelimit(l, allDelimits) {
+    allDelimits = allDelimits || [',', '\t', '|']
+    return allDelimits.map((a) => {
+        return [l.split(a).length, a]
+    }).sort().reverse()[0][1]
 }
 
 export function rowIsEmpty(obj) {
