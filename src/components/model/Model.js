@@ -75,12 +75,12 @@ export default function (appModel, defaults, eventor) {
             return r
         },
         load () {
-            return axios.all([this.loadData(), this.loadOptions()]).then(axios.spread((data, restOptions) => {
+            return axios.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((data, restOptions,viewsConfig) => {
                 if (!this.id) {
                     data = this.emptyDataFromOptions(restOptions.actions.POST)
                 }
                 this.data = Object.assign({}, this.data, data)
-                return [data, restOptions]
+                return [data, restOptions, viewsConfig]
             }))
         },
         save (data) {
@@ -155,7 +155,7 @@ export default function (appModel, defaults, eventor) {
             return import(`@/views${this.getListUrl()}config.js`).then(m => {
                 return m.default || {}
             }).catch((err) => {
-                console.error(err)
+                console.warn(err, '找不到视图配置,将使用默认配置')
                 return {}
             }).then(config => {
                 this.viewsConfig = config

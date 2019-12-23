@@ -2,7 +2,7 @@
     <el-select v-model="selectedValue" :disabled="field.disabled" ref="select" class="model-select"
                :multiple="field.multiple" filterable @change="changed" remote clearable reserve-keyword
                :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
-               :loading="loading" :loading-text="loading"
+               :loading="loading" :loading-text="`${loading}`"
                :placeholder="field.placeholder || `请选择${field.label}`">
         <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
                    v-for="c,i in optionList" :key="c.id || c.pk || c.url || c.name">
@@ -29,7 +29,9 @@
     import Qs from 'qs'
     import {uniqWith, isEqual} from 'lodash'
     import Model from './Model'
+    import serverResponse from 'vue-django/src/mixins/server_response'
     export default{
+        mixins: [serverResponse],
         props: {
             appModel: String,
             placeholder: String,

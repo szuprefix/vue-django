@@ -5,19 +5,17 @@
     import {formatTime, localTimeStr} from '../../utils/filters'
     export default{
         props: {
-            value: [String],
+            value: Object,
             field: Object
         },
         computed:{
             localStr (){
-               return this.value && localTimeStr(this.value)  || ''
+                let v = this.value[this.field.name]
+               return  v && localTimeStr(v)  || ''
             },
             now(){
-                let s = this.value
-                if(s == null){
-                    return ""
-                }
-                return formatTime(new Date(s))
+                let v = this.value[this.field.name]
+                return v && formatTime(new Date(v)) || ''
             }
         }
     }

@@ -132,7 +132,7 @@
         },
         methods: {
             init () {
-                this.model.loadOptionsAndViewsConfig().then((data) => {
+                this.model.loadOptionsAndViewsConfig().then(() => {
                     if (this.$refs.search) {
                         this.$refs.search.init()
                     }
@@ -267,8 +267,10 @@
                 } else if (f.choices) {
                     return ChoicesDisplay
                 } else if (f.child) {
-                    return function ({value}) {
-                        return value.map(a => Object.values(a).join(',')).join('\n')
+                    return function (value, field) {
+                        let d = value[field.name]
+                        let sfs = field.child.children
+                        return d.map(r => Object.keys(sfs).map(sf => r[sf]).join(',')).join('\n')
                     }
                 }
             },
@@ -301,7 +303,7 @@
                         r['id__in'] = ids.length > 0 && ids || [0]
                     } else {
                         let am = parent.appModel
-                        let pid = parent.data.id
+                        let pid = parent.id
                         let fs = Object.values(this.model.fieldConfigs)
                         let f = fs.find(a => a.model === am)
                         if (f && f.multiple !== true) {

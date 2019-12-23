@@ -21,10 +21,11 @@
           },
           computed : {
               text () {
-                  return this.show ? this.value : this.lines[0]
+                  return this.show ? this.value[this.field.name]: this.lines[0]
               },
               lines () {
-                  return this.value.split('\n')
+                  let v = this.value[this.field.name]
+                  return v.split('\n')
               }
           },
           watch : {
