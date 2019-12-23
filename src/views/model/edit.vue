@@ -1,7 +1,7 @@
 <template>
     <model-form :appModel="appModel" v-model="data"  ref="form">
         <template v-slot:bottom="{model}">
-            <model-relations v-if="model.data.id && model.viewsConfig" :items="model.viewsConfig.relations"
+            <model-relations v-if="model.data.id && model.viewsConfig"
                              :parent="model"></model-relations>
 
         </template>

@@ -1,5 +1,5 @@
 <template>
-    <el-tabs type="border-card" v-if="items.length>0">
+    <el-tabs type="border-card" v-if="modelItems.length>0">
         <el-tab-pane lazy v-for="m in modelItems" :key="m.name">
             <template slot="label"><i :class="`fa fa-${m.icon}`"></i>{{m.label}}</template>
             <model-table :appModel="m.name" :baseQueries="m.baseQueries" :items="m.items" :parent="parent"></model-table>
@@ -14,7 +14,7 @@
     export default{
         props: {
             parent: Object,
-            items: {type: Array, default: () => []},
+            items: Array,
         },
         data () {
             return {
@@ -27,7 +27,8 @@
         },
         methods: {
             normalizeItems () {
-                this.modelItems = array_normalize(this.items, {}, (a) => {
+                let items = this.items || this.parent.viewsConfig.relations
+                this.modelItems = array_normalize(items, {}, (a) => {
                     let m = a.model = Model(a.name)
                     a.icon = m.config.icon
                     a.label = m.config.verbose_name
