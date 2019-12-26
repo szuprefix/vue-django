@@ -1,5 +1,5 @@
 <template>
-    <i class="el-icon-check" v-if="value[field.name]"></i>
+    <i class="el-icon-check" style="color:green;font-weight: bold" :title="field.label" v-if="value[field.name]"></i>
 </template>
 <script>
     export default{

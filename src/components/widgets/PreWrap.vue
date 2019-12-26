@@ -1,5 +1,5 @@
 <template>
-  <span style="white-space: pre-wrap">{{value}}</span>
+  <span style="white-space: pre-wrap">{{value[field.name]}}</span>
 </template>
 <script>
       export default{

@@ -1,7 +1,6 @@
 <template>
-    <video class="player-size" preload="auto" playsinline webkit-playsinline>
+    <video class="vod-player player-size" :style="{width, height}" preload="auto" playsinline webkit-playsinline>
     </video>
-
 </template>
 <script>
     //    import load from 'load.js'
@@ -9,7 +8,9 @@
     export default{
         props: {
             fileID: String,
-            appID: String
+            appID: String,
+            width: String,
+            height: String
         },
         data () {
             return {
@@ -18,7 +19,8 @@
             }
         },
         components: {},
-        created () {
+        mounted () {
+//            console.log(this.fileID,this.appID)
             this.init()
         },
         methods: {
@@ -30,10 +32,7 @@
                 document.getElementsByTagName('head')[0].appendChild(link)
             },
             createPlayer () {
-                this.player = window.TCPlayer(this.$el, {
-                    fileID: this.fileID,
-                    appID: this.appID
-                })
+                this.player = window.TCPlayer(this.$el, this.playerOptions)
             },
             init () {
                 if (!window.TCPlayer) {
@@ -46,7 +45,24 @@
                 }
             }
         },
-        computed: {}
+        computed: {
+            playerOptions () {
+                return {
+                    fileID: this.fileID,
+                    appID: this.appID,
+                    plugins: {
+                        ContinuePlay: { // 开启续播功能
+                            auto: true
+                        }
+                    }
+                }
+            }
+        },
+        watch: {
+            fileID (v) {
+                this.player.loadVideoByID(this.playerOptions)
+            }
+        }
     }
 </script>
 <style>

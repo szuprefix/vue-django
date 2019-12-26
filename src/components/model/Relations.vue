@@ -27,7 +27,7 @@
         },
         methods: {
             normalizeItems () {
-                let items = this.items || this.parent.viewsConfig.relations
+                let items = this.items || this.parent.viewsConfig.relations || []
                 this.modelItems = array_normalize(items, {}, (a) => {
                     let m = a.model = Model(a.name)
                     a.icon = m.config.icon

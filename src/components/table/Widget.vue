@@ -1,5 +1,5 @@
 <template>
-    <form-widget v-if="field.useFormWidget" v-model="value" :field="field" v-bind="[$attrs,$props]"></form-widget>
+    <form-widget v-if="field.useFormWidget" v-model="value" v-bind="[$attrs,$props]"></form-widget>
     <component :is="field.widget" v-model="value" v-bind="[$attrs,$props]"
                v-else-if="field.widget && typeof field.widget == 'object'"></component>
     <span v-else-if="field.widget && typeof field.widget == 'function'"

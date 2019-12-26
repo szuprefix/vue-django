@@ -1,36 +1,8 @@
 <template>
-    <div>
-        <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search"
-                v-if="showSearch"
-                @change="onSearch"></search>
-        <batch-actions :items="batchActionItems" :count="selection.length" @done="refresh" :context="{selection}"
-                       v-if="batchActionItems.length>0"></batch-actions>
-        <el-drawer :visible.sync="editing" direction="rtl"
-                   :title="`${parentMultipleRelationField?'添加':'创建'}${model.config.verbose_name}`" size="66%">
-            <slot name="edit">
-                <model-table :appModel="appModel" :options="{remoteTable:{table:{topActions:[], rowActions:[]}}}"
-                             :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', confirm:false, do:addToParent}]"
-                             v-if="parentMultipleRelationField"></model-table>
-                <component :is="creator" :appModel="appModel" :defaults="parentQueries" v-else
-                           :topActions="['saveAndAnother']"></component>
-
-            </slot>
-        </el-drawer>
-
-        <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" v-if="optionLoaded"
-                      v-bind="rtAttrs" v-on="$listeners" @selection-change="onSelectionChange">
-
-            <template slot="left" v-if="$slots.left">
-                <slot name="left"></slot>
-            </template>
-            <template slot="right" v-if="$slots.right">
-                <slot name="right"></slot>
-            </template>
-        </remote-table>
-    </div>
+    <grid :items="tableItems" :value.sync="data" v-if="optionLoaded"></grid>
 </template>
 <script>
-    import RemoteTable from '../table/RemoteTable.vue'
+    import Grid from '../table/Grid.vue'
     import Model from './Model'
     import {mergeOptions} from '../table/Table'
     import array_normalize from '../../utils/array_normalize'
@@ -69,6 +41,7 @@
         },
         data () {
             return {
+                data: [],
                 model: Model(this.appModel, {}, this.$store.state.bus),
                 tableItems: [],
                 search: {},
@@ -120,7 +93,7 @@
                 }
             }
         },
-        components: {RemoteTable, Search, BatchActions},
+        components: {Grid, Search, BatchActions},
         mounted () {
             this.init()
             this.$store.state.bus.$on('model-posted', this.onModelPosted)
@@ -140,6 +113,17 @@
                     return this.normalizeItems()
                 }).then(() => {
                     this.optionLoaded = true
+                    this.load()
+                }).catch(this.onServerResponseError)
+            },
+            load (queris) {
+                let d = queris || this.queries
+                this.loading = '查询中'
+                return this.$http.get(`${this.model.getListUrl()}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
+                    this.data = data.results
+                    this.count = data.count
+                    this.loading = false
+                    this.$emit("loaded", this.data)
                 }).catch(this.onServerResponseError)
             },
             refresh () {
@@ -250,7 +234,7 @@
             },
             getConfig () {
                 let config = this.model.viewsConfig.list || {}
-                let listItems = this.items || config.table || config.items || Object.values(this.model.fieldConfigs).filter(a => ['name', 'title'].includes(a.name))
+                let listItems = this.items || config.grid || config.items || Object.values(this.model.fieldConfigs).filter(a => ['name', 'title'].includes(a.name))
                 if (!listItems || listItems.length === 0) {
                     listItems = ['__str__']
                 }

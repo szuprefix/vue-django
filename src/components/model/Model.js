@@ -123,7 +123,7 @@ export default function (appModel, defaults, eventor) {
             })
         },
         emitPosted (id) {
-            this.eventor.$emit('model-posted', {appModel: this.appModel, id})
+            this.eventor && this.eventor.$emit('model-posted', {appModel: this.appModel, id})
         },
         onErrors (error) {
             if (error.code === 400) {

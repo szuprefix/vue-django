@@ -1,5 +1,5 @@
 <template>
-    <i class="fa fa-cross" v-if="!value"></i>
+    <i class="el-icon-close" style="color:red;font-weight: bold" v-if="!value[field.name]"></i>
 </template>
 <script>
     export default{

@@ -1,5 +1,5 @@
 <template>
-  <span>{{value.join(delimeter)}}</span>
+  <span>{{value[field.name].join(delimeter)}}</span>
 </template>
 <script>
   export default{
