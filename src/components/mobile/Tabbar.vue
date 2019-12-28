@@ -1,5 +1,5 @@
 <template>
-    <tabbar v-if="show" style="position: fixed;">
+    <tabbar v-if="show" style="position: fixed;" v-on="$listeners">
         <tabbar-item :show-dot="t.showDot" :selected="t.link === $route.path" :badge="t.badge" v-for="t in tabItems" :link="t.link" :key="t.name">
             <i slot="icon" :class="`iconfont icon-${t.icon}`"></i>
             <span slot="label">{{t.label}}</span>

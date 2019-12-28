@@ -3,7 +3,6 @@
     </video>
 </template>
 <script>
-    //    import load from 'load.js'
     import $script from 'scriptjs'
     export default{
         props: {
