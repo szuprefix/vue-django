@@ -60,7 +60,7 @@ export default{
             }).catch(this.onServerResponseError)
         },
         onLoaded (data) {
-            console.log('onLoaded')
+            // console.log('onLoaded')
         },
         onSearch () {
             this.updateQueries({})
