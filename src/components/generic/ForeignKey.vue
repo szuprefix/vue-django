@@ -9,6 +9,7 @@
 <script>
     import {Register} from 'vue-django/src/utils/app_model'
     import ContentType from './ContentType'
+    ContentType.loadIdMap()
     export default{
         props: {
             value: [String, Number],
