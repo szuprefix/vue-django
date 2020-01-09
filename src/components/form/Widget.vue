@@ -1,5 +1,5 @@
 <template>
-    <span v-if="field.widget === 'readonly'">
+    <span v-if="field.widget === 'readonly'" style="white-space: pre-wrap">
         {{value[field.name]}}
     </span>
     <span v-else-if="typeof(field.widget) === 'function'" v-html="field.widget(value,field)">
