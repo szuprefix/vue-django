@@ -1,9 +1,7 @@
 <template>
-    <el-form ref="form" :inline="elOptions.inline" :size="elOptions.size" :model="formValue" v-if="value"
-             :inline-message="elOptions.inlineMessage" :hide-required-asterisk="elOptions.hideRequiredAsterisk"
-             label-position="elOptions.labelPosition"
-             :label-width="elOptions.labelWidth || elOptions.noLabel && '0px' || (!elOptions.inline && '160px')"
-             v-loading="loading" :element-loading-text="loading">
+    <el-form ref="form" v-bind="[$props,$attrs]"  :model="formValue" v-if="value"
+             v-loading="loading" :element-loading-text="loading"
+             :label-width="$attrs.labelWidth || $attrs.noLabel && '0px' || (!$attrs.inline && '160px')">
 
         <slot name="header"></slot>
         <el-alert :title="errors.non_field_errors" type="error" v-if="errors.non_field_errors"
@@ -11,16 +9,16 @@
         <el-row>
             <template v-for="f in formItems" v-if="canEdit(f)">
                 <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
-                        :key="f.name" v-if="!elOptions.inline && !elOptions.oneColumn && f.widget !== 'hidden'">
-                    <item :field="f" v-model="formValue" :options="options" :error="errors[f.name]"></item>
+                        :key="f.name" v-if="!$attrs.inline && !$attrs.oneColumn && f.widget !== 'hidden'">
+                    <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions" :error="errors[f.name]"></item>
                 </el-col>
-                <item :field="f" v-model="formValue" :options="options" :error="errors[f.name]" v-else></item>
+                <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions"  :error="errors[f.name]" v-else></item>
 
             </template>
             <slot name="submit">
-                <el-col :xs="elOptions.inline?12:24" :sm="elOptions.inline?8:24" :md="elOptions.inline?6:24"
-                        :lg="elOptions.inline?4:24"
-                        :xl="elOptions.inline?3:24" v-if="!elOptions.inline">
+                <el-col :xs="$attrs.inline?12:24" :sm="$attrs.inline?8:24" :md="$attrs.inline?6:24"
+                        :lg="$attrs.inline?4:24"
+                        :xl="$attrs.inline?3:24" v-if="!$attrs.inline">
                     <el-form-item>
                         <actions :items="_actions"></actions>
                     </el-form-item>
@@ -132,7 +130,7 @@
             },
 
             _actions () {
-                return this.actions || [{name: 'submit', label: this.submitName, do: this.onSubmit}]
+                return this.actions || [{name: 'submit', label: this.submitName, do: this.onSubmit, type: 'primary', size:this.$attrs.size}]
             },
             elOptions () {
                 return this.options.elForm || {}

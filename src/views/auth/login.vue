@@ -1,33 +1,37 @@
 <template>
     <div class="login-container">
-        <!--<el-dialog title="登录" :visible="!(user.id>0)" :show-close="false"-->
-        <!--:close-on-click-modal="false">-->
-        <rest-form formUrl="/auth/user/login/" v-model="form" :formItems="fieldItems" ref="form" formSize="big"
-                   class="login-form"
-                   formSubmitName="登录" formNoLabel :formHideRequiredAsterisk="true" @form-posted="done">
+        <x-form url="/auth/user/login/" v-model="form" :items="items" ref="form" size="big" :itemOptions="{noLabel:true}"
+                class="login-form" submitName="登录" :noLabel="true" :hide-required-asterisk="true" @form-posted="done">
 
             <h3 slot="header">登录{{$store.state.system_name}}</h3>
-        </rest-form>
-        <!--</el-dialog>-->
+        </x-form>
     </div>
 </template>
 <script>
     import {mapState} from 'vuex'
-    import RestForm from '../../components/rest/Form.vue'
+    import XForm from '../../components/form/Form.vue'
     import {setToken} from '../../utils/auth'
     const AUTH_STORAGE_NAME = 'auth.username'
     export default{
         data () {
             return {
                 form: {username: localStorage.getItem(AUTH_STORAGE_NAME), password: ''},
-                fieldItems: [
-                    {name: 'username', required: true, label: '帐号', span: 24, icon: 'user'},
-                    {name: 'password', required: true, label: '密码', widget: 'password', icon: 'lock', span: 24, onEnter: this.submit}
+                items: [
+                    {name: 'username', required: true, label: '帐号', span: 24, icon: 'user', 'label-width': '0px'},
+                    {
+                        name: 'password',
+                        required: true,
+                        label: '密码',
+                        widget: 'password',
+                        icon: 'lock',
+                        span: 24,
+                        onEnter: this.submit
+                    }
                 ]
             }
         },
         components: {
-            RestForm
+            XForm
         },
         methods: {
             done(data){
