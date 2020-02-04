@@ -4,10 +4,22 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
+import Vue from 'vue'
+
+function genBaseUrl (tpl) {
+    let a =tpl
+    location.pathname.split('/').forEach( (s, i) => {
+        a = a.replace('$' +i, s)
+    })
+    if(a.startsWith('//')) {
+        a=a.slice(1)
+    }
+    return a
+}
+
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.headers['X-REQUESTED-WITH'] = 'XMLHttpRequest'
-axios.defaults.baseURL = '/api/'
 
 axios.interceptors.response.use(function (response) {
     return response;
@@ -19,11 +31,14 @@ axios.interceptors.response.use(function (response) {
     }
 })
 
-import Vue from 'vue'
 Vue.prototype.$http = Vue.http = axios
 
 if (!Cookies.get('csrftoken')) {
     axios.get('/csrf_token/')
+}
+
+axios.setBaseURL = (url) => {
+    axios.defaults.baseURL = genBaseUrl(url)
 }
 
 export default axios
