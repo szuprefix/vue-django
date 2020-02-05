@@ -23,7 +23,7 @@ export function defaultRuleType(f){
     if (f.choices && f.choices.length > 0) {
         return typeof f.choices[0][0]
     }
-    return f.model ? 'number' : (['field', 'time'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
+    return f.model ? 'number' : (['field', 'time', 'datetime'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
 }
 
 export function defaultSpan(f){

@@ -1,7 +1,7 @@
 /**
  * Created by denishuang on 2017/11/16.
  */
-import { formatRelative, subDays, distance_in_words_to_now } from 'date-fns'
+import {formatRelative, subDays, distance_in_words_to_now} from 'date-fns'
 import zh_cn from 'date-fns/locale/zh_cn'
 export function date2now(d) {
     "use strict";
@@ -9,7 +9,7 @@ export function date2now(d) {
 }
 
 export function date(d) {
-    return distance_in_words_to_now(d, { locale: zh_cn})
+    return distance_in_words_to_now(d, {locale: zh_cn})
 }
 
 function pluralize(time, label) {
@@ -74,20 +74,21 @@ export function formatTime(time, option) {
     const now = new Date()
 
     const diff = (now - d) / 1000
-
-    if (diff < 30) {
-        return '刚刚'
-    } else if (diff < 3600) { // less 1 hour
-        return Math.ceil(diff / 60) + '分钟前'
-    } else if (diff < 3600 * 24) {
-        return Math.ceil(diff / 3600) + '小时前'
-    } else if (diff < 3600 * 24 * 2) {
-        return '1天前'
+    if (diff >= 0) {
+        if (diff < 30) {
+            return '刚刚'
+        } else if (diff < 3600) { // less 1 hour
+            return Math.ceil(diff / 60) + '分钟前'
+        } else if (diff < 3600 * 24) {
+            return Math.ceil(diff / 3600) + '小时前'
+        } else if (diff < 3600 * 24 * 2) {
+            return '1天前'
+        }
     }
     if (option) {
         return parseTime(time, option)
     } else {
-        if(d.getYear()!=now.getYear()){
+        if (d.getYear() != now.getYear()) {
             return parseTime(d, '{y}-{m}-{d} {h}:{i}')
         }
         return (d.getMonth() + 1) + '月' + d.getDate() + '日' + d.getHours() + '时' + d.getMinutes() + '分'
@@ -122,7 +123,7 @@ export function toThousandslsFilter(num) {
     return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
 }
 
-export function percent(value){
+export function percent(value) {
     let a = value && (value * 100).toFixed(2)
     return `${a}%`
 }
