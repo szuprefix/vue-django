@@ -15,7 +15,7 @@
             },
             now(){
                 let v = this.value[this.field.name]
-                return v && formatTime(new Date(v)) || ''
+                return v && formatTime(v) || ''
             }
         }
     }

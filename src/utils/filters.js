@@ -3,6 +3,14 @@
  */
 import {formatRelative, subDays, distance_in_words_to_now} from 'date-fns'
 import zh_cn from 'date-fns/locale/zh_cn'
+
+function dateTime(t) {
+    if(typeof t === 'string' && !t.includes('+')){
+        t = t.concat('+08:00')
+    }
+    return new Date(t)
+}
+
 export function date2now(d) {
     "use strict";
     return d
@@ -66,11 +74,10 @@ export function parseTime(time, cFormat) {
     return time_str
 }
 export function localTimeStr(t) {
-    return new Date(t).toLocaleString()
+    return dateTime(t).toLocaleString()
 }
 export function formatTime(time, option) {
-    // time = +time * 1000
-    const d = new Date(time)
+    const d = dateTime(time)
     const now = new Date()
 
     const diff = (now - d) / 1000
@@ -128,6 +135,12 @@ export function percent(value) {
     return `${a}%`
 }
 
+export function duration (a) {
+    let m = Math.floor(a / 60)
+    let s = a % 60
+    return `${m}'${s}''`
+}
+
 export default {
     date2now,
     date,
@@ -137,5 +150,6 @@ export default {
     nFormatter,
     html2Text,
     toThousandslsFilter,
-    percent
+    percent,
+    duration
 }
