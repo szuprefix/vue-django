@@ -1,6 +1,6 @@
 <template>
     <video class="vod-player player-size" :style="{width, height}"
-           preload="auto" playsinline webkit-playsinline x5-playsinline>
+           preload="auto" playsinline webkit-playsinline>
     </video>
 </template>
 <script>
@@ -10,7 +10,8 @@
             fileID: String,
             appID: String,
             width: String,
-            height: String
+            height: String,
+            fullScreen: false
         },
         data () {
             return {
@@ -33,6 +34,20 @@
             },
             createPlayer () {
                 this.player = window.TCPlayer(this.$el, this.playerOptions)
+                let es = ['ended', 'pause', 'timeupdate']
+                es.forEach(e => {
+                    this.player.on(e, (a) => {
+                        try {
+                            this.$emit(e, a)
+                        } catch (err) {
+                        }
+                    })
+                })
+//                if (this.fullScreen) {
+//                    this.$nextTick(() => {
+//                        this.player.requestFullscreen()
+//                    })
+//                }
             },
             init () {
                 if (!window.TCPlayer) {
@@ -54,13 +69,21 @@
                         ContinuePlay: { // 开启续播功能
                             auto: true
                         }
-                    }
+                    },
+                    ...this.$attrs
                 }
             }
         },
         watch: {
             fileID (v) {
                 this.player.loadVideoByID(this.playerOptions)
+            },
+            fullScreen (v) {
+                if (v) {
+                    this.player.requestFullscreen()
+                } else {
+                    this.player.exitFullscreen()
+                }
             }
         }
     }
@@ -88,5 +111,31 @@
         .tcp-logo-img {
             width: 50%;
         }
+    }
+    video{
+        width: 100%;
+    }
+    video::-webkit-media-controls-fullscreen-button {
+        display: none;
+    }
+    video::-webkit-media-controls-play-button {
+        background: red;
+    }
+    video::-webkit-media-controls-play-button {display: none}
+    video::-webkit-media-controls-timeline {display: none}
+    video::-webkit-media-controls-current-time-display{}
+    video::-webkit-media-controls-time-remaining-display {}
+    video::-webkit-media-controls-time-remaining-display {}
+    video::-webkit-media-controls-mute-button {}
+    video::-webkit-media-controls-toggle-closed-captions-button {}
+    video::-webkit-media-controls-volume-slider {}
+    video::-internal-media-controls-download-button {
+        display:none;
+    }
+    video::-webkit-media-controls-enclosure {
+        overflow:hidden;
+    }
+    video::-webkit-media-controls-panel {
+        width: calc(100% + 30px);
     }
 </style>

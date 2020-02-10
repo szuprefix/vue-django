@@ -5,10 +5,12 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import apps from '@/configs/apps'
 import {logout} from '../utils/auth'
+import dailyLog from 'vue-django/src/utils/dailylog'
 Vue.use(Vuex)
 const state = {
     bus: new Vue(),
     user: {},
+    dailyLog,
     apps,
     system_name: '',
     logo: require('../assets/logo.png')
