@@ -1,5 +1,6 @@
 <template>
-    <video class="vod-player player-size" :style="{width, height}" preload="auto" playsinline webkit-playsinline>
+    <video class="vod-player player-size" :style="{width, height}"
+           preload="auto" playsinline webkit-playsinline x5-playsinline>
     </video>
 </template>
 <script>

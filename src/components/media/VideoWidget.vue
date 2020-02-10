@@ -1,6 +1,6 @@
 <template>
     <q-video :width="field.width" :height="field.height" :appID="$store.state.qcloud.vod.appId"
-             :fileID="value[field.name].fileId" ref="video">
+             :fileID="fileId" ref="video">
     </q-video>
 </template>
 <script>
@@ -18,7 +18,12 @@
         },
         components: {QVideo},
         methods: {},
-        computed: {},
+        computed: {
+            fileId () {
+                let ct = this.value[this.field.name]
+                return ct.FileId || ct.fileId
+            }
+        },
         watch: {
             value(v) {
                 this.$refs.video.createPlayer()
