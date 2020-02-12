@@ -52,12 +52,18 @@
             init () {
                 if (!window.TCPlayer) {
                     this.loadStyle('//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.css')
-                    $script('//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.min.js', () => {
+                    $script([
+                        '//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.min.js',
+//                        '//imgcache.qq.com/open/qcloud/video/tcplayer/lib/hls.min.0.8.8.js'
+                    ], () => {
                         this.createPlayer()
                     })
                 } else {
                     this.createPlayer()
                 }
+            },
+            setCurrentTime (ct) {
+                document.querySelector('video').currentTime = ct
             }
         },
         computed: {
@@ -112,30 +118,5 @@
             width: 50%;
         }
     }
-    video{
-        width: 100%;
-    }
-    video::-webkit-media-controls-fullscreen-button {
-        display: none;
-    }
-    video::-webkit-media-controls-play-button {
-        background: red;
-    }
-    video::-webkit-media-controls-play-button {display: none}
-    video::-webkit-media-controls-timeline {display: none}
-    video::-webkit-media-controls-current-time-display{}
-    video::-webkit-media-controls-time-remaining-display {}
-    video::-webkit-media-controls-time-remaining-display {}
-    video::-webkit-media-controls-mute-button {}
-    video::-webkit-media-controls-toggle-closed-captions-button {}
-    video::-webkit-media-controls-volume-slider {}
-    video::-internal-media-controls-download-button {
-        display:none;
-    }
-    video::-webkit-media-controls-enclosure {
-        overflow:hidden;
-    }
-    video::-webkit-media-controls-panel {
-        width: calc(100% + 30px);
-    }
+
 </style>

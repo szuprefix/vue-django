@@ -34,13 +34,18 @@ export function AppModel (config) {
                 return data
             })
         },
+        query (d) {
+            return axios.get(`${this.listUrl}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
+                return data
+            })
+        },
         updateOrCreate (s, d) {
             return axios.get(`${this.listUrl}?${Qs.stringify(s)}`).then(({data}) => {
-                if (data.count === 1){
+                if (data.count === 1) {
                     let id = data.results[0].id
                     return Promise.resolve(id)
-                } else if (data.count > 1){
-                    return Promise.reject('不是唯一')
+                } else if (data.count > 1) {
+                    throw Error('不是唯一')
                 } else {
                     return Promise.resolve(undefined)
                 }
@@ -83,7 +88,7 @@ export var Register = {
     getConfig (fullName) {
         let config = this.configs[fullName]
         if (!config) {
-            throw `model ${fullName} not found!`
+            throw Error(`model ${fullName} not found!`)
         } else {
             return config
         }
