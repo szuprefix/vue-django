@@ -18,12 +18,20 @@
             </el-select>
             <model-select :field="f" v-model="value[f.name]" @input="onSearch"
                           :showCreate="false" :appModel="f.model"
-                          v-if="f.model" :pageSize="100"></model-select>
+                          v-else-if="f.model" :pageSize="100"></model-select>
+        </template>
+
+        <template v-for="f in filterFields" v-if="! (f.name in exclude)">
+            <array-input v-if="f.type === 'string' && f.lookups && f.lookups.includes('in')"
+                         v-model="value[`${f.name}__in`]" :placeholder="`批量查询${f.label}`" style="width: 10rem;"
+                         :autosize="{minRows:1,maxRows:4}" @change="onSearch"></array-input>
         </template>
     </div>
 </template>
 <script>
     import ModelSelect from './Select.vue'
+    import ArrayInput from '../widgets/ArrayInput.vue'
+    import array_normalize from '../../utils/array_normalize'
     export default{
         props: {
             model: Object,
@@ -39,7 +47,7 @@
                 baseQueries: {}
             }
         },
-        components: {ModelSelect},
+        components: {ModelSelect, ArrayInput},
         created () {
         },
         methods: {
@@ -50,8 +58,8 @@
                 let search = this.model.options.actions.SEARCH
                 this.searchFields = search.search_fields
                 let filterItems = this.items || search.filter_fields
-                this.filterFields = filterItems.map((a) => {
-                    return Object.assign({multiple: false}, this.model.fieldConfigs[a])
+                this.filterFields = array_normalize(filterItems, this.model.fieldConfigs, (a) => {
+                    return {multiple: false, ...a}
                 })
                 this.filters = Object.assign({}, this.getFilters())
             },

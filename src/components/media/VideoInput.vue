@@ -1,5 +1,5 @@
 <template>
-    <q-video :width="field.width" :height="field.height" :appID="$store.state.qcloud.vod.appId" :fileID="value.fileId">
+    <q-video :width="field.width" :height="field.height" :appID="$store.state.qcloud.vod.appId" :fileID="fileId">
     </q-video>
 </template>
 <script>
@@ -17,6 +17,11 @@
         },
         components: {QVideo},
         methods: {},
-        computed: {}
+        computed: {
+            fileId () {
+                let ct = this.value
+                return ct.FileId || ct.fileId
+            }
+        }
     }
 </script>

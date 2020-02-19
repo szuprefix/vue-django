@@ -3,7 +3,7 @@
         <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search"
                 v-if="showSearch"
                 @change="onSearch"></search>
-        <batch-actions :items="batchActionItems" :count="selection.length" @done="refresh" :context="{selection}"
+        <batch-actions :items="batchActionItems" @done="refresh" :context="{selection,count}"
                        v-if="batchActionItems.length>0"></batch-actions>
         <el-drawer :visible.sync="editing" direction="rtl"
                    :title="`${parentMultipleRelationField?'添加':'创建'}${model.config.verbose_name}`" size="66%">
@@ -18,7 +18,7 @@
         </el-drawer>
 
         <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" v-if="optionLoaded"
-                      v-bind="rtAttrs" v-on="$listeners" @selection-change="onSelectionChange">
+                @loaded="onLoaded"  v-bind="rtAttrs" v-on="$listeners" @selection-change="onSelectionChange">
 
             <template slot="left" v-if="$slots.left">
                 <slot name="left"></slot>
@@ -78,6 +78,7 @@
                 batchActionItems: [],
                 selection: [],
                 parentQueries: {},
+                count: 0,
                 avairableActions: {
                     'create': {
                         icon: 'plus',
@@ -146,6 +147,7 @@
                 this.$refs.table.refresh()
             },
             onLoaded (v) {
+                this.count = v.count
                 this.$emit('loaded', v)
             },
             onSearch () {
@@ -219,9 +221,10 @@
                 })
             },
             defaultBatchActionDo (action) {
-                return ({selection}) => {
+                return ({selection, scope}) => {
                     let ids = selection.map((a) => a.id)
-                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/`, {id__in: ids, ...action.context})
+                    let qd = {...this._baseQueries, ...this.search}
+                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma'})}`, {batch_action_ids: ids, ...action.context, scope})
                 }
             },
             addToParent ({selection}) {

@@ -82,7 +82,7 @@
                     this.data = data.results
                     this.count = data.count
                     this.loading = false
-                    this.$emit("loaded", this.data)
+                    this.$emit("loaded", data)
                 }).catch(this.onServerResponseError)
             },
             onSearch(){
