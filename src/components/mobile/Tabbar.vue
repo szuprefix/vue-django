@@ -1,6 +1,6 @@
 <template>
-    <tabbar v-if="show" style="position: fixed;" v-on="$listeners">
-        <tabbar-item :show-dot="t.showDot" :selected="t.link === $route.path" :badge="t.badge" v-for="t in tabItems" :link="t.link" :key="t.name">
+    <tabbar v-show="show" style="position: fixed;" v-on="$listeners">
+        <tabbar-item :show-dot="t.showDot" :selected="t.link === $route.fullPath" :badge="t.badge" v-for="t in tabItems" :link="t.link" :key="t.name">
             <i slot="icon" :class="`iconfont icon-${t.icon}`"></i>
             <span slot="label">{{t.label}}</span>
         </tabbar-item>
@@ -38,7 +38,7 @@
         },
         computed: {
             show () {
-                return this.tabItems.map(a => a.link).includes(this.$route.path)
+                return this.tabItems.map(a => a.link).includes(this.$route.fullPath)
             }
         },
         watch: {

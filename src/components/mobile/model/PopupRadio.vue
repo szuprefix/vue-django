@@ -2,7 +2,7 @@
     <popup-radio v-bind="[$attrs]" :title="title" :options="options" v-model="value_"></popup-radio>
 </template>
 <script>
-    import {Register} from '../../utils/app_model'
+    import {Register} from '../../../utils/app_model'
     import {PopupRadio} from 'vux'
     export default{
         props: {

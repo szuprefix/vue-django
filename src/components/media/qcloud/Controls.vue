@@ -1,10 +1,11 @@
 <template>
     <div v-if="isActive">
+        <popup-radio title="画质" v-model="definition" :options="definitionOptions"></popup-radio>
         <!--<x-button @click.native="changeSrc(f)" v-for="f in files" :key="f.Definition">{{f.name}}</x-button>-->
     </div>
 </template>
 <script>
-    import {XButton} from 'vux'
+    import {XButton, PopupRadio} from 'vux'
     import {get} from 'lodash'
     import Cache from 'vue-django/src/utils/cache'
     export default{
@@ -13,12 +14,13 @@
         },
         data () {
             return {
+                definition: 10,
                 breakPoint: 0,
                 currentTime: 0,
                 cache: Cache(`qcloud.vod.${this.fileId}.currentTime`)
             }
         },
-        components: {XButton},
+        components: {XButton, PopupRadio},
         mounted () {
             if (this.isActive) {
                 this.init()
@@ -30,6 +32,7 @@
                 let ct = el.currentTime
                 el.src = f.url
                 el.play()
+                this.breakPoint = ct
                 this.setCurrentTime(ct)
             },
             init () {
@@ -82,6 +85,16 @@
             },
             isActive () {
                 return this.isWechat && !this.isIPhone
+            },
+            definitionOptions () {
+                return this.files.map(a => {
+                    return {key: a.definition, value: a.name}
+                })
+            }
+        },
+        watch: {
+            definition(v) {
+                this.changeSrc(this.files.find(a => a.definition === v))
             }
         }
     }
