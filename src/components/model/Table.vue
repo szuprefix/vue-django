@@ -352,8 +352,9 @@
                     })
                 }
                 let avairableActions = {...this.avairableActions, ...bactions}
+                let topActions = ['refresh', 'create', ['download'].concat(Object.keys(bactions))]
                 return {
-                    topActions: ['refresh', 'create', ['download'].concat(Object.keys(bactions))],
+                    topActions,
                     rowActions: ['edit', [this.parentMultipleRelationField ? 'removeFromParent' : 'delete']],
                     excelFormat: this.excelFormat,
                     permissionFunction: this.checkPermission,
@@ -361,7 +362,8 @@
                     title: this.model.config.verbose_name,
                     ...this.$attrs,
                     baseQueries: this._baseQueries,
-                    avairableActions
+                    avairableActions,
+                    ...get(this.model, 'viewsConfig.list.options.remoteTable')
                 }
             },
             _baseQueries () {
