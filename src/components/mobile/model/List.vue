@@ -7,11 +7,11 @@
                 <slot name="icon" v-bind="scope"></slot>
             </template>
         </cells>
-        <load-more :tip="tip" :show-loading="loading"></load-more>
+        <load-more :tip="tip" :show-loading="loading" v-if="pageSize < count"></load-more>
     </div>
 </template>
 <script>
-    import {LoadMore} from 'vux'
+    import {LoadMore, InlineLoading} from 'vux'
     import Panel from './Panel.vue'
     import Cells from './Cells.vue'
     import {Register} from '../../../utils/app_model'
@@ -31,7 +31,7 @@
                 model: Register.get(this.appModel)
             }
         },
-        components: {Panel, Cells, LoadMore},
+        components: {Panel, Cells, LoadMore, InlineLoading},
         created () {
             this.load()
         },
@@ -42,7 +42,9 @@
                     qd.owner_type = this.owner.options.content_type_id
                     qd.owner_id = this.owner.id
                 }
+                this.loading = true
                 return this.model.query(qd).then(data => {
+                    this.loading = false
                     this.count = data.count
                     this.data = data.results
                 })
@@ -55,7 +57,7 @@
         },
         computed: {
             tip () {
-                return this.pageSize < this.count ? '加载中' : '暂无数据'
+                return this.pageSize < this.count ? '加载中' : '没有了'
             }
         },
         watch: {

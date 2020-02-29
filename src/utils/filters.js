@@ -4,30 +4,29 @@
 import {formatRelative, subDays, distance_in_words_to_now} from 'date-fns'
 import zh_cn from 'date-fns/locale/zh_cn'
 
-function dateTime(t) {
-    if(typeof t === 'string' && !t.includes('+')){
+function dateTime (t) {
+    if (typeof t === 'string' && !t.includes('+')) {
         t = t.concat('+08:00')
     }
     return new Date(t)
 }
 
-export function date2now(d) {
-    "use strict";
+export function date2now (d) {
     return d
 }
 
-export function date(d) {
+export function date (d) {
     return distance_in_words_to_now(d, {locale: zh_cn})
 }
 
-function pluralize(time, label) {
+function pluralize (time, label) {
     if (time === 1) {
         return time + label
     }
     return time + label + 's'
 }
 
-export function timeAgo(time) {
+export function timeAgo (time) {
     const between = Date.now() / 1000 - Number(time)
     if (between < 3600) {
         return pluralize(~~(between / 60), ' minute')
@@ -38,7 +37,7 @@ export function timeAgo(time) {
     }
 }
 
-export function parseTime(time, cFormat) {
+export function parseTime (time, cFormat) {
     if (arguments.length === 0) {
         return null
     }
@@ -102,8 +101,8 @@ export function formatTime(time, option) {
     }
 }
 
-/* 数字 格式化*/
-export function nFormatter(num, digits) {
+/* 数字 格式化 */
+export function nFormatter (num, digits) {
     const si = [
         {value: 1E18, symbol: 'E'},
         {value: 1E15, symbol: 'P'},
@@ -120,17 +119,17 @@ export function nFormatter(num, digits) {
     return num.toString()
 }
 
-export function html2Text(val) {
+export function html2Text (val) {
     const div = document.createElement('div')
     div.innerHTML = val
     return div.textContent || div.innerText
 }
 
-export function toThousandslsFilter(num) {
+export function toThousandslsFilter (num) {
     return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
 }
 
-export function percent(value) {
+export function percent (value) {
     let a = value && (value * 100).toFixed(2)
     return `${a}%`
 }

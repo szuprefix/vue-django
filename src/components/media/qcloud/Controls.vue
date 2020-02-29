@@ -14,7 +14,7 @@
         },
         data () {
             return {
-                definition: 10,
+                definition: 20,
                 breakPoint: 0,
                 currentTime: 0,
                 cache: Cache(`qcloud.vod.${this.fileId}.currentTime`)
@@ -93,7 +93,7 @@
             }
         },
         watch: {
-            definition(v) {
+            definition (v) {
                 this.changeSrc(this.files.find(a => a.definition === v))
             }
         }

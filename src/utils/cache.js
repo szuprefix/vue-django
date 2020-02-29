@@ -4,7 +4,16 @@
 import {throttle} from 'lodash'
 export default function (key, interval) {
     function saveAtOnce (v) {
-        localStorage.setItem(key, v)
+        try {
+            localStorage.setItem(key, v)
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('超出本地存储限额！')
+                // 如果历史信息不重要了，可清空后再设置
+                localStorage.clear()
+                localStorage.setItem(key, v)
+            }
+        }
     }
 
     let save = throttle(saveAtOnce, interval || 1000)
