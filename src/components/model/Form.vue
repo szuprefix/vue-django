@@ -108,7 +108,7 @@
             },
             getId(){
                 let id = this.value && this.value.id ||
-                    this.$route.path.includes(this.model.getListUrl()) && this.$route.params.id
+                    this.$route.path.startsWith(this.model.getListUrl()) && this.$route.params.id
                     || undefined
                 return id === 'create' ? undefined : id
             },
