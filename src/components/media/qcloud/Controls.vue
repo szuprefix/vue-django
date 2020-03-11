@@ -4,16 +4,15 @@
             <span @click="showPopup = true">{{definitionMap[definition]}}</span>
             <span @click="togglePlaybackRate">{{playbackRate}}x</span>
         </div>
-        <!--<popup-radio title="倍速" v-model="playbackRate" :options="playbackRateOptions"></popup-radio>-->
         <popup v-model="showPopup">
             <group title="画质">
-                <radio v-model="definition" :options="definitionOptions" :fill-mode="false"></radio>
+                <radio v-model="definition" :options="definitionOptions"  @on-change="showPopup = false"></radio>
             </group>
         </popup>
     </div>
 </template>
 <script>
-    import {XButton, PopupRadio, Popup, Radio, Group} from 'vux'
+    import {Popup, Radio, Group} from 'vux'
     import {get} from 'lodash'
     import Cache from 'vue-django/src/utils/cache'
     export default{
@@ -37,7 +36,7 @@
                 cache: Cache(`qcloud.vod.${this.fileId}.currentTime`)
             }
         },
-        components: {XButton, PopupRadio, Popup, Radio, Group},
+        components: {Popup, Radio, Group},
         mounted () {
             if (this.isActive) {
                 this.init()
