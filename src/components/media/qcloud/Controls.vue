@@ -1,11 +1,19 @@
 <template>
     <div v-if="isActive">
-        <popup-radio title="画质" v-model="definition" :options="definitionOptions"></popup-radio>
-        <!--<x-button @click.native="changeSrc(f)" v-for="f in files" :key="f.Definition">{{f.name}}</x-button>-->
+        <div class="wechat_android_video_control">
+            <span @click="showPopup = true">{{definitionMap[definition]}}</span>
+            <span @click="togglePlaybackRate">{{playbackRate}}x</span>
+        </div>
+        <!--<popup-radio title="倍速" v-model="playbackRate" :options="playbackRateOptions"></popup-radio>-->
+        <popup v-model="showPopup">
+            <group title="画质">
+                <radio v-model="definition" :options="definitionOptions" :fill-mode="false"></radio>
+            </group>
+        </popup>
     </div>
 </template>
 <script>
-    import {XButton, PopupRadio} from 'vux'
+    import {XButton, PopupRadio, Popup, Radio, Group} from 'vux'
     import {get} from 'lodash'
     import Cache from 'vue-django/src/utils/cache'
     export default{
@@ -15,12 +23,21 @@
         data () {
             return {
                 definition: 20,
+                definitionMap: {
+                    10: '流畅',
+                    20: '标清',
+                    30: '高清',
+                    1100: '纯音频'
+                },
                 breakPoint: 0,
+                playbackRate: 1,
+                playbackRates: [0.5, 1, 1.25, 1.5, 2],
+                showPopup: false,
                 currentTime: 0,
                 cache: Cache(`qcloud.vod.${this.fileId}.currentTime`)
             }
         },
-        components: {XButton, PopupRadio},
+        components: {XButton, PopupRadio, Popup, Radio, Group},
         mounted () {
             if (this.isActive) {
                 this.init()
@@ -34,6 +51,9 @@
                 el.play()
                 this.breakPoint = ct
                 this.setCurrentTime(ct)
+            },
+            togglePlaybackRate () {
+                this.playbackRate = this.playbackRates.find(a => a > this.playbackRate) || this.playbackRates[0]
             },
             init () {
                 let ct = this.cache.read() || 0
@@ -70,17 +90,10 @@
                 return this.options.FileId || this.options.FileId
             },
             files () {
-                let dm = {
-                    10: '流畅',
-                    20: '标清',
-                    30: '高清',
-                    1100: '纯音频'
-                }
-
                 return get(this.options, 'TranscodeInfo.TranscodeSet', [])
                     .filter(a => [10, 20, 30, 1100].includes(a.Definition))
                     .map(a => {
-                        return {definition: a.Definition, name: dm[a.Definition], url: a.Url}
+                        return {definition: a.Definition, name: this.definitionMap[a.Definition], url: a.Url}
                     })
             },
             isActive () {
@@ -95,7 +108,21 @@
         watch: {
             definition (v) {
                 this.changeSrc(this.files.find(a => a.definition === v))
+            },
+            playbackRate (v) {
+                this.getEl().playbackRate = v
             }
         }
     }
 </script>
+<style>
+    .wechat_android_video_control {
+        background-color: darkgray;
+        color: white;
+        padding: 0.5rem;
+    }
+
+    .wechat_android_video_control span {
+        padding: 0 1rem;
+    }
+</style>

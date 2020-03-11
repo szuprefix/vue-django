@@ -63,7 +63,7 @@ export default  {
         },
         onServerResponseError: function (error) {
             this.loading = false
-            if(error == 'cancel'){  // confirm dialog cancel ?
+            if (error == 'cancel') {  // confirm dialog cancel ?
                return
             }
             if ([404,403,405,429, 537].includes(error.code) && error.msg.detail) {
@@ -73,9 +73,11 @@ export default  {
             if (error.code === 400) {
                 // this.errors = this.formErrors = joinErrors(error.msg)
             } else if (error.code === 401) {
-                this.$store.state.bus.$emit("user-logout")
-            } else if (error.code === 502){
-                this.alertError("网关错误")
+                this.$store.state.bus.$emit('user-logout')
+            } else if (error.code === 502) {
+                this.alertError('网关错误')
+            } else if (error instanceof Error) {
+                this.alertError({code: error.name, msg: error.message})
             } else {
                 this.alertError(error)
             }
