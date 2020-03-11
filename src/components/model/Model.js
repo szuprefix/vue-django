@@ -17,8 +17,7 @@ export default function (appModel, defaults, eventor) {
     let m = {
         appModel,
         defaults: defaults || {},
-        eventor: eventor || function () {
-        },
+        eventor,
         config: {},
         id: null,
         fieldConfigs: {},
@@ -27,7 +26,7 @@ export default function (appModel, defaults, eventor) {
         data: {},
         viewsConfig: undefined,
 
-        init(){
+        init () {
             this.config = Register.getConfig(this.appModel)
         },
         clear () {
@@ -70,12 +69,12 @@ export default function (appModel, defaults, eventor) {
             Object.keys(m).forEach((k) => {
                 let f = m[k]
                 let v = dvs[f.name]
-                r[k] = v !== undefined ? v : ( f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null )
+                r[k] = v !== undefined ? v : (f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null)
             })
             return r
         },
         load () {
-            return axios.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((data, restOptions,viewsConfig) => {
+            return axios.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((data, restOptions, viewsConfig) => {
                 if (!this.id) {
                     data = this.emptyDataFromOptions(restOptions.actions.POST)
                 }
@@ -101,10 +100,10 @@ export default function (appModel, defaults, eventor) {
         selectOrCreate (d) {
             let url = this.getListUrl()
             return axios.get(`${url}?${Qs.stringify(d)}`).then(({data}) => {
-                if(data.count === 1) {
+                if (data.count === 1) {
                     return data.results[0]
-                } else if (data.count === 0 ) {
-                    return axios.post(url, d). then(({data}) => {
+                } else if (data.count === 0) {
+                    return axios.post(url, d).then(({data}) => {
                         return data
                     })
                 } else {
@@ -119,7 +118,7 @@ export default function (appModel, defaults, eventor) {
         destroy (id) {
             id = id || this.id
             return axios.delete(this.getDetailUrl(id)).then(() => {
-                this.eventor.$emit('model-deleted', {appModel: this.appModel, id})
+                this.eventor && this.eventor.$emit('model-deleted', {appModel: this.appModel, id})
             })
         },
         emitPosted (id) {
@@ -145,8 +144,13 @@ export default function (appModel, defaults, eventor) {
             let mid = id || this.id
             return `${this.getListUrl()}${mid}/`
         },
+        query (d) {
+            return axios.get(`${this.getListUrl()}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
+                return data
+            })
+        },
         title () {
-            return !this.id && `新增${this.config.verbose_name}` || this.data['__str__']
+            return (!this.id && `新增${this.config.verbose_name}`) || this.data['__str__']
         },
         loadViewsConfig () {
             if (this.viewsConfig) {

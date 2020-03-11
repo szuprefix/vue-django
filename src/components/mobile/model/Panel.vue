@@ -21,7 +21,7 @@
                     let d = {meta: {}}
                     this.items.forEach((f) => {
                         let p = f.placeholder || 'meta'
-                        let v = a[f.name]
+                        let v = (f.name === '$' && a) || a[f.name]
                         if (f.format) {
                             v = f.format(v)
                         }

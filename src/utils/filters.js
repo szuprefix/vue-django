@@ -4,7 +4,7 @@
 import {formatRelative, subDays, distance_in_words_to_now} from 'date-fns'
 import zh_cn from 'date-fns/locale/zh_cn'
 
-function dateTime (t) {
+export function dateTime (t) {
     if (typeof t === 'string' && !t.includes('+')) {
         t = t.concat('+08:00')
     }
@@ -141,6 +141,7 @@ export function duration (a) {
 }
 
 export default {
+    dateTime,
     date2now,
     date,
     parseTime,
