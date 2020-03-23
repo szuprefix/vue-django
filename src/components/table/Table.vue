@@ -3,7 +3,7 @@
               :element-loading-text="loading"  v-on="elListeners" v-bind="elAttrs">
         <slot name="left"></slot>
         <column :field="f" v-for="f in _items" :key="f.name"></column>
-        <el-table-column label="" align="right"
+        <el-table-column label="" align="right" fixed="right"
                          v-if="rowActions &&  rowActions.length>0 || topActions && topActions.length>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
                 <actions :items="_topActions" :context="scope" :permissionFunction="$attrs.permissionFunction"

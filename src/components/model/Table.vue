@@ -342,20 +342,32 @@
                 }
             },
             rtAttrs () {
+                let mc = this.model.config
                 let bactions = {}
-                if (this.model.config.actions) {
-                    this.model.config.actions.forEach(a => {
+                if (mc.actions) {
+                    mc.actions.forEach(a => {
                         bactions[a.name] = a
                         a.do = () => {
                             this.$router.push(`${this.model.getListUrl()}${a.name}/`)
                         }
                     })
                 }
-                let avairableActions = {...this.avairableActions, ...bactions}
+                let ractions = {}
+                if (mc.itemActions) {
+                    mc.itemActions.forEach(a => {
+                        ractions[a.name] = a
+                        a.do = ({row}) => {
+                            this.$router.push(`${this.model.getDetailUrl(row.id)}${a.name}/`)
+                        }
+                    })
+                }
+
+                let avairableActions = {...this.avairableActions, ...bactions, ...ractions}
                 let topActions = ['refresh', 'create', ['download'].concat(Object.keys(bactions))]
+                let rowActions = ['edit'].concat(Object.keys(ractions)).concat([[this.parentMultipleRelationField ? 'removeFromParent' : 'delete']])
                 return {
                     topActions,
-                    rowActions: ['edit', [this.parentMultipleRelationField ? 'removeFromParent' : 'delete']],
+                    rowActions,
                     excelFormat: this.excelFormat,
                     permissionFunction: this.checkPermission,
                     dblClickAction: 'edit',

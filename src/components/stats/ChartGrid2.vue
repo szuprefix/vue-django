@@ -1,13 +1,12 @@
 <template>
     <el-row>
-        <el-col :sm="c.sm || c.span || 24" :md="c.md || c.span ||  12" :xl="c.xl || c.span || 8" v-for="c in items"
-                :key="c.name" v-loading="loading"
+        <el-col :sm="c.sm || 24" :md="c.md || 12" :xl="c.xl || 8" v-for="c in chartItems" :key="c.name" v-loading="loading"
                 :element-loading-text="loading">
-            <template v-if="chartData[c.name]">
-                <data-table v-if="c.type === 'table'" :title="c.title" :group="c.group" :value="genTableData(c)"
+            <template v-if="c.data">
+                <x-table v-if="c.type === 'table'" :title="c.title" :group="c.group" :value="genTableData(c)"
                             :items="c.fields"
-                            :options="Object.assign({maxHeight:500},c.options)"></data-table>
-                <chart v-else :options="chartOptions[c.name]" :auto-resize="true"></chart>
+                            :options="Object.assign({maxHeight:500},c.options)"></x-table>
+                <chart v-else :options="c.options" :auto-resize="true"></chart>
             </template>
         </el-col>
     </el-row>
@@ -15,8 +14,9 @@
 <script>
     import Qs from 'qs'
     import server_response from 'vue-django/src/mixins/server_response'
-    import DataTable from 'vue-django/src/components/table/Table.vue'
+    import XTable from 'vue-django/src/components/table/Table.vue'
     import {zipObject} from 'lodash'
+    import arrayNormalize from 'vue-django/src/utils/array_normalize'
     let OPTIONS_TOOLBOX = {
         show: true,
         right: '5%',
@@ -44,10 +44,13 @@
         },
         data () {
             return {
-                chartData: {}
+                chartItems: []
             }
         },
-        components: {DataTable},
+        components: {XTable},
+        created () {
+            this.normalizeItems()
+        },
         mounted() {
             this.loadTimeData(this.period)
         },
@@ -63,7 +66,7 @@
                     visualMap: item.visualMap,
                     xAxis: {
                         type: 'category',
-                        data: data.map((a) => a[0])
+//                        data: data.map((a) => a[0])
                     },
                     yAxis: {
                         type: 'value',
@@ -72,9 +75,24 @@
                         type: 'line',
                         smooth: true,
                         name: item.title,
-                        data: data.map((a) => a[1])
+//                        data: data.map((a) => a[1])
                     }]
                 }
+            },
+            normalizeItems () {
+                let res = {}
+                this.chartItems = arrayNormalize(this.items, {}, (a) => {
+                    let optionFunc = a.type == 'daily' ? this.genDailyOption : (a.type === 'funnel' ? this.genFunnelOption : this.genBarOption)
+                    a.options = {
+                        ...COMMON_OPTIONS,
+                        title: {
+                            text: a.title
+                        },
+                        ...optionFunc(a),
+                        ...a.options
+                    }
+                    return a
+                })
             },
             genTreeMapOption(item, data){
 
@@ -86,7 +104,7 @@
                         formatter: "{a} <br/>{b} : {c}%"
                     },
                     legend: {
-                        data: data.map(a => a[0])
+//                        data: data.map(a => a[0])
                     },
                     calculable: true,
                     series: [
@@ -123,32 +141,32 @@
                                     fontSize: 20
                                 }
                             },
-                            data: data.map(a => {
-                                return {value: (a[1] / data[0][1] * 100).toFixed(0), name: a[0]}
-                            })
+//                            data: data.map(a => {
+//                                return {value: (a[1] / data[0][1] * 100).toFixed(0), name: a[0]}
+//                            })
                         }
                     ]
                 }
             },
             genBarOption (item, data){
                 let dataZoom = []
-                if (data.length >= 16) {
-                    dataZoom.push(
-                        {
-                            id: 'dataZoomY',
-                            type: 'slider',
-                            yAxisIndex: [0],
-                            filterMode: 'filter',
-                            show: true,
-                            start: 0,
-                            end: 900 / data.length
-                        })
-                }
-                return {
+//                if (data.length >= 16) {
+//                    dataZoom.push(
+//                        {
+//                            id: 'dataZoomY',
+//                            type: 'slider',
+//                            yAxisIndex: [0],
+//                            filterMode: 'filter',
+//                            show: true,
+//                            start: 0,
+//                            end: 900 / data.length
+//                        })
+//                }
+                return  {
                     dataZoom,
                     yAxis: {
                         type: 'category',
-                        data: data.map((a) => a[0])
+//                        data: data.map((a) => a[0])
                     },
                     grid: {
                         left: '33%',
@@ -161,19 +179,15 @@
                         type: 'bar',
                         smooth: true,
                         name: item.title,
-                        data: data.map((a) => a[1])
+//                        data: data.map((a) => a[1])
                     }]
                 }
             },
             loadTimeData(period){
-                let context = {measures: this.items.map((a) => a.name), period: `${period[0]}至${period[1]}`}
+                let context = {measures: this.chatItems.map((a) => a.name), period: `${period[0]}至${period[1]}`}
                 let qs = Qs.stringify(context, {indices: false})
                 this.loading = "加载中"
-                let url = this.url
-                if (!url.includes('?')) {
-                    url = url.concat('?')
-                }
-                this.$http.get(`${url}&${qs}`).then(({data}) => {
+                this.$http.get(`${this.url}?${qs}`).then(({data}) => {
                     this.loading = false
                     let ds = data
                     if (this.base) {
