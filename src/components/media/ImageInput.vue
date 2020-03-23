@@ -1,0 +1,51 @@
+<template>
+    <image-upload v-bind="[$attrs, $pros, field]" :context="context" :bucket="$store.state.qcloud.cos.bucket"
+                  :urls="imageUrls" @success="onSuccess" @remove="onRemove">
+    </image-upload>
+</template>
+<script>
+    import ImageUpload from './qcloud/ImageUpload.vue'
+    import {template} from 'lodash'
+    export default{
+        props: {
+            value: [String, Array],
+            field: Object,
+            context: Object
+        },
+        data () {
+            return {
+//                fileName: undefined
+            }
+        },
+        created () {
+//            console.log(this.$store.state.qcloud.cos.bucket)
+        },
+        components: {ImageUpload},
+        methods: {
+            onSuccess({fileList}) {
+
+                this.changeFileList(fileList)
+            },
+            onRemove ({fileList}) {
+                this.changeFileList(fileList)
+            },
+            changeFileList (fileList) {
+                let limit = this.$attrs.limit || this.field.limit
+                let urls = fileList.map(f => f.url)
+                this.$emit('input', limit === 1 ? (urls.length > 0 ? urls[0] : null) : urls)
+            }
+        },
+        computed: {
+            imageUrls () {
+                let v = this.value
+                if (!v) {
+                    return []
+                }
+                if (typeof v === 'string') {
+                    return [v]
+                }
+                return v
+            }
+        }
+    }
+</script>

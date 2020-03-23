@@ -1,9 +1,6 @@
 <template>
-    <span v-if="field.widget === 'readonly'" style="white-space: pre-wrap">
-        {{value[field.name]}}
-    </span>
-    <span v-else-if="typeof(field.widget) === 'function'" v-html="field.widget(value,field)">
-    </span>
+    <span v-if="field.widget === 'readonly'" style="white-space: pre-wrap">{{value[field.name]}}</span>
+    <span v-else-if="typeof(field.widget) === 'function'" v-html="field.widget(value,field)"></span>
     <el-radio-group v-model="value[field.name]" v-else-if="field.widget === 'radio'" @change="fieldValueChanged"
                     :disabled="field.disabled">
         <el-radio-button :label="c.value" v-for="c in field.choices" :key="c.value">{{ c.display_name}}

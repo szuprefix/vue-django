@@ -99,7 +99,7 @@
             onPosted(data){
                 this.loading = false
                 this.$message({message: this.successInfo || `${this.submitName}成功`, type: 'success'})
-                this.$emit("form-posted", data)
+                this.$emit('form-posted', data)
                 return data
             },
             onValidated (valid, notValidFields) {

@@ -124,7 +124,8 @@
                     return Promise.resolve(this.items)
                 }
                 return import(`@/views${this.model.getListUrl()}config.js`).then(m => {
-                    return m.default.form || {}
+                    let c = m.default
+                    return this.mid && c.update || c.create || c.form || {}
                 }).catch(() => {
                     return {}
                 }).then(config => {
@@ -152,6 +153,7 @@
             {
                 let payLoad = {model: this.model.config, data, intent: this.intent}
                 this.$emit("form-posted", payLoad)
+                this.$emit('input', data)
             },
             toDelete(){
                 this.$emit("model-delete", this)
@@ -198,6 +200,9 @@
             },
         },
         watch: {
+            value(val){
+                this.formValue = val
+            },
             formValue(val){
                 this.model.data = val
                 this.$emit("input", val)

@@ -7,9 +7,13 @@
                :disabled="scopes.select.count===0" :type="a.type"
                :key="a.name">{{a.label}}
     </el-button>
+    <el-dialog :title="dialog.title" v-if="dialog" :visible.sync="showDialog">
+      <component :is="dialog.component" v-bind="[dialog]"></component>
+    </el-dialog>
   </span>
 </template>
 <script>
+//  import _import from '../../router/_import_production'
     export default{
         props: {
             items: Array,
@@ -17,12 +21,24 @@
         },
         data () {
             return {
-                scope: 'select'
+                scope: 'select',
+                dialog: undefined,
+                showDialog: false
             }
         },
         components: {},
         methods: {
             onCommand(action){
+                if(action.dialog) {
+//                    let component = _import(action.dialog.component)
+                    this.dialog = {title:action.label, ...action.dialog}
+                    this.showDialog = true
+                }else {
+                    this.runCommand(action)
+                }
+
+            },
+            runCommand(action) {
                 let scope = this.scopes[this.scope]
                 if (scope.count === 0) {
                     this.$message('请先勾选至少一条记录')
