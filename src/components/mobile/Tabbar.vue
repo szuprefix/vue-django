@@ -23,12 +23,22 @@
         created () {
             this.normalizeItems()
 //            console.log(this.tabItems)
+            this.getBadges()
         },
         methods: {
             normalizeItems () {
                 this.tabItems = arrayNormalize(this.items, {}, (a) => {
                     a.label = a.label || a.name
                     return a
+                })
+            },
+            getBadges () {
+                this.tabItems.forEach((a, i) => {
+                    if (a.getBadge) {
+                        this.$http.get(a.getBadge).then(({data}) => {
+                            this.tabItems[i] = {...a, badge: data.count}
+                        })
+                    }
                 })
             }
         },
