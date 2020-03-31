@@ -4,7 +4,7 @@
                v-else-if="field.widget && typeof field.widget == 'object'"></component>
     <span v-else-if="field.widget && typeof field.widget == 'function'"
           v-html="field.widget(value, field)"></span>
-    <span v-else>{{value[field.name]}}</span>
+    <span v-else>{{field.formatter && field.formatter(value, field.name, value[field.name]) || value[field.name]}}</span>
 </template>
 <script>
     import FormWidget from '../form/Widget.vue'

@@ -8,12 +8,12 @@
                :key="a.name">{{a.label}}
     </el-button>
     <el-dialog :title="dialog.title" v-if="dialog" :visible.sync="showDialog">
-      <component :is="dialog.component" v-bind="[dialog]"></component>
+      <component :is="dialog.component" v-bind="[dialog]" :submit="function() {runCommand(dialog.action)}"></component>
     </el-dialog>
   </span>
 </template>
 <script>
-//  import _import from '../../router/_import_production'
+    //  import _import from '../../router/_import_production'
     export default{
         props: {
             items: Array,
@@ -29,11 +29,10 @@
         components: {},
         methods: {
             onCommand(action){
-                if(action.dialog) {
-//                    let component = _import(action.dialog.component)
-                    this.dialog = {title:action.label, ...action.dialog}
+                if (action.dialog) {
+                    this.dialog = {title: action.label, ...action.dialog, action}
                     this.showDialog = true
-                }else {
+                } else {
                     this.runCommand(action)
                 }
 

@@ -30,8 +30,8 @@
                 let items = this.items || this.parent.viewsConfig.relations || []
                 this.modelItems = array_normalize(items, {}, (a) => {
                     let m = a.model = Model(a.name)
-                    a.icon = m.config.icon
-                    a.label = m.config.verbose_name
+                    a.icon = a.icon || m.config.icon
+                    a.label = a.label || m.config.verbose_name
                     return a
                 })
             }
