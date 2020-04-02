@@ -1,5 +1,5 @@
 <template>
-    <a :href="`#/${field.model.replace('.','/')}/${value[field.name]}/`" v-if="hasLink">
+    <a :href="`#/${field.model.replace('.','/')}/${value[field.name]}`" title="点击跳转" class="foreignkey-link" v-if="hasLink">
         {{theValue}}
     </a>
     <span v-else>
@@ -25,3 +25,8 @@
         }
     }
 </script>
+<style>
+    a.foreignkey-link:hover{
+        text-decoration: underline;
+    }
+</style>

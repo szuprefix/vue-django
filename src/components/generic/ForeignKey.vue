@@ -1,5 +1,5 @@
 <template>
-  <a :href="`#${url}`" v-if="hasLink">
+  <a :href="`#${url}`"  title="点击跳转" class="foreignkey-link" v-if="hasLink">
     {{label}}
   </a>
   <span v-else>
