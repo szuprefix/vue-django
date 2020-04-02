@@ -28,7 +28,7 @@
                     if (a.getBadge) {
                         this.$http.get(a.getBadge).then(({data}) => {
                             this.cellItems[i] = {...a, badge: data.count}
-                            console.log(this.cellItems)
+//                            console.log(this.cellItems)
                         })
                     }
                 })

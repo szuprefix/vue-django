@@ -24,6 +24,10 @@
 //            console.log(this.fileID,this.appID)
             this.init()
         },
+        beforeDestroy () {
+            this.player.dispose()
+            this.player = null
+        },
         methods: {
             loadStyle (href) {
                 var link = document.createElement('link')
