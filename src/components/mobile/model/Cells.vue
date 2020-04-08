@@ -26,7 +26,7 @@
         },
         methods: {
             genGetLinkFunc() {
-                let l = this.$attrs.link || `/${this.$attrs.appModel.replace('.', '/')}/$\{id}/`
+                let l = this.$attrs.link || `/${this.$attrs.appModel.replace('.', '/')}/$\{id}`
                 if (this.relationModelName) {
                     l = `${l}?relation_model_name=${this.relationModelName}`
                 }

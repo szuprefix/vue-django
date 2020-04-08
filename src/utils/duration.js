@@ -5,7 +5,7 @@
 export default function (key) {
     let ms = localStorage.getItem(key)
     ms = (ms && Math.floor(ms)) || 0
-    console.debug(key, localStorage.getItem(key))
+    // console.debug(key, localStorage.getItem(key))
     return {
         lastTime: undefined,
         ms: ms,

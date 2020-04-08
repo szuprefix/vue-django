@@ -20,7 +20,8 @@
             appModel: String,
             owner: Object,
             queries: {type: Object, default: {}},
-            layout: {type: String, default: 'panel'}
+            layout: {type: String, default: 'panel'},
+            prepare: Function
         },
         data () {
             return {
@@ -46,7 +47,11 @@
                 return this.model.query(qd).then(data => {
                     this.loading = false
                     this.count = data.count
-                    this.data = data.results
+                    let ds = data.results
+                    if (this.prepare) {
+                        ds = this.prepare(ds)
+                    }
+                    this.data = ds
                 })
             },
             loadMore (loaded) {
