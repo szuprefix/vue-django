@@ -4,12 +4,13 @@
 <script>
     export default{
         props: {
-            value: [String, Number],
+            value: Object,
             field: Object
         },
         computed:{
             display(){
-                let a = this.field.choices.find(a => a.value == this.value)
+                let v = this.value[this.field.name]
+                let a = this.field.choices.find(a => a.value === v)
                 return a && a.display_name
             }
         }
