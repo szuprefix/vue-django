@@ -105,7 +105,7 @@
                 let rowspan = m[rowIndex][columnIndex]
                 return {rowspan, colspan: rowspan > 0 ? 1 : 0}
             },
-            genDefaultFormater (f) {
+            genDefaultFormatter (f) {
                 let df = (v) => v
                 let func = ['decimal', 'number', 'integer'].includes(f.type) && toThousandslsFilter || ['percent'].includes(f.type) && percent || df
                 return (row, column, cellValue, index) => func(cellValue)
@@ -121,7 +121,7 @@
                 f.align = f.align || ['decimal', 'number', 'percent', 'integer'].includes(f.type) && 'right' || 'left'
                 f.widget = f.widget || this.cellWidget
                 f.headerWidget = f.headerWidget || this.headerWidget
-                f.formatter = f.formatter || this.genDefaultFormater(f)
+                f.formatter = f.formatter || this.genDefaultFormatter(f)
                 if (f.subColumns) {
                     f.subColumns = f.subColumns.map(i => this.normalizeField(i))
                 }

@@ -1,8 +1,8 @@
 <template>
     <el-table :data="_value" ref="table" v-loading="loading"
-              :element-loading-text="loading"  v-on="elListeners" v-bind="elAttrs">
+              :element-loading-text="loading" v-on="elListeners" v-bind="elAttrs">
         <slot name="left"></slot>
-        <column :field="f" v-for="f in _items" :key="f.name"></column>
+        <column :field="f" v-for="f in _items" v-if="f.hidden !== true" :key="f.name"></column>
         <el-table-column label="" align="right" fixed="right"
                          v-if="rowActions &&  rowActions.length>0 || topActions && topActions.length>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
@@ -20,7 +20,7 @@
     </el-table>
 </template>
 <script>
-    import {percent, toThousandslsFilter} from '../../utils/filters'
+    import {percent, toThousandslsFilter, json} from '../../utils/filters'
     import {sortBy} from 'lodash'
     import Column from './Column.vue'
     import Actions from '../layout/Actions.vue'
@@ -69,9 +69,25 @@
         methods: {
             excelFormat(data){
                 let ds = data.map((d) => {
-                    return this.fieldNames.map((a) => d[a])
+                    let rs = []
+                    this.fields.forEach(f => {
+                        let fd = d[f.name]
+                        if (f.items) {
+                            f.items.forEach(a => {
+                                rs.push(fd[a.name])
+                            })
+                        } else {
+
+                            let r = d[f.name]
+                            if (f.formatter) {
+                                r = f.formatter(d, f.name, r)
+                            }
+                            rs.push(r)
+                        }
+                    })
+                    return rs
                 })
-                return [this.fieldNames].concat(ds)
+                return [this.fieldLabels].concat(ds)
             },
             excelGetAllData () {
                 return Promise.resolve(this.value)
@@ -81,7 +97,7 @@
                 let excelGetAllData = this.$attrs.excelGetAllData || this.excelGetAllData
                 let excelFormat = this.$attrs.excelFormat || this.excelFormat
                 excelGetAllData().then((data) => {
-                    if(data === undefined) {
+                    if (data === undefined) {
                         this.loading = false
                         return
                     }
@@ -107,7 +123,10 @@
                 let rowspan = m[rowIndex][columnIndex]
                 return {rowspan, colspan: rowspan > 0 ? 1 : 0}
             },
-            genDefaultFormater (f) {
+            genDefaultFormatter (f) {
+                if (f.type === 'field') {
+                    return (row, column, cellValue, index) => json(cellValue, f.items)
+                }
                 let df = (v) => v
                 let func = ['decimal', 'number', 'integer'].includes(f.type) && toThousandslsFilter || ['percent'].includes(f.type) && percent || df
                 return (row, column, cellValue, index) => func(cellValue)
@@ -122,14 +141,14 @@
                 })
             },
             normalizeItem(f){
-                if(typeof f === 'string'){
-                    f = {name:f}
+                if (typeof f === 'string') {
+                    f = {name: f}
                 }
                 f.type = f.type || 'string'
                 f.align = f.align || ['decimal', 'number', 'percent', 'integer'].includes(f.type) && 'right' || 'left'
                 f.widget = f.widget || this.cellWidget
                 f.headerWidget = f.headerWidget || this.headerWidget
-                f.formatter = f.formatter || this.genDefaultFormater(f)
+                f.formatter = f.formatter || this.genDefaultFormatter(f)
                 if (f.subColumns) {
                     f.subColumns = f.subColumns.map(i => this.normalizeItem(i))
                 }
@@ -159,9 +178,21 @@
                     return this.normalizeItem(i)
                 })
             },
-            fieldNames (){
-                let fs = flatten(this._items, 'subColumns')
-                return fs.map(a => a.name)
+            fields () {
+                return flatten(this._items, 'subColumns')
+            },
+            fieldNames () {
+                return this.fields.map(a => a.name)
+            },
+            fieldLabels () {
+                let rs = []
+                this.fields.map(f => {
+                    let ls = f.items ? f.items : [f]
+                    ls.forEach(a => {
+                        rs.push(a.label || a.name)
+                    })
+                })
+                return rs
             },
             _value(){
                 if (this.group > 0) {

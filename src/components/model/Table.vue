@@ -205,7 +205,9 @@
                     let orderingFields = get(this.model.options, 'actions.SEARCH.ordering_fields', [])
                     let rs = array_normalize(config.listItems, this.model.fieldConfigs, (a) => {
                         Object.assign(a, {field: this.model.fieldConfigs[a.name]})
-
+                        if(!a.formatter) {
+                            a.formatter = this.genDefaultFormatter(a)
+                        }
                         if (!a.useFormWidget) {
                             a.widget = a.widget || this.defaultWidget(a)
                         }
@@ -277,21 +279,32 @@
                     }
                 }
             },
-            excelFormat(data){
-                let ds = data.map((d) => {
-                    return this.tableItems.map((a) => {
-                        let v = d[a.name]
-                        if (a.choices) {
-                            return a.choices.find(a => a.value === v).display_name
-                        } else if (a.model) {
-                            return d[`${a.name}_name`]
-                        }
-                        return v
-
-                    })
-                })
-                return [this.tableItems.map((a) => a.label)].concat(ds)
+            genDefaultFormatter (f) {
+                if (f.choices) {
+                    return (d, n, v) => f.choices.find(a => a.value === v).display_name
+                } else if (f.model) {
+                    return (d, n, v) => d[`${f.name}_name`]
+                }
             },
+//            excelFormat(data){
+//                let ds = data.map((d) => {
+//                    console.log(this.tableItems)
+//                    return this.tableItems.map((a) => {
+//                        let v = d[a.name]
+//                        if (a.choices) {
+//                            v= a.choices.find(a => a.value === v).display_name
+//                        } else if (a.model) {
+//                            v = d[`${a.name}_name`]
+//                        }
+//                        if (a.formatter) {
+//                            v = a.formatter(d, a.name, v)
+//                        }
+//                        return v
+//
+//                    })
+//                })
+//                return [this.tableItems.map((a) => a.label)].concat(ds)
+//            },
             checkPermission(p, m){
                 m = m || this
                 return this.$store.state.user.model_permissions[m.appModel].includes(p)
@@ -368,7 +381,7 @@
                 return {
                     topActions,
                     rowActions,
-                    excelFormat: this.excelFormat,
+//                    excelFormat: this.excelFormat,
                     permissionFunction: this.checkPermission,
                     dblClickAction: 'edit',
                     title: this.model.config.verbose_name,

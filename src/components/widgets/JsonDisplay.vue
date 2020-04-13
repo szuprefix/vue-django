@@ -2,7 +2,7 @@
     <el-row class="json-display">
         <template v-for="a in items">
             <el-col :span="8" class="label">{{a.label || a.name}}</el-col>
-            <el-col :span="16">{{a.value}}</el-col>
+            <el-col :span="16">{{a.value}}&nbsp;</el-col>
         </template>
     </el-row>
 </template>
