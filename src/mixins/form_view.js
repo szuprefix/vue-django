@@ -32,13 +32,15 @@ export default{
             type: String, default: '160px'
         },
         formTextareaSize: {
-            type: Object, default(){
+            type: Object,
+            default () {
                 return {minRows: 4, maxRows: 8}
             }
         },
-        formNoLabel: {type:Boolean, default:false},
+        formNoLabel: {type: Boolean, default: false},
         formItemStyle: {
-            type: Object, default(){
+            type: Object,
+            default () {
                 return {minWidth: '350px'}
             }
         }
@@ -65,10 +67,10 @@ export default{
             }
 
         },
-        _formSubmitSuccess(data){
+        _formSubmitSuccess (data) {
             this.loading = false
             this.$message({message: `${this.formSubmitName}成功`, type: 'success'})
-            this.$emit("form-posted", data)
+            this.$emit('form-posted', data)
             return data
         },
         onSubmit () {
@@ -91,7 +93,7 @@ export default{
                 formValid(procedure)
             } else {
                 let validator = new schema(this.formRules)
-                validator.validate(this.formValue, (errors /*, fields*/) => {
+                validator.validate(this.formValue, (errors) => {
                     let valid = true
                     if (errors) {
                         this.formErrors = errors
@@ -108,26 +110,28 @@ export default{
                         valid = false
                     }
                     procedure(valid)
+                }).catch(e => {
+                    console.log(e)
                 })
             }
 
         },
         formDefaultWidget (f) {
-            return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime', 'time'].includes(f.type) ? f.type : ( ['integer','decimal'].includes(f.type) ? 'number' : 'text'))
+            return f.type === 'boolean' ? 'checkbox' : (['date', 'datetime', 'time'].includes(f.type) ? f.type : ( ['integer','decimal'].includes(f.type) ? 'number' : 'text'))
         },
-        formDefaultRuleType(f){
+        formDefaultRuleType (f) {
             if (f.multiple) {
                 return 'array'
             }
             if (f.choices && f.choices.length > 0) {
-                return typeof f.choices[0][0]
+                return typeof (f.choices[0][0] || f.choices[0])
             }
-            return f.model ? 'number' : (['field','time'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
+            return f.model ? 'number' : (['field','time'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : (f.type || 'string')))
         },
-        formDefaultSpan(f){
-            return f.widget == 'textarea' ? {xs: 24, sm: 24, md: 24, lg:24, xl: 24} : {xs: 24, sm: 24, md: 12, lg:12, xl: 8}
+        formDefaultSpan (f) {
+            return f.widget === 'textarea' ? {xs: 24, sm: 24, md: 24, lg: 24, xl: 24} : {xs: 24, sm: 24, md: 12, lg: 12, xl: 8}
         },
-        formDefaultRules(f){
+        formDefaultRules (f) {
             let rs = []
             if (f.required) {
                 rs.push({
@@ -144,8 +148,9 @@ export default{
             }
             return rs
         },
-        formNormalizeItem(i){
+        formNormalizeItem (i) {
             let a = Object.assign({}, i)
+            a.type = a.type || 'string'
             a.label = a.label || a.name
             a.rules = a.rules || this.formDefaultRules(a)
             a.widget = a.widget || this.formDefaultWidget(a)
@@ -154,7 +159,7 @@ export default{
             a.span = Object.assign({}, this.formDefaultSpan(a), a.span)
             return a
         },
-        formNormalizeItems(formItems){
+        formNormalizeItems (formItems) {
             return formItems.map((i) => {
                 return this.formNormalizeItem(i)
             })
@@ -169,12 +174,11 @@ export default{
                 let n = f.name
                 let rs = d[n] = f.rules || []
                 rs.concat(this.formDefaultRules(f))
-
             })
             return d
 
         },
-        _formItems() {
+        _formItems () {
             return this.formNormalizeItems(this.formItems)
         }
     }

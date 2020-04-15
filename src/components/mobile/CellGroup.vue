@@ -1,6 +1,6 @@
 <template>
     <group :title="$attrs.title">
-        <cell :link="c.link" v-for="c in cellItems">
+        <cell :link="c.link" v-for="c in cellItems" :key="c.name">
             <span slot="title">{{c.title}}<badge v-if="c.badge" :text="c.badge"></badge></span>
         </cell>
     </group>

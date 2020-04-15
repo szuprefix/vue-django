@@ -6,7 +6,7 @@
         </div>
         <popup v-model="showPopup">
             <group title="画质">
-                <radio v-model="definition" :options="definitionOptions"  @on-change="showPopup = false"></radio>
+                <radio v-model="definition" :fill-mode="false" :options="definitionOptions"  @on-change="showPopup = false"></radio>
             </group>
         </popup>
     </div>
@@ -21,7 +21,7 @@
         },
         data () {
             return {
-                definition: 20,
+                definition: 30,
                 definitionMap: {
                     10: '流畅',
                     20: '标清',

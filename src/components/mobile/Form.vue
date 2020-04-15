@@ -6,12 +6,18 @@
                     {{formValue[field.name]}}
                 </template>
 
-                <radio :title="field.label" v-model="formValue[field.name]" :required="field.required"
-                       :options="field.choices"
-                       :ref="field.name"
-                       v-if="field.widget === 'radio'"></radio>
+                <popup-radio :title="field.label" v-if="field.widget === 'radio'" v-model="formValue[field.name]"
+                             :placeholder="field.placeholder || field.help_text || `请输入${field.label}`"
+                             :required="field.required" :options="normalizeOptions(field.choices)" :ref="field.name">
+                    <p slot="popup-header" class="vux-1px-b form-popup-radio-header">{{field.help_text || field.placeholder || field.label}}</p>
+                </popup-radio>
+                <checker :title="field.label" v-model="formValue[field.name]" :required="field.required"
+                         :ref="field.name" v-else-if="field.widget === 'checker'">
+                    <checker-item v-for="c in field.choices" :key="c.value" :value="c.value">{{c.display_name}}
+                    </checker-item>
+                </checker>
                 <selector :title="field.label" v-model="formValue[field.name]" :required="field.required"
-                          :ref="field.name"
+                          :ref="field.name" :options="normalizeOptions(field.choices)"
                           v-else-if="field.widget === 'select'"></selector>
                 <x-switch :title="field.label" v-model="formValue[field.name]" :required="field.required"
                           :ref="field.name"
@@ -24,14 +30,17 @@
                           :format="field.widget=='datetime'?'YYYY-MM-DD HH:mm':'YYYY-MM-DD'"
                           v-else-if="['date','datetime'].includes(field.widget)"></datetime>
                 <x-textarea :title="field.label" v-model="formValue[field.name]" :required="field.required"
-                            :ref="field.name"
-                            :placeholder="field.help_text"
+                            :ref="field.name" :placeholder="field.help_text"
                             v-else-if="field.widget === 'textarea'"></x-textarea>
+                <popup-picker :title="field.label" v-model="formValue[field.name]" :required="field.required"
+                              :ref="field.name" :data="field.choices" :placeholder="field.help_text"
+                              v-else-if="field.widget === 'popup-picker'"></popup-picker>
+
                 <component :is="field.widget" v-else-if="typeof field.widget == 'object'"
                            :ref="field.name"
                            :placeholder="field.label" v-model="formValue[field.name]" :field="field"></component>
                 <x-input :title="field.label" v-else v-model="formValue[field.name]" :required="field.required"
-                         :placeholder="field.help_text" :equal-with="field.equalWith"
+                         :placeholder="field.placeholder || field.help_text || `请输入${field.label}`" :equal-with="field.equalWith"
                          :icon-type="formErrors[field.name]?'error':null"
                          :ref="field.name" :keyboard="field.keyboard" @on-click-error-icon="showError(field)"
                          :is-type="field.isType" :mask="field.mask" :max="field.max"
@@ -53,10 +62,13 @@
         XTextarea,
         XSwitch,
         XNumber,
-        Radio,
+        PopupRadio,
+        Checker,
+        CheckerItem,
         Selector,
         Datetime,
         XButton,
+        PopupPicker,
         Box
     } from 'vux'
     export default{
@@ -75,10 +87,13 @@
             XTextarea,
             XSwitch,
             XNumber,
-            Radio,
+            PopupRadio,
+            Checker,
+            CheckerItem,
             Selector,
             Datetime,
             XButton,
+            PopupPicker,
             Box
         },
         created () {
@@ -87,6 +102,15 @@
         methods: {
             showError (field) {
                 this.$message({message: this.formErrors[field.name], type: 'error'})
+            },
+            normalizeOptions (choices) {
+                let ops = choices.map(a => {
+                    if (typeof a === 'string') {
+                        return {key: a, value: a}
+                    }
+                    return {key: a.value, value: a.display_name}
+                })
+                return ops
             }
         },
         watch: {
@@ -105,4 +129,11 @@
         }
     }
 </script>
+<style>
+    .form-popup-radio-header {
+        text-align: center;
+        padding: 8px 0;
+        color: #888;
+    }
+</style>
 
