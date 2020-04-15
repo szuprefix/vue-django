@@ -28,5 +28,6 @@
 <style>
     a.foreignkey-link:hover{
         text-decoration: underline;
+        color:blue;
     }
 </style>

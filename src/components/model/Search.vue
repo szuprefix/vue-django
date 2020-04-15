@@ -19,6 +19,9 @@
             <model-select :field="f" v-model="value[f.name]" @input="onSearch"
                           :showCreate="false" :appModel="f.model"
                           v-else-if="f.model" :pageSize="100"></model-select>
+            <el-select v-model="value[f.name]" clearable :placeholder="`请选择${f.label}`" v-else-if="f.choices" @change="onSearch">
+                <el-option v-for="c in f.choices" :label="c.display_name" :value="c.value" :key="c.value"></el-option>
+            </el-select>
         </template>
 
         <template v-for="f in filterFields" v-if="! (f.name in exclude)">

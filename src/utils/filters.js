@@ -140,6 +140,19 @@ export function duration (a) {
     return `${m}'${s}''`
 }
 
+export function json(value, items) {
+    console.log(value)
+    if(items) {
+        return items.map(a => {
+            return `${a.label || a.name}: ${value[a.name]}`
+        }).join('\n')
+    } else {
+        return Object.keys(value).map(k => {
+            return `${k}: ${value[k]}`
+        }).join('\n')
+    }
+}
+
 export default {
     dateTime,
     date2now,
@@ -151,5 +164,6 @@ export default {
     html2Text,
     toThousandslsFilter,
     percent,
-    duration
+    duration,
+    json
 }
