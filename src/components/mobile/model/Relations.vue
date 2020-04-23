@@ -9,7 +9,7 @@
 </template>
 <script>
     import {Tab, TabItem} from 'vux'
-    import Cache from 'vue-django/src/utils/cache'
+    import Cache from '../../../utils/user_storage'
     export default{
         props: {
             items: Array,
@@ -17,7 +17,7 @@
         },
         data () {
             return {
-                cache: Cache(`${this.owner.appModel}.${this.owner.id}.relations.tab`),
+                cache: Cache(`${this.owner.appModel}.n${this.owner.id}.relations.tab`, this.$store.state.user.id),
                 tab: undefined,
                 modelListComponents: [],
                 relationComponent: undefined
@@ -45,7 +45,7 @@
         watch: {
             tab (v) {
                 this.relationComponent = this.modelListComponents[this.tab]
-                this.cache.saveAtOnce(v)
+                this.cache.save(v)
             }
         }
     }
