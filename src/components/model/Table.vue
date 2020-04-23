@@ -1,8 +1,7 @@
 <template>
     <div>
         <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search"
-                v-if="showSearch"
-                @change="onSearch"></search>
+                v-if="showSearch" :map="searchMap" @change="onSearch"></search>
         <batch-actions :items="batchActionItems" @done="refresh" :context="{selection,count}"
                        v-if="batchActionItems.length>0"></batch-actions>
         <el-drawer :visible.sync="editing" direction="rtl"
@@ -44,6 +43,7 @@
     import Date2Now from '../widgets/Date2Now.vue'
     import ForeignKey from '../widgets/ForeignKey.vue'
     import Search from './Search.vue'
+    import ContentType from '../generic/ContentType'
 
     export default{
         name: 'ModelTable',
@@ -286,25 +286,7 @@
                     return (d, n, v) => d[`${f.name}_name`]
                 }
             },
-//            excelFormat(data){
-//                let ds = data.map((d) => {
-//                    console.log(this.tableItems)
-//                    return this.tableItems.map((a) => {
-//                        let v = d[a.name]
-//                        if (a.choices) {
-//                            v= a.choices.find(a => a.value === v).display_name
-//                        } else if (a.model) {
-//                            v = d[`${a.name}_name`]
-//                        }
-//                        if (a.formatter) {
-//                            v = a.formatter(d, a.name, v)
-//                        }
-//                        return v
-//
-//                    })
-//                })
-//                return [this.tableItems.map((a) => a.label)].concat(ds)
-//            },
+
             checkPermission(p, m){
                 m = m || this
                 return this.$store.state.user.model_permissions[m.appModel].includes(p)
@@ -328,11 +310,11 @@
                             let popt = this.model.options
                             if (popt.generic_foreign_key) {
                                 let {ct_field, fk_field} = popt.generic_foreign_key
-                                r[ct_field] = this.parent.options.content_type_id
+                                r[ct_field] = ContentType.getId(this.parent.appModel)
                                 if (!this.model.fieldConfigs[fk_field]) {
                                     throw Error(`genric foreign key id_field:${id_field} not found.`)
                                 }
-                                r[fk_field] = pid
+                                r[fk_field] = pid || undefined
                             }
                         }
 
@@ -393,6 +375,13 @@
             },
             _baseQueries () {
                 return Object.assign({}, this.parentQueries, this.baseQueries)
+            },
+            searchMap () {
+                let d = {}
+                this.tableItems.forEach(a => {
+                    d[a.name]={name: a.name, label: a.label}
+                })
+                return d
             }
         },
         watch: {

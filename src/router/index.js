@@ -91,7 +91,7 @@ export var genModelRouters = function (apps, importFunc, defaultLayout) {
                     path: `/${a}/${m}/${action.name}/`,
                     name: `${a}-${m}-${action.name}`,
                     meta: {
-                        title: `${action.verbose_name || action.title}${mname}`,
+                        title: `${mname}${action.verbose_name || action.title}`,
                         model,
                         icon: model.icon,
                         permissions: action.permission || []
