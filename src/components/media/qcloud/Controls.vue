@@ -6,22 +6,25 @@
         </div>
         <popup v-model="showPopup">
             <group title="画质">
-                <radio v-model="definition" :options="definitionOptions"  @on-change="showPopup = false"></radio>
+                <radio v-model="definition" :fill-mode="false" :options="definitionOptions"
+                       @on-change="showPopup = false"></radio>
             </group>
         </popup>
     </div>
 </template>
 <script>
     import {Popup, Radio, Group} from 'vux'
-    import {get} from 'lodash'
-    import Cache from 'vue-django/src/utils/cache'
+    import {get, throttle} from 'lodash'
+    import Cache from 'vue-django/src/utils/user_storage'
+    import {duration} from 'vue-django/src/utils/filters'
     export default{
         props: {
-            options: Object
+            options: Object,
+            currentTime: {type: Number, default: 0}
         },
         data () {
             return {
-                definition: 20,
+                definition: 30,
                 definitionMap: {
                     10: '流畅',
                     20: '标清',
@@ -32,8 +35,7 @@
                 playbackRate: 1,
                 playbackRates: [0.5, 1, 1.25, 1.5, 2],
                 showPopup: false,
-                currentTime: 0,
-                cache: Cache(`qcloud.vod.${this.fileId}.currentTime`)
+                cache: undefined
             }
         },
         components: {Popup, Radio, Group},
@@ -55,9 +57,7 @@
                 this.playbackRate = this.playbackRates.find(a => a > this.playbackRate) || this.playbackRates[0]
             },
             init () {
-                let ct = this.cache.read() || 0
-                this.breakPoint = ct
-//                this.setCurrentTime(ct)
+                this.breakPoint = this.currentTime
                 this.getEl().addEventListener('timeupdate', this.onTimeUpdate)
             },
             getEl () {
@@ -69,9 +69,14 @@
                     ct = this.breakPoint
                     this.breakPoint = 0
                     this.getEl().currentTime = ct
+                    this.$vux.toast.text(`从上次断点${duration(ct)}继续播放.`)
                 }
-                this.cache.save(ct)
+//                this.currentTime = ct
+//                this.saveCurrentTime()
             },
+//            saveCurrentTime: throttle(function () {
+//                this.cache.save(this.currentTime)
+//            }, 2000),
             setCurrentTime (ct) {
                 setTimeout(() => {
                     this.getEl().currentTime = ct
@@ -80,13 +85,14 @@
         },
         computed: {
             isWechat () {
+//                return true
                 return (/MicroMessenger/i).test(window.navigator.userAgent)
             },
             isIPhone () {
                 return (/iphone/i).test(window.navigator.userAgent)
             },
             fileId () {
-                return this.options.FileId || this.options.FileId
+                return this.options.FileId
             },
             files () {
                 return get(this.options, 'TranscodeInfo.TranscodeSet', [])

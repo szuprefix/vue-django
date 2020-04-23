@@ -38,7 +38,7 @@
             },
             createPlayer () {
                 this.player = window.TCPlayer(this.$el, this.playerOptions)
-                let es = ['ended', 'pause', 'timeupdate']
+                let es = ['ended', 'pause', 'timeupdate', 'resolutionswitched']
                 es.forEach(e => {
                     this.player.on(e, (a) => {
                         try {

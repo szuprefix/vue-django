@@ -1,10 +1,10 @@
 /**
  * Created by denishuang on 2020/2/8.
  */
-
-export default function (key) {
-    let ms = localStorage.getItem(key)
-    ms = (ms && Math.floor(ms)) || 0
+import {throttle} from 'lodash'
+export default function (cache) {
+    let ms = cache.read()
+    ms = ms || 0
     // console.debug(key, localStorage.getItem(key))
     return {
         lastTime: undefined,
@@ -25,10 +25,11 @@ export default function (key) {
         },
         setMs (ms) {
             this.ms = ms
-            if (key) {
-                localStorage.setItem(key, ms)
-            }
+            this.saveCache()
         },
+        saveCache: throttle(function () {
+            cache.save(this.ms)
+        }, 10000),
         getSeconds () {
             return Math.floor(this.ms / 1000)
         }

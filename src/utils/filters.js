@@ -136,7 +136,7 @@ export function percent (value, fixed) {
 
 export function duration (a) {
     let m = Math.floor(a / 60)
-    let s = a % 60
+    let s = Math.floor(a % 60)
     return `${m}'${s}''`
 }
 
