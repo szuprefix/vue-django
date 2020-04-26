@@ -6,6 +6,7 @@ import axios from '../../configs/axios'
 import Model from "../model/Model";
 export default {
     idMap: undefined,
+    nameMap: undefined,
     model: Model('contenttypes.contenttype'),
     loading: false,
     getAppModel (id) {
@@ -15,19 +16,24 @@ export default {
         let d = this.idMap[id]
         return Model(`${d.app_label}.${d.model}`)
     },
+    getId (name) {
+        return this.nameMap[name]
+    },
     loadIdMap () {
         if (this.idMap === undefined && this.loading === false) {
             this.loading = true
             axios.get(`${this.model.getListUrl()}?page_size=1000`).then(({data}) => {
                 return data.results
             }).then(ls => {
-                let d = {}
+                let idm = {}
+                let nm = {}
                 ls.forEach(a => {
-                    d[a.id] = a
+                    idm[a.id] = a
+                    nm[`${a.app_label}.${a.model}`] = a.id
                 })
-                this.idMap = d
+                this.idMap = idm
+                this.nameMap = nm
                 this.loading = false
-                // console.log(this.idMap)
             }).catch((e) => {
                 this.loading = false
             })

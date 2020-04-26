@@ -15,7 +15,8 @@ export var addDays = function (d, days) {
     return d
 }
 import dateUtil from 'element-ui/src/utils/date'
-const DFMT = "yyyy-MM-ddTHH:mm:ss"
+const DFMT = "yyyy-MM-ddTHH:mm:ss+08:00"
+// const DFMT0 = "yyyy-MM-ddT00:00:00+08:00"
 
 
 export var recent_nday = function (n) {

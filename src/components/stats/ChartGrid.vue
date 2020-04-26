@@ -166,7 +166,8 @@
                 }
             },
             loadTimeData(period){
-                let context = {measures: this.items.map((a) => a.name), period: `${period[0]}至${period[1]}`}
+                period = period instanceof Array ? `${period[0]}至${period[1]}` : period
+                let context = {measures: this.items.map((a) => a.name), period}
                 let qs = Qs.stringify(context, {indices: false})
                 this.loading = "加载中"
                 let url = this.url
