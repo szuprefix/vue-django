@@ -9,13 +9,21 @@ export function Cache (key, db) {
     return {
         db,
         save (v) {
-            db.set(key, v).write()
+            try {
+                db.set(key, v).write()
+            } catch (e) {
+                alert(e.toString())
+            }
         },
         read (k) {
             return db.get(k || key).value()
         },
         destroy () {
-            db.unset(key).write()
+            try {
+                db.unset(key).write()
+            } catch (e) {
+                alert(e.toString())
+            }
         }
     }
 }
@@ -40,7 +48,7 @@ export default BCache
 
 export function UserStorage (key) {
     if (key === undefined) {
-       key = 'userStore'
+        key = 'userStore'
     }
     if (Number.isInteger(key)) {
         key = `userStore${key}`
