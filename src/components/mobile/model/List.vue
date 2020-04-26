@@ -7,7 +7,9 @@
                 <slot name="icon" v-bind="scope"></slot>
             </template>
         </cells>
+
         <load-more :tip="tip" :show-loading="loading" v-if="pageSize < count"></load-more>
+        <div v-if="!loading && count<=0" style="text-align: center;margin: 2rem 0;">暂无数据</div>
     </div>
 </template>
 <script>

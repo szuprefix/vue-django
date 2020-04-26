@@ -5,12 +5,14 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import apps from '@/configs/apps'
 import {logout} from '../utils/auth'
-import dailyLog from 'vue-django/src/utils/dailylog'
+import dailyLog from '../utils/dailylog'
+import {UserStorage} from '../utils/user_storage'
 Vue.use(Vuex)
 const state = {
     bus: new Vue(),
     user: {},
     dailyLog,
+    storage: UserStorage(),
     apps,
     system_name: '',
     logo: require('../assets/logo.png')
@@ -22,6 +24,7 @@ var store = new Vuex.Store({
         setUser (state, payload) {
             // console.log(payload)
             state.user = payload
+            state.storage = UserStorage(payload.id)
             state.bus.$emit('get-user-info', payload)
         },
         clearUser (state) {

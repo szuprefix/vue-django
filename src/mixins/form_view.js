@@ -110,8 +110,6 @@ export default{
                         valid = false
                     }
                     procedure(valid)
-                }).catch(e => {
-                    console.log(e)
                 })
             }
 

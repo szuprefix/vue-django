@@ -2,36 +2,39 @@
  * Created by denishuang on 2020/1/7.
  */
 
-export default function (options) {
+import {duration} from './filters'
+import {throttle} from 'lodash'
+export default function (cache) {
     let t = {
         value: 0,
-        ...options,
+        cache,
         init () {
-            if (this.key) {
-                this.value = Number.parseInt(localStorage.getItem(this.key) || 0)
+            if (this.cache) {
+                this.value = this.cache.read() || 0
             }
         },
         run () {
             this.handler = setInterval(() => {
                 this.value++
-                if (this.key && this.value % 10 === 0) {
-                    localStorage.setItem(this.key, this.value)
+                if (this.cache) {
+                    this.saveCache()
                 }
             }, 1000)
         },
+        saveCache: throttle(function () {
+            this.cache.save(this.value)
+        }, 10000),
         stop () {
             clearInterval(this.handler)
         },
         clear () {
             this.value = 0
-            if (this.key) {
-                localStorage.removeItem(this.key)
+            if (this.cache) {
+                this.cache.destroy()
             }
         },
         toString () {
-            let m = Math.floor(this.value / 60)
-            let s = this.value % 60
-            return `${m}'${s}''`
+            return duration(this.value)
         }
     }
     t.init()
