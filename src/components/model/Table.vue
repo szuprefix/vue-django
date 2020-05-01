@@ -1,7 +1,7 @@
 <template>
     <div>
         <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search"
-                v-if="showSearch" :map="searchMap" @change="onSearch"></search>
+                v-if="showSearch && optionLoaded" :map="searchMap" @change="onSearch"></search>
         <batch-actions :items="batchActionItems" @done="refresh" :context="{selection,count}"
                        v-if="batchActionItems.length>0"></batch-actions>
         <el-drawer :visible.sync="editing" direction="rtl"
@@ -134,9 +134,6 @@
         methods: {
             init () {
                 this.model.loadOptionsAndViewsConfig().then(() => {
-                    if (this.$refs.search) {
-                        this.$refs.search.init()
-                    }
                     this.parentQueries = Object.assign({}, this.getParentQueries())
                     return this.normalizeItems()
                 }).then(() => {
