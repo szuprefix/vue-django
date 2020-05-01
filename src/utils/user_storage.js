@@ -6,24 +6,24 @@ import low from 'lowdb'
 import LocalStorage from 'lowdb/adapters/LocalStorage'
 
 export function Cache (key, db) {
-    if (Number.isInteger(db) || db === undefined) {
-        db = `userStore${db}`
-    }
-    if (typeof db === 'string') {
-        let adapter = new LocalStorage(db)
-        db = low(adapter)
-        db.read()
-    }
     return {
         db,
         save (v) {
-            db.set(key, v).write()
+            try {
+                db.set(key, v).write()
+            } catch (e) {
+                alert(e.toString())
+            }
         },
         read (k) {
             return db.get(k || key).value()
         },
         destroy () {
-            db.unset(key).write()
+            try {
+                db.unset(key).write()
+            } catch (e) {
+                alert(e.toString())
+            }
         }
     }
 }
@@ -34,6 +34,7 @@ export function BCache (key, db) {
         ps[2] = ps[2].replace(/^n/, '')
         return ps.join('.')
     }
+
     let cache = Cache(key, db)
     return {
         ...cache,
@@ -44,3 +45,20 @@ export function BCache (key, db) {
 }
 
 export default BCache
+
+export function UserStorage (key) {
+    if (key === undefined) {
+        key = 'userStore'
+    }
+    if (Number.isInteger(key)) {
+        key = `userStore${key}`
+    }
+    let adapter = new LocalStorage(key)
+    let db = low(adapter)
+    return {
+        db,
+        newCache: function (key) {
+            return BCache(key, db)
+        }
+    }
+}

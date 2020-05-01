@@ -9,7 +9,6 @@
 </template>
 <script>
     import {Tab, TabItem} from 'vux'
-    import Cache from '../../../utils/user_storage'
     export default{
         props: {
             items: Array,
@@ -17,7 +16,7 @@
         },
         data () {
             return {
-                cache: Cache(`${this.owner.appModel}.n${this.owner.id}.relations.tab`, this.$store.state.user.id),
+                cache: this.$store.state.storage.newCache(`${this.owner.appModel}.n${this.owner.id}.relations.tab`),
                 tab: undefined,
                 modelListComponents: [],
                 relationComponent: undefined

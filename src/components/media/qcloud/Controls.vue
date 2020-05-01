@@ -14,8 +14,7 @@
 </template>
 <script>
     import {Popup, Radio, Group} from 'vux'
-    import {get, throttle} from 'lodash'
-    import Cache from 'vue-django/src/utils/user_storage'
+    import {get} from 'lodash'
     import {duration} from 'vue-django/src/utils/filters'
     export default{
         props: {
@@ -71,12 +70,7 @@
                     this.getEl().currentTime = ct
                     this.$vux.toast.text(`从上次断点${duration(ct)}继续播放.`)
                 }
-//                this.currentTime = ct
-//                this.saveCurrentTime()
             },
-//            saveCurrentTime: throttle(function () {
-//                this.cache.save(this.currentTime)
-//            }, 2000),
             setCurrentTime (ct) {
                 setTimeout(() => {
                     this.getEl().currentTime = ct

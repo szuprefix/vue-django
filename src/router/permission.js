@@ -1,12 +1,11 @@
 import router from './index'
-import {asyncRouterMap} from './index'
 import store from '../store'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css'// progress bar style
-import {getToken, setToken, getLoginMode, removeToken} from '../utils/auth' // getToken from cookie
+import {getToken, setToken} from '../utils/auth' // getToken from cookie
 
 NProgress.configure({showSpinner: false})// NProgress Configuration
-const loginUrl = '/auth/login/'
+const loginUrl = '/auth/login'
 
 router.beforeEach((to, from, next) => {
         NProgress.start() // start progress bar
@@ -28,7 +27,7 @@ router.beforeEach((to, from, next) => {
                     // router.addRoutes(asyncRouterMap) //todo: make dynamics routers
                     next({...to, replace: true}) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
                 }).catch((error) => {
-                    Vue.prototype.$message({message:'身份认证失败, 请重新登录', type:'error'})
+                    Vue.$message({message:'身份认证失败, 请重新登录', type:'error'})
                     next({path: loginUrl, query: {redirect: to.fullPath}})
                 })
             } else {
@@ -39,7 +38,7 @@ router.beforeEach((to, from, next) => {
                 if (isAllowed) {
                     next()
                 } else {
-                    next({path: '/notallow/'})
+                    next({path: '/notallow'})
                 }
             }
         }
@@ -53,5 +52,5 @@ router.afterEach(() => {
 router.onError((err) => {
     NProgress.done()
     console.error(err)
-    Vue.prototype.$message({message:`发生异常:${err}`, type:'error'})
+    Vue.$message({message:`发生异常:${err}`, type:'error'})
 })
