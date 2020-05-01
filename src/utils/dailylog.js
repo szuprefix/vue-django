@@ -1,18 +1,17 @@
 /**
  * Created by denishuang on 2020/2/8.
  */
-import Vue from 'vue'
 import {throttle} from 'lodash'
-
+import axios from 'axios'
+import Qs from 'qs'
+import {parseTime} from './filters'
 let INTERVAL = 5
-export default new Vue({
-    data: {
+function DailyLog () {
+    let a = {
         m: {},
         saveTime: undefined,
-        delayMethods: {}
-    },
-    methods: {
-        log (app, model, id, metics, subMetics, v, interval) {
+        delayMethods: {},
+        log  (app, model, id, metics, subMetics, v, interval) {
             let k = `${app}.${model}.${id}.${metics}.${subMetics}`
             let d = new Date()
             let dk = d.toISOString().substr(0, 10)
@@ -23,14 +22,67 @@ export default new Vue({
             this.delayMethods[`save${it}s`]()
         },
         save () {
-            return this.$http.post('/dailylog/dailylog/write/', this.m)
+            return axios.post('/dailylog/dailylog/write/', this.m)
+        },
+        init () {
+            for (var i = 1; i <= 3; i++) {
+                let p = Math.pow(2, i - 1) * INTERVAL
+                this.delayMethods[`save${p}s`] = throttle(() => this.save(), p * 1000)
+            }
+            return this
         }
-    },
-    created () {
-        for (var i = 1; i <= 3; i++) {
-            let p = Math.pow(2, i - 1) * INTERVAL
-            this.delayMethods[`save${p}s`] = throttle(this.save, p * 1000)
-        }
-        // console.log(this.delayMethods)
     }
-})
+    return a.init()
+}
+
+export default DailyLog()
+//     created () {
+
+//         // console.log(this.delayMethods)
+//     }
+// })
+
+export function Performance (app, model, ownerId, target, interval) {
+    let qd = {app, model, owner_id: ownerId}
+    return {
+        data: {
+            parts: [],
+            dates: [],
+            target,
+            score: null,
+            times: 0
+        },
+        post () {
+            let d = {...qd, detail: this.data}
+            return axios.post('/dailylog/performance/write/', d)
+        },
+        save: throttle(function () {
+            this.post()
+        }, interval || 10000),
+        stack (s, v) {
+            if (s[s.length - 1] !== v) {
+                s.push(v)
+            }
+        },
+        read () {
+            return axios.get(`/dailylog/performance/read/?${Qs.stringify(qd)}`).then(({data}) => {
+                Object.assign(this.data, data.detail, {target})
+                return this.data
+            })
+        },
+        addPart (p) {
+            this.stack(this.data.parts, p)
+            let d = parseTime(new Date()).substr(0,10)
+            this.stack(this.data.dates, d)
+            return this
+        },
+        addScore (score) {
+            this.data.score = Math.max(this.data.score, score)
+            return this
+        },
+        addTimes (times) {
+            this.data.times += times
+            return this
+        }
+    }
+}

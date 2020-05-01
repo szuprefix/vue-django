@@ -8,7 +8,7 @@
             </template>
         </cells>
 
-        <load-more :tip="tip" :show-loading="loading" v-if="pageSize < count"></load-more>
+        <load-more :tip="tip" :show-loading="loading" v-if="currentPageSize < count"></load-more>
         <div v-if="!loading && count<=0" style="text-align: center;margin: 2rem 0;">暂无数据</div>
     </div>
 </template>
@@ -23,24 +23,25 @@
             owner: Object,
             queries: {type: Object, default: {}},
             layout: {type: String, default: 'panel'},
-            prepare: Function
+            prepare: Function,
+            pageSize: {type: Number, default: 20}
         },
         data () {
             return {
                 loading: false,
                 data: [],
                 count: 0,
-                pageSize: 20,
+                currentPageSize: 0,
                 model: Register.get(this.appModel)
             }
         },
         components: {Panel, Cells, LoadMore, InlineLoading},
         created () {
-            this.load()
+            this.currentPageSize = this.pageSize
         },
         methods: {
             load () {
-                let qd = {...this.queries, page_size: this.pageSize}
+                let qd = {...this.queries, page_size: this.currentPageSize}
                 if (this.owner) {
                     qd.owner_type = this.owner.options.content_type_id
                     qd.owner_id = this.owner.id
@@ -57,21 +58,21 @@
                 })
             },
             loadMore (loaded) {
-                if (this.pageSize < this.count) {
-                    this.pageSize += 10
+                if (this.currentPageSize < this.count) {
+                    this.currentPageSize += this.pageSize
                 }
             }
         },
         computed: {
             tip () {
-                return this.pageSize < this.count ? '加载中' : '没有了'
+                return this.currentPageSize < this.count ? '加载中' : '没有了'
             }
         },
         watch: {
             queries (v) {
                 this.load()
             },
-            pageSize (v) {
+            currentPageSize (v) {
                 this.load()
             },
             owner (v) {

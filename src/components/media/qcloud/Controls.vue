@@ -47,6 +47,7 @@
             changeSrc (f) {
                 let el = this.getEl()
                 let ct = el.currentTime
+                ct = ct > 0 ? ct : this.breakPoint
                 el.src = f.url
                 el.play()
                 this.breakPoint = ct
