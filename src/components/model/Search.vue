@@ -75,7 +75,6 @@
                     return {multiple: false, ...a, label, widget: this.defaultWidget(a)}
                 })
                 this.filterFields = this.reorder(ffields)
-                console.log(search.filter_fields, ffields, this.filterFields)
                 this.filters = Object.assign({}, this.getFilters())
             },
             defaultWidget (item) {
