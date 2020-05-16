@@ -1,7 +1,7 @@
 /**
  * Created by denishuang on 2020/5/15.
  */
-import UserStorage from '../../utils/user_storage'
+import {UserStorage} from '../../utils/user_storage'
 import {logout} from '../../utils/auth'
 export default {
     state: {
@@ -9,8 +9,7 @@ export default {
     },
     mutations: {
         setUser (state, payload) {
-            Object.assign(state, payload)
-            state.storage = UserStorage(payload.id)
+            Object.assign(state, payload, {storage: UserStorage(payload.id)})
         },
         clearUser (state) {
             state.user = {}
