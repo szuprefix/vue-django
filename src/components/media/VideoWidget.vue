@@ -1,5 +1,5 @@
 <template>
-    <q-video :width="field.width" :height="field.height" :appID="$store.state.qcloud.vod.appId"
+    <q-video :width="field.width" :height="field.height" :appID="$store.state.party.settings.media.qcloud.vod.appid"
              :fileID="fileId" ref="video">
     </q-video>
 </template>

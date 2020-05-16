@@ -4,7 +4,7 @@
                    class="image-uploader"
                    ref="upload"
                    action="noaction"
-                   accept=".jpg,.png,.jpeg"
+                   accept=".jpg,.png,.jpeg,.gif"
                    list-type="picture-card"
                    :file-list="fileList"
                    v-bind="[$attrs, $props]"
@@ -78,14 +78,14 @@
                 this.dialogVisible = true
             },
             onProgress(event, file, fileList){
-                console.log(['progress', event, file, fileList])
+//                console.log(['progress', event, file, fileList])
             },
             onError(err, file, fileList){
                 console.log(['error', err, file, fileList])
             },
 
             onSuccess(response, file, fileList){
-                let sf = fileList.find(f => f.uid = file.uid)
+                let sf = fileList.find(f => f.uid === file.uid)
                 if (!sf) {
                     console.error('file not found:', file.uid)
                     return
@@ -98,12 +98,12 @@
                 this.$emit('remove', {file, fileList})
             },
             onChange (file, fileList) {
-                console.log('change')
+//                console.log('change')
                 this.fileList = fileList
             },
             toggleAdd () {
                 if (this.$attrs.limit === 1) {
-                    console.debug(this.$attrs.limit, this.fileList.length)
+//                    console.debug(this.$attrs.limit, this.fileList.length)
                     if (this.fileList.length>0) {
                         this.elUploader.classList.add('hidden')
                     } else {
@@ -118,6 +118,13 @@
                 var URL = window.URL || window.webkitURL
                 let url = URL.createObjectURL(file)
                 return url
+            },
+            getFileNumber(fn) {
+                let re = /(\d+)\./g
+                let m =re.exec(fn)
+                if(m) {
+                    return m[1]
+                }
             },
             getFileNameContext (fn) {
                 let ps = fn.split('.')
@@ -134,14 +141,16 @@
                     extName,
                     fileName,
                     baseName,
-                    dateTime
+                    dateTime,
+                    number: this.getFileNumber(fn)
                 }
             },
             uploadFile (req) {
                 let file = req.file
                 let fn = file.name
                 let ctx = {...this.context, ...this.getFileNameContext(fn)}
-                console.log(ctx)
+                file.uploadContext = ctx
+//                console.log(ctx)
                 let fileName = template(this.fileName || '${dateTime}.${extName}')(ctx)
 //                console.log(fileName)
 //                return
@@ -153,6 +162,7 @@
                         Key: fileName,
                         Body: req.file,
                         onProgress: function (info) {
+                            console.log('tcCos.onProgress', info, req)
                             req.onProgress(info)
                         }
                     }, function (err, data) {

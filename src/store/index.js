@@ -5,14 +5,14 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import apps from '@/configs/apps'
 import {logout} from '../utils/auth'
+import user from './modules/user'
+import party from './modules/party'
 import dailyLog from '../utils/dailylog'
 import {UserStorage} from '../utils/user_storage'
 Vue.use(Vuex)
 const state = {
     bus: new Vue(),
-    user: {},
     dailyLog,
-    storage: UserStorage(),
     apps,
     system_name: '',
     logo: require('../assets/logo.png')
@@ -20,31 +20,9 @@ const state = {
 
 var store = new Vuex.Store({
     state: state,
-    mutations: {
-        setUser (state, payload) {
-            // console.log(payload)
-            state.user = payload
-            state.storage = UserStorage(payload.id)
-            state.bus.$emit('get-user-info', payload)
-        },
-        clearUser (state) {
-            state.user = {}
-            state.bus.$emit('user-logout')
-        }
-    },
-    actions: {
-        getUserInfo (context) {
-            return Vue.http.get('/auth/user/current/').then(({data}) => {
-                context.commit('setUser', data)
-                return data
-            })
-        },
-        logout (context) {
-            return logout().then((data) => {
-                context.commit('clearUser')
-                return data
-            })
-        }
+    modules: {
+        user,
+        party
     },
     plugins: []
 })

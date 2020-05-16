@@ -5,8 +5,8 @@
         <template v-else>
             <el-menu class="el-menu-demo" mode="horizontal" router>
                 <el-menu-item index="/" class="brand">
-                    <img :src="logo" height="32">
-                    <b v-if="user.as_saas_worker">{{user.as_saas_worker.party}}</b>
+                    <img :src="party.logo" height="32">
+                    <b v-if="user.as_saas_worker">{{party.name}}</b>
                     {{system_name}}
                 </el-menu-item>
                 <el-submenu index="2" style="float:right">
@@ -51,7 +51,7 @@
             layout (){
                 return this.$route.meta.layout
             },
-            ...mapState(['user', 'system_name', 'logo'])
+            ...mapState(['user', 'system_name', 'party'])
         },
         methods: {
             logout(){
