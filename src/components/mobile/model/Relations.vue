@@ -16,7 +16,7 @@
         },
         data () {
             return {
-                cache: this.$store.state.storage.newCache(`${this.owner.appModel}.n${this.owner.id}.relations.tab`),
+                cache: this.$store.state.user.storage.newCache(`${this.owner.appModel}.n${this.owner.id}.relations.tab`),
                 tab: undefined,
                 modelListComponents: [],
                 relationComponent: undefined

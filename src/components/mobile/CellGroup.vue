@@ -1,7 +1,7 @@
 <template>
     <group :title="$attrs.title">
-        <cell :link="c.link" v-for="c in cellItems" :key="c.name">
-            <span slot="title">{{c.title}}<badge v-if="c.badge" :text="c.badge"></badge></span>
+        <cell :link="c.link" v-for="c in cellItems" :key="c.title">
+            <span slot="title">{{c.title}}<badge v-if="badges[c.title]" :text="badges[c.title]"></badge></span>
         </cell>
     </group>
 
@@ -14,7 +14,8 @@
         },
         data () {
             return {
-                cellItems: []
+                cellItems: [],
+                badges: {}
             }
         },
         mounted () {
@@ -27,8 +28,8 @@
                 this.cellItems.forEach((a, i) => {
                     if (a.getBadge) {
                         this.$http.get(a.getBadge).then(({data}) => {
-                            this.cellItems[i] = {...a, badge: data.count}
-//                            console.log(this.cellItems)
+                            this.badges[a.title] = data.count
+                            this.badges = {...this.badges}
                         })
                     }
                 })
