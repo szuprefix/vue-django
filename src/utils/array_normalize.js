@@ -3,7 +3,7 @@
  */
 
 export default function (items, templates, normalize) {
-    return items.map((a) => {
+    return items.map((a, i) => {
         let d = {}
         if (typeof a === 'string' || a instanceof String) {
             Object.assign(d, templates[a])
@@ -14,7 +14,7 @@ export default function (items, templates, normalize) {
             Object.assign(d, templates[a.name], a)
         }
         if (normalize) {
-            d = normalize(d)
+            d = normalize(d, i)
         }
         return d
     })
