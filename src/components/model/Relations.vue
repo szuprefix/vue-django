@@ -14,7 +14,7 @@
     export default{
         props: {
             parent: Object,
-            items: Array,
+            items: Array
         },
         data () {
             return {

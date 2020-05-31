@@ -1,7 +1,7 @@
 <template>
     <div>
         <tab v-model="tab" :animate="false">
-            <tab-item :active-class="`active-${i%3+1}`" v-for="a, i in items" :key="a.name">{{a.label}}</tab-item>
+            <tab-item :active-class="`active-${i%3+1}`" :badge-label="a.badge" v-for="a, i in tabItems" :key="a.name">{{a.label}}</tab-item>
         </tab>
         <component :is="tabItems[tab].component" :owner="owner" v-bind="[tabItems[tab]]"
                    v-if="loaded"></component>
@@ -11,6 +11,9 @@
     import {Tab, TabItem} from 'vux'
     import arrayNormalize from 'vue-django/src/utils/array_normalize'
     export default{
+        model: {
+            prop: 'current'
+        },
         props: {
             current: Number,
             items: Array,
@@ -34,6 +37,12 @@
             normalizeItems () {
                 this.tabItems = arrayNormalize(this.items, {}, (a, i) => {
                     a.component = a.component || `${a.name.replace('.', '/')}/components/List`
+                    if (a.getAsyncInfo) {
+                        a.getAsyncInfo().then(info => {
+                            this.tabItems[i] = {...this.tabItems[i], ...info}
+                            this.$emit('syncinfo', info)
+                        })
+                    }
                     return a
                 })
             },
@@ -54,6 +63,10 @@
                 if (typeof this.tabItems[v].component === 'string') {
                     this.load(v)
                 }
+                this.$emit('input', v)
+            },
+            current (v) {
+                this.tab = v
             }
         }
     }

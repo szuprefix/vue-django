@@ -22,7 +22,7 @@ export default {
     loadIdMap () {
         if (this.idMap === undefined && this.loading === false) {
             this.loading = true
-            axios.get(`${this.model.getListUrl()}?page_size=1000`).then(({data}) => {
+            axios.get(`${this.model.getListUrl()}all/?page_size=1000`).then(({data}) => {
                 return data.results
             }).then(ls => {
                 let idm = {}
