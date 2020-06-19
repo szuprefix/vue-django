@@ -1,7 +1,7 @@
 <template>
     <div>
         <tab v-model="tab" :animate="false">
-            <tab-item :active-class="`active-${i%3+1}`" :badge-label="a.badge" v-for="a, i in tabItems" :key="a.name">{{a.label}}</tab-item>
+            <tab-item :active-class="`active-${i%4+1}`" :badge-label="a.badge" v-for="a, i in tabItems" :key="a.name">{{a.label}}</tab-item>
         </tab>
         <component :is="tabItems[tab].component" :owner="owner" v-bind="[tabItems[tab]]"
                    v-if="loaded"></component>
@@ -85,5 +85,9 @@
     .active-3 {
         color: rgb(55, 174, 252) !important;
         border-color: rgb(55, 174, 252) !important;
+    }
+    .active-4 {
+        color: darkorange !important;
+        border-color: darkorange !important;
     }
 </style>
