@@ -84,7 +84,7 @@
                         icon: 'plus',
                         title: '创建',
                         do: this.toCreateModel,
-                        show: () => this.checkPermission('create')
+                        show: () => this.parentMultipleRelationField && this.checkPermission('update', this.parent) || this.checkPermission('create')
                     },
                     'add': {
                         icon: 'plus-square',
@@ -284,9 +284,10 @@
                 }
             },
 
-            checkPermission(p, m){
+            checkPermission (p, m) {
                 m = m || this
-                return this.$store.state.user.model_permissions[m.appModel].includes(p)
+                let ps = this.$store.state.user.model_permissions[m.appModel]
+                return ps && ps.includes(p)
             },
             getParentQueries() {
                 let r = {}
