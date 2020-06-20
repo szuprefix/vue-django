@@ -200,7 +200,7 @@
                 return array_normalize(this.topActions, this.avairableActions)
             },
             disabled () {
-                return !(this.checkPermission(this.model.appModel, 'update') || this.checkPermission(this.model.appModel, 'create'))
+                return !(this.checkPermission('update', this.model) || this.checkPermission('create', this.model))
             }
         },
         watch: {
