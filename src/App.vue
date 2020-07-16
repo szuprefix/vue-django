@@ -6,7 +6,7 @@
             <el-menu class="el-menu-demo" mode="horizontal" router>
                 <el-menu-item index="/" class="brand">
                     <img :src="party.logo" height="32">
-                    <b v-if="user.as_saas_worker">{{party.name}}</b>
+                    <b>{{party.name}}</b>
                     {{system_name}}
                 </el-menu-item>
                 <el-submenu index="2" style="float:right">

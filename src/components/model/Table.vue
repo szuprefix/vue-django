@@ -358,13 +358,17 @@
                 let avairableActions = {...this.avairableActions, ...bactions, ...ractions}
                 let topActions = ['refresh', 'create', ['download'].concat(Object.keys(bactions))]
                 let rowActions = ['edit'].concat(Object.keys(ractions)).concat([[this.parentMultipleRelationField ? 'removeFromParent' : 'delete']])
+                let title = this.model.config.verbose_name
+                if (this.parent) {
+                    title = `${this.parent.title()}${title}`
+                }
                 return {
                     topActions,
                     rowActions,
 //                    excelFormat: this.excelFormat,
                     permissionFunction: this.checkPermission,
                     dblClickAction: 'edit',
-                    title: this.model.config.verbose_name,
+                    title,
                     ...this.$attrs,
                     baseQueries: this._baseQueries,
                     avairableActions,
