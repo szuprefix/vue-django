@@ -26,9 +26,10 @@
         components: {},
         methods: {
             onChange(file, fileList) {
-                console.log(file)
+//                console.log(file)
             },
             readFile(req) {
+                this.$emit('start', req)
                 let file = req.file
                 import('xlsx').then(XLSX => {
 

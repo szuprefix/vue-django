@@ -8,7 +8,7 @@
                 <actions :items="_topActions"></actions>
             </el-col>
         </el-row>
-        <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form"
+        <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form" :disabled="disabled"
                 :successInfo="successInfo"
                 :method="method" @form-posted="onPosted" :submit="submit">
             <span slot="submit" v-if="!options.inline"></span>
@@ -184,7 +184,8 @@
             },
             checkPermission(p, m){
                 m = m || this
-                return this.$store.state.user.model_permissions[m.appModel].includes(p)
+                let ps = this.$store.state.user.model_permissions[m.appModel]
+                return ps && ps.includes(p)
             }
         },
         computed: {
@@ -197,6 +198,9 @@
             _topActions(){
                 return arrayNormalize(this.topActions, this.avairableActions)
             },
+            disabled () {
+                return !(this.checkPermission('update', this.model) || this.checkPermission('create', this.model))
+            }
         },
         watch: {
             value(val){

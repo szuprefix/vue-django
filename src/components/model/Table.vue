@@ -83,7 +83,7 @@
                         icon: 'plus',
                         title: '创建',
                         do: this.toCreateModel,
-                        show: () => this.checkPermission('create')
+                        show: () => this.parentMultipleRelationField && this.checkPermission('partial_update', this.parent) || this.checkPermission('create')
                     },
                     'add': {
                         icon: 'plus-square',
@@ -95,7 +95,7 @@
                         icon: 'pencil',
                         title: '编辑',
                         do: this.toEditModel,
-                        show: () => this.checkPermission('update')
+                        show: () => this.checkPermission('update') || this.checkPermission('partial_update')
                     },
                     'delete': {
                         icon: 'trash',
@@ -108,7 +108,7 @@
                         icon: 'trash',
                         title: '移除',
                         do: this.removeFromParent,
-                        show: () => this.checkPermission('update', this.parent)
+                        show: () => this.checkPermission('partial_update', this.parent)
                     },
                     'batch': {
                         icon: 'archive',
@@ -222,7 +222,7 @@
                 return ({selection, scope}) => {
                     let ids = selection.map((a) => a.id)
                     let qd = {...this._baseQueries, ...this.search}
-                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma'})}`, {batch_action_ids: ids, ...action.context, scope})
+                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma'})}`, {batch_action_ids: ids, ...action.context, scope}).catch(this.onServerResponseError)
                 }
             },
             addToParent ({selection}) {
@@ -238,7 +238,7 @@
                             rows: data[fn].length - oids.length
                         }
                     }
-                })
+                }).catch(this.onServerResponseError)
             },
             removeFromParent({row}) {
                 let fn = this.parentMultipleRelationField.name
@@ -247,7 +247,7 @@
                 return this.$http.patch(this.parent.getDetailUrl(), d).then(({data}) => {
                     this.parent.data[fn] = data[fn]
                     this.parentQueries = Object.assign({}, this.getParentQueries())
-                })
+                }).catch(this.onServerResponseError)
             },
             getConfig () {
                 let config = this.model.viewsConfig.list || {}
@@ -357,13 +357,17 @@
                 let avairableActions = {...this.avairableActions, ...bactions, ...ractions}
                 let topActions = ['refresh', 'create', ['download'].concat(Object.keys(bactions))]
                 let rowActions = ['edit'].concat(Object.keys(ractions)).concat([[this.parentMultipleRelationField ? 'removeFromParent' : 'delete']])
+                let title = this.model.config.verbose_name
+                if (this.parent) {
+                    title = `${this.parent.title()}${title}`
+                }
                 return {
                     topActions,
                     rowActions,
 //                    excelFormat: this.excelFormat,
                     permissionFunction: this.checkPermission,
                     dblClickAction: 'edit',
-                    title: this.model.config.verbose_name,
+                    title,
                     ...this.$attrs,
                     baseQueries: this._baseQueries,
                     avairableActions,

@@ -13,14 +13,14 @@
                         <el-button type="primary" size="small" @click="sumbit">开始</el-button>
                     </div>
 
-                    <x-table v-model="queue" :items="items" :cellWidget="TableCell"></x-table>
+                    <x-table v-model="queue" :items="items" :cellWidget="TableCell" row-key="keyField"></x-table>
                 </div>
             </el-tab-pane>
             <el-tab-pane :label="`${success.length}`">
                 <span slot="label"><i class="fa fa-check"></i> 成功记录<el-badge type="success" :value="success.length"
                                                                              v-if="success.length>0"/></span>
 
-                <x-table v-model="success" :items="items"></x-table>
+                <x-table v-model="success" :items="items" row-key="keyField"></x-table>
             </el-tab-pane>
             <el-tab-pane :label="`${fail.length}`">
                 <span slot="label"><i class="fa fa-close"></i> 失败记录<el-badge :value="fail.length"
@@ -29,7 +29,7 @@
                 <div class="flex-right">
                     <el-button type="primary" size="small" @click="retry">再试一次</el-button>
                 </div>
-                <x-table v-model="fail" :items="items"></x-table>
+                <x-table v-model="fail" :items="items" row-key="keyField"></x-table>
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -43,7 +43,7 @@
         props: {
             items: Array,
             concurrence: {type: Number, default: 1},
-            keyField: String,
+            keyField: {type: String, default: 'id'},
             action: Function,
             onSuccess: Function,
             value: Array
@@ -73,7 +73,13 @@
                         this.fail.push(d)
                     }
                 }).then(() => {
-                    this.queue = this.queue.filter(a => !(a[this.keyField] in this.ids))
+                    for (var i in this.queue) {
+                        if (this.queue[i][this.keyField] === id) {
+                            this.queue.splice(i,1)
+                            console.log('delete', id)
+                            return
+                        }
+                    }
                 })
             },
             sumbit () {
