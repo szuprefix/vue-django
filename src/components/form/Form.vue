@@ -31,14 +31,13 @@
     </el-form>
 </template>
 <script>
-    import server_response from '../../mixins/server_response'
-    import schema from 'async-validator'
+    import ServerResponse from '../../mixins/server_response'
     import Item from './Item.vue'
     import Form from './Form'
     import Actions from '../layout/Actions.vue'
     export default{
         mixins: [
-            server_response
+            ServerResponse
         ],
         props: {
             value: Object,
@@ -87,7 +86,7 @@
                     })
                 }
             },
-            canEdit(f) {
+            canEdit (f) {
                 return ! (f.widget instanceof Function)
             },
             genValuesWithFunctionWidget () {

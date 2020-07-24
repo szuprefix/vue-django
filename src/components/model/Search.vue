@@ -41,7 +41,7 @@
     import DateRange from '../form/widgets/DateRange.vue'
     import ModelSelect from './Select.vue'
     import ArrayInput from '../widgets/ArrayInput.vue'
-    import array_normalize from '../../utils/array_normalize'
+    import arrayNormalize from '../../utils/array_normalize'
     export default{
         props: {
             model: Object,
@@ -70,7 +70,7 @@
                 let search = this.model.options.actions.SEARCH
                 this.searchFields = search.search_fields
                 let items = this.items || search.filter_fields
-                let ffields = array_normalize(items, this.model.fieldConfigs, (a) => {
+                let ffields = arrayNormalize(items, this.model.fieldConfigs, (a) => {
                     let label = this.map[a.name] && this.map[a.name].label || a.label
                     return {multiple: false, ...a, label, widget: this.defaultWidget(a)}
                 })

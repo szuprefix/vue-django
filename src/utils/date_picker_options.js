@@ -2,6 +2,7 @@
  * Created by denishuang on 2018/7/6.
  */
 
+import dateUtil from 'element-ui/src/utils/date'
 export var today = function () {
     let d = new Date()
     d.setHours(0)
@@ -14,10 +15,8 @@ export var addDays = function (d, days) {
     d.setTime(d.getTime() + day_seconds * days)
     return d
 }
-import dateUtil from 'element-ui/src/utils/date'
-const DFMT = "yyyy-MM-ddTHH:mm:ss+08:00"
+const DFMT = 'yyyy-MM-ddTHH:mm:ss+08:00'
 // const DFMT0 = "yyyy-MM-ddT00:00:00+08:00"
-
 
 export var recent_nday = function (n) {
     const end = new Date()

@@ -25,7 +25,7 @@
     import Column from './Column.vue'
     import Actions from '../layout/Actions.vue'
     import {genSpanMap, flatten} from './Table'
-    import array_normalize from '../../utils/array_normalize'
+    import arrayNormalize from '../../utils/array_normalize'
     import serverResponse from '../../mixins/server_response'
 
 
@@ -132,7 +132,7 @@
                 return (row, column, cellValue, index) => func(cellValue)
             },
             normalizeActions(actions){
-                return array_normalize(actions, this.avairableActions, (a) => {
+                return arrayNormalize(actions, this.avairableActions, (a) => {
                     if (a instanceof Array) {
                         return this.normalizeActions(a)
                     } else {
@@ -174,7 +174,7 @@
                 return this.normalizeActions(this.rowActions)
             },
             _items(){
-                return array_normalize(this.items, {}, (i) => {
+                return arrayNormalize(this.items, {}, (i) => {
                     return this.normalizeItem(i)
                 })
             },

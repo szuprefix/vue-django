@@ -19,7 +19,7 @@
     import TooltipCell from '../table/widgets/TooltipCell.vue'
     import {pick, last, uniqWith, isEqual, isEmpty, uniqueId, filter, forOwn, sortBy} from 'lodash'
     import ModelView from '../../mixins/model_view'
-    import server_response from '../../mixins/server_response'
+    import ServerResponse from '../../mixins/server_response'
     import Qs from 'qs'
     import queueLimit from '../../utils/async_queue'
     import {Validator, genFieldRules, clear$Fields} from '../../utils/validators'
@@ -27,7 +27,7 @@
 
     export default{
         name: 'BatchCreator',
-        mixins: [server_response, ModelView],
+        mixins: [ServerResponse, ModelView],
         props: {
             structure: Object,
             value: Array

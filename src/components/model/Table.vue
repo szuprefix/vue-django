@@ -31,9 +31,8 @@
 <script>
     import RemoteTable from '../table/RemoteTable.vue'
     import Model from './Model'
-    import {mergeOptions} from '../table/Table'
-    import array_normalize from '../../utils/array_normalize'
-    import server_response from '../../mixins/server_response'
+    import arrayNormalize from '../../utils/array_normalize'
+    import ServerResponse from '../../mixins/server_response'
     import Qs from 'qs'
     import {get} from 'lodash'
     import BatchActions from '../layout/BatchActions.vue'
@@ -47,7 +46,7 @@
 
     export default{
         name: 'ModelTable',
-        mixins: [server_response],
+        mixins: [ServerResponse],
         props: {
             appModel: String,
             items: Array,
@@ -191,7 +190,7 @@
             normalizeItems(){
                 this.getConfig().then(config => {
 
-                    this.batchActionItems = array_normalize(config.batchActions, this.avairableActions, (a) => {
+                    this.batchActionItems = arrayNormalize(config.batchActions, this.avairableActions, (a) => {
                         if (!a.do) {
                             a.do = this.defaultBatchActionDo(a)
                         }
@@ -200,7 +199,7 @@
 
                     let qns = Object.keys(this._baseQueries)
                     let orderingFields = get(this.model.options, 'actions.SEARCH.ordering_fields', [])
-                    let rs = array_normalize(config.listItems, this.model.fieldConfigs, (a) => {
+                    let rs = arrayNormalize(config.listItems, this.model.fieldConfigs, (a) => {
                         Object.assign(a, {field: this.model.fieldConfigs[a.name]})
                         if(!a.formatter) {
                             a.formatter = this.genDefaultFormatter(a)
@@ -284,9 +283,10 @@
                 }
             },
 
-            checkPermission(p, m){
+            checkPermission (p, m) {
                 m = m || this
-                return this.$store.state.user.model_permissions[m.appModel].includes(p)
+                let ps = this.$store.state.user.model_permissions[m.appModel]
+                return ps && ps.includes(p)
             },
             getParentQueries() {
                 let r = {}

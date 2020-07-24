@@ -22,7 +22,7 @@
     </el-button-group>
 </template>
 <script>
-    import array_normalize from '../../utils/array_normalize'
+    import arrayNormalize from '../../utils/array_normalize'
     export default{
         props: {
             items: Array,
@@ -52,7 +52,7 @@
             normalizeItem(a)
             {
                 if(a instanceof Array) {
-                    return array_normalize(a, this.map, this.normalizeItem)
+                    return arrayNormalize(a, this.map, this.normalizeItem)
                 }
                 if (!a.show && this.permissionFunction && a.permission) {
                     a.show = () => this.permissionFunction(a.permission)
@@ -64,7 +64,7 @@
                 return icon && (icon.includes(' ') ? icon : `fa fa-${icon}`) || undefined
             },
             normalizeItems() {
-                this._items = array_normalize(this.items, this.map, this.normalizeItem)
+                this._items = arrayNormalize(this.items, this.map, this.normalizeItem)
             },
         },
         computed: {

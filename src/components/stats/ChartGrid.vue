@@ -14,7 +14,7 @@
 </template>
 <script>
     import Qs from 'qs'
-    import server_response from 'vue-django/src/mixins/server_response'
+    import ServerResponse from 'vue-django/src/mixins/server_response'
     import DataTable from 'vue-django/src/components/table/Table.vue'
     import {zipObject} from 'lodash'
     let OPTIONS_TOOLBOX = {
@@ -35,7 +35,7 @@
     }
 
     export default{
-        mixins: [server_response],
+        mixins: [ServerResponse],
         props: {
             period: Array,
             url: String,
