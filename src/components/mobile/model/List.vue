@@ -17,7 +17,9 @@
     import Panel from './Panel.vue'
     import Cells from './Cells.vue'
     import {Register} from '../../../utils/app_model'
+    import ServerResponse from '../../../mixins/server_response'
     export default{
+        mixins: [ServerResponse],
         props: {
             appModel: String,
             owner: Object,
@@ -55,7 +57,7 @@
                         ds = this.prepare(ds)
                     }
                     this.data = ds
-                })
+                }).catch(this.onServerResponseError)
             },
             loadMore (loaded) {
                 if (this.currentPageSize < this.count) {

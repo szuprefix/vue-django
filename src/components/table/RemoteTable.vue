@@ -22,11 +22,10 @@
 
 </template>
 <script>
-    import {DEFAULT_PAGE_SIZE, DEFAULT_MAX_PAGE_SIZE, mergeOptions} from './Table'
+    import {DEFAULT_PAGE_SIZE, DEFAULT_MAX_PAGE_SIZE} from './Table'
     import Qs from 'qs'
     import XTable from './Table.vue'
     import serverResponse from '../../mixins/server_response'
-    import array_normalize from '../../utils/array_normalize'
     import queueLimit from '../../utils/async_queue'
     import {range} from 'lodash'
     export default{

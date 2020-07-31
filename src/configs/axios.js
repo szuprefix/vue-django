@@ -6,7 +6,8 @@ import Cookies from 'js-cookie'
 
 import Vue from 'vue'
 
-function genBaseUrl(tpl) {
+
+function genBaseUrl (tpl) {
     let a = tpl
     location.pathname.split('/').forEach((s, i) => {
         a = a.replace('$' + i, s)
@@ -22,7 +23,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.headers['X-REQUESTED-WITH'] = 'XMLHttpRequest'
 
 axios.interceptors.response.use(function (response) {
-    return response;
+    return response
 }, function (error) {
     if (error.response) {
         return Promise.reject({code: error.response.status, msg: error.response.data})

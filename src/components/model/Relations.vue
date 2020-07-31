@@ -8,8 +8,7 @@
 </template>
 <script>
     import Model from './Model'
-    import array_normalize from '../../utils/array_normalize'
-    import queue_limit from '../../utils/async_queue'
+    import arrayNormalize from '../../utils/array_normalize'
     import ModelTable from './Table.vue'
     export default{
         props: {
@@ -28,7 +27,7 @@
         methods: {
             normalizeItems () {
                 let items = this.items || this.parent.viewsConfig.relations || []
-                this.modelItems = array_normalize(items, {}, (a) => {
+                this.modelItems = arrayNormalize(items, {}, (a) => {
                     let m = a.model = Model(a.name)
                     a.icon = a.icon || m.config.icon
                     a.label = a.label || m.config.verbose_name
