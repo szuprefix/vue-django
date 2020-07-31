@@ -6,13 +6,13 @@ import Cookies from 'js-cookie'
 
 import Vue from 'vue'
 
-function genBaseUrl (tpl) {
-    let a =tpl
-    location.pathname.split('/').forEach( (s, i) => {
-        a = a.replace('$' +i, s)
+function genBaseUrl(tpl) {
+    let a = tpl
+    location.pathname.split('/').forEach((s, i) => {
+        a = a.replace('$' + i, s)
     })
-    if(a.startsWith('//')) {
-        a=a.slice(1)
+    if (a.startsWith('//')) {
+        a = a.slice(1)
     }
     return a
 }
@@ -38,7 +38,13 @@ if (!Cookies.get('csrftoken')) {
 }
 
 axios.setBaseURL = (url) => {
-    axios.defaults.baseURL = genBaseUrl(url)
+    // axios.defaults.baseURL = genBaseUrl(url)
+    let p = location.pathname.split(/\/(mobile|dashboard)\//g)[0]
+    if (['/', ''].includes(p)) {
+        axios.defaults.baseURL = url
+    } else {
+        axios.defaults.baseURL = `${p}${url}`
+    }
 }
 
 export default axios
