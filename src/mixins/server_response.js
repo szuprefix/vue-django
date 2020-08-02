@@ -32,12 +32,12 @@ export default  {
             server_response_error: undefined
         }
     },
-    computed: {
-      isTagsView() {
-        // wayky add : 判断是否tagsView作tab导航
-        return !!this.$store.state.tagsView
-      }
-    },
+    // computed: {
+    //   isTagsView() {
+    //     // wayky add : 判断是否tagsView作tab导航
+    //     return !!this.$store.state.tagsView
+    //   }
+    // },
     methods: {
         joinErrors,
         submitData: function (url, data, successMsg, isCreate) {
@@ -66,7 +66,7 @@ export default  {
             if (error == 'cancel') {  // confirm dialog cancel ?
                return
             }
-            if ([404,403,405,429, 537].includes(error.code) && error.msg.detail) {
+            if ([404,403,405,406,429, 537].includes(error.code) && error.msg.detail) {
                 error.msg = error.msg.detail
             }
             console.log(error)
@@ -84,29 +84,29 @@ export default  {
             return error
             // this.server_response_error = error
         },
-
-        resolveRoutePath(path) {
-            return path
-          // wayky add : 根据isTagsView自动给路由路径处理结尾的 / , tagView 组件的去掉结尾的 /
-          if (this.isTagsView) {
-            return path
-          } else {
-            if (path.indexOf('?') !== -1) {
-              const p = path.split('?')
-              return `${p[0]}/?${p[1]}`
-            } else {
-              return `${path}/`
-            }
-          }
-        },
-
-        resolveCurrentTagLabel(path, title) {
-          // wayky add : 根据isTagsView设置当前的Tag标签
-          if (this.isTagsView) {
-            this.$store.dispatch('setCurrentTagLabel', { path, title})
-            // 同时修改
-            this.$store.dispatch('updateLabelInVisitedViews', { path, title})
-          }
-        }
+        //
+        // resolveRoutePath(path) {
+        //     return path
+        //   // wayky add : 根据isTagsView自动给路由路径处理结尾的 / , tagView 组件的去掉结尾的 /
+        //   if (this.isTagsView) {
+        //     return path
+        //   } else {
+        //     if (path.indexOf('?') !== -1) {
+        //       const p = path.split('?')
+        //       return `${p[0]}/?${p[1]}`
+        //     } else {
+        //       return `${path}/`
+        //     }
+        //   }
+        // },
+        //
+        // resolveCurrentTagLabel(path, title) {
+        //   // wayky add : 根据isTagsView设置当前的Tag标签
+        //   if (this.isTagsView) {
+        //     this.$store.dispatch('setCurrentTagLabel', { path, title})
+        //     // 同时修改
+        //     this.$store.dispatch('updateLabelInVisitedViews', { path, title})
+        //   }
+        // }
     }
 }

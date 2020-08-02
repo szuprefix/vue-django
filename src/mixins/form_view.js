@@ -2,12 +2,12 @@
  * Created by denishuang on 2018/4/20.
  */
 
-import server_response from './server_response'
-import schema from 'async-validator'
+import ServerResponse from './server_response'
+import Schema from 'async-validator'
 
 export default{
     mixins: [
-        server_response
+        ServerResponse
     ],
     props: {
         formItems: Array,
@@ -92,7 +92,7 @@ export default{
             if (formValid) {
                 formValid(procedure)
             } else {
-                let validator = new schema(this.formRules)
+                let validator = new Schema(this.formRules)
                 validator.validate(this.formValue, (errors) => {
                     let valid = true
                     if (errors) {

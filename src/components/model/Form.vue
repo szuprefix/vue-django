@@ -17,15 +17,14 @@
     </div>
 </template>
 <script>
-    import {Register} from '../../utils/app_model'
     import XForm from '../form/Form.vue'
     import Model from './Model'
-    import server_response from '../../mixins/server_response'
-    import array_normalize from '../../utils/array_normalize'
+    import ServerResponse from '../../mixins/server_response'
+    import arrayNormalize from '../../utils/array_normalize'
     import Actions from '../layout/Actions.vue'
     import RelatedSelect from './Select.vue'
     export default{
-        mixins: [server_response],
+        mixins: [ServerResponse],
         components: {XForm, Actions},
         props: {
             appModel: String,
@@ -141,7 +140,7 @@
             normalizeItems() {
                 this.getItems().then(items => {
                     let qns = Object.keys(this.defaults)
-                    this.formItems = array_normalize(items, this.model.fieldConfigs, this.normalizeItem).filter(a => !qns.includes(a.name))
+                    this.formItems = arrayNormalize(items, this.model.fieldConfigs, this.normalizeItem).filter(a => !qns.includes(a.name))
                 })
 
             },
@@ -197,7 +196,7 @@
                 return this.mid ? "put" : "post"
             },
             _topActions(){
-                return array_normalize(this.topActions, this.avairableActions)
+                return arrayNormalize(this.topActions, this.avairableActions)
             },
             disabled () {
                 return !(this.checkPermission('update', this.model) || this.checkPermission('create', this.model))

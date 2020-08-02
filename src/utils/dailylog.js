@@ -13,8 +13,7 @@ function DailyLog () {
         delayMethods: {},
         log  (app, model, id, metics, subMetics, v, interval) {
             let k = `${app}.${model}.${id}.${metics}.${subMetics}`
-            let d = new Date()
-            let dk = d.toISOString().substr(0, 10)
+            let dk = parseTime(new Date(), '{y}-{m}-{d}')
             let dm = this.m[dk] || {}
             let it = interval || INTERVAL
             dm[k] = v
@@ -72,7 +71,7 @@ export function Performance (app, model, ownerId, target, interval) {
         },
         addPart (p) {
             this.stack(this.data.parts, p)
-            let d = parseTime(new Date()).substr(0,10)
+            let d = parseTime(new Date(), '{y}-{m}-{d}')
             this.stack(this.data.dates, d)
             return this
         },

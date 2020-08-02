@@ -72,4 +72,3 @@
         computed: {}
     }
 </script>
-<style></style>

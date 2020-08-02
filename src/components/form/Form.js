@@ -2,21 +2,20 @@
  * Created by denishuang on 2019/8/25.
  */
 
-import schema from 'async-validator'
-import array_normalize from '../../utils/array_normalize'
+import arrayNormalize from '../../utils/array_normalize'
 
-export function joinErrors(errors) {
+export function joinErrors (errors) {
     let es = {}
     for (let n in errors) {
-        es[n] = errors[n].join("")
+        es[n] = errors[n].join('')
     }
     return es
 }
 export function defaultWidget (f) {
-    return f.type == 'boolean' ? 'checkbox' : (['date', 'datetime', 'time'].includes(f.type) ? f.type : ( ['integer', 'decimal'].includes(f.type) ? 'number' : 'text'))
+    return f.type === 'boolean' ? 'checkbox' : (['date', 'datetime', 'time'].includes(f.type) ? f.type : ( ['integer', 'decimal'].includes(f.type) ? 'number' : 'text'))
 }
 
-export function defaultRuleType(f){
+export function defaultRuleType (f){
     if (f.multiple) {
         return 'array'
     }
@@ -26,8 +25,8 @@ export function defaultRuleType(f){
     return f.model ? 'number' : (['field', 'time', 'datetime'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
 }
 
-export function defaultSpan(f){
-    return f.widget == 'textarea' ? {xs: 24, sm: 24, md: 24, lg: 24, xl: 24} : {
+export function defaultSpan (f){
+    return f.widget === 'textarea' ? {xs: 24, sm: 24, md: 24, lg: 24, xl: 24} : {
         xs: 24,
         sm: 24,
         md: 12,
@@ -35,7 +34,7 @@ export function defaultSpan(f){
         xl: 8
     }
 }
-export function defaultRules(f){
+export function defaultRules (f){
     let rs = []
     if (f.required) {
         rs.push({
@@ -52,7 +51,7 @@ export function defaultRules(f){
     }
     return rs
 }
-export function normalizeItem(i){
+export function normalizeItem (i) {
     let a = Object.assign({}, i)
     a.label = a.label || a.name
     a.rules = a.rules || defaultRules(a)
@@ -62,8 +61,8 @@ export function normalizeItem(i){
     a.span = Object.assign({}, defaultSpan(a), a.span)
     return a
 }
-export function normalizeItems(items){
-    return array_normalize(items,{}, normalizeItem)
+export function normalizeItems (items) {
+    return arrayNormalize(items,{}, normalizeItem)
 }
 export function getItemRules (items) {
     let d = {}
