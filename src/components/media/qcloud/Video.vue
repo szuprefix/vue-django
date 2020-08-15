@@ -75,6 +75,7 @@
                 return {
                     fileID: this.fileID,
                     appID: this.appID,
+                    playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
                     plugins: {
                         ContinuePlay: { // 开启续播功能
                             auto: true

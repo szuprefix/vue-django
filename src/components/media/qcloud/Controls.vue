@@ -32,7 +32,7 @@
                 },
                 breakPoint: 0,
                 playbackRate: 1,
-                playbackRates: [0.5, 1, 1.25, 1.5, 2],
+                playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
                 showPopup: false,
                 cache: undefined
             }
