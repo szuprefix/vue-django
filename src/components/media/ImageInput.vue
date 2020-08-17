@@ -1,11 +1,11 @@
 <template>
-    <image-upload v-bind="[$attrs, $pros, field]" :context="context" :bucket="$store.state.qcloud.cos.bucket"
+    <image-upload v-bind="[$attrs, $pros, field]" :context="context" :bucket="bucket"
                   :urls="imageUrls" @success="onSuccess" @remove="onRemove">
     </image-upload>
 </template>
 <script>
     import ImageUpload from './qcloud/ImageUpload.vue'
-    import {template} from 'lodash'
+    import {template, get} from 'lodash'
     export default{
         props: {
             value: [String, Array],
@@ -18,7 +18,7 @@
             }
         },
         created () {
-//            console.log(this.$store.state.qcloud.cos.bucket)
+            console.log(this.bucket)
         },
         components: {ImageUpload},
         methods: {
@@ -45,6 +45,10 @@
                     return [v]
                 }
                 return v
+            },
+            bucket () {
+                let state= this.$store.state
+                return get(state, 'party.settings.media.qcloud.cos.bucket') || get(state, 'qcloud.cos.bucket')
             }
         }
     }
