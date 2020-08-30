@@ -144,8 +144,11 @@ export default function (appModel, defaults, eventor) {
             let mid = id || this.id
             return `${this.getListUrl()}${mid}/`
         },
-        query (d) {
-            return axios.get(`${this.getListUrl()}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
+        query (d, url) {
+            if (!url) {
+                url = this.getListUrl()
+            }
+            return axios.get(`${url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
                 return data
             })
         },
@@ -159,7 +162,7 @@ export default function (appModel, defaults, eventor) {
             return import(`@/views${this.getListUrl()}config.js`).then(m => {
                 return m.default || {}
             }).catch((err) => {
-                console.warn(err, '找不到视图配置,将使用默认配置')
+                console.warn(`找不到视图配置@/views${this.getListUrl()}config.js,将使用默认配置`)
                 return {}
             }).then(config => {
                 this.viewsConfig = config

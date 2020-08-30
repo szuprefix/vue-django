@@ -34,8 +34,11 @@ export function AppModel (config) {
                 return data
             })
         },
-        query (d) {
-            return axios.get(`${this.listUrl}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
+        query (d, url) {
+            if (!url) {
+                url = this.listUrl
+            }
+            return axios.get(`${url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
                 return data
             })
         },

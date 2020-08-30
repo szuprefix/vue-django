@@ -26,7 +26,8 @@
             queries: {type: Object, default: {}},
             layout: {type: String, default: 'panel'},
             prepare: Function,
-            pageSize: {type: Number, default: 20}
+            pageSize: {type: Number, default: 20},
+            url: String
         },
         data () {
             return {
@@ -49,7 +50,7 @@
                     qd.owner_id = this.owner.id
                 }
                 this.loading = true
-                return this.model.query(qd).then(data => {
+                return this.model.query(qd, this.url).then(data => {
                     this.loading = false
                     this.count = data.count
                     let ds = data.results
