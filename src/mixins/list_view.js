@@ -69,13 +69,13 @@ export default{
             this.toEditModel(row, column, cell, event)
         },
         toEditModel (row, column, cell, event) {
-            const path = this.resolveRoutePath(`${row.id}`)
+            const path = `${row.id}`
             this.$router.replace(path)
             this.resolveCurrentTagLabel(path, `${row.__str__}`)
         },
         toCreateModel () {
             let url = `/${this.model.listUrl}create?${this.model.title_field}=${this.queries.search}`
-            this.$router.push(this.resolveRoutePath(url))
+            this.$router.push(url)
             this.resolveCurrentTagLabel(url, `新增${this.model.verbose_name}`)
         },
         onPageChanged (val) {

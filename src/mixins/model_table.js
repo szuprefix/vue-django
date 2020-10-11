@@ -135,7 +135,7 @@ export default {
 
         tableToEditModel ({row}){
             // wayky edit
-            const path = this.resolveRoutePath(`/${this.appModelName.replace('.', '/')}/${row.id}`)
+            const path = `/${this.appModelName.replace('.', '/')}/${row.id}`
             this.$router.push(path)
             this.resolveCurrentTagLabel(path, `编辑${row.__str__}`)
         },
@@ -148,7 +148,7 @@ export default {
 
 
         tableToBatchCreateModel (){
-            this.$router.push(this.resolveRoutePath(`${this.modelListUrl}batch?${this.modelConfig.title_field}=${this.tableQueries.search}`))
+            this.$router.push(`${this.modelListUrl}batch?${this.modelConfig.title_field}=${this.tableQueries.search}`)
         },
 
         tableToCreateModel(){
@@ -156,7 +156,7 @@ export default {
             if (!!this.modelConfig.title_field && !!this.tableQueries.search) {
                 createUrl = `${createUrl}?${this.modelConfig.title_field}=${this.tableQueries.search}`
             }
-            const path = this.resolveRoutePath(createUrl)
+            const path = createUrl
             this.$router.push(path)
             this.resolveCurrentTagLabel(path, `新增${this.modelConfig.verbose_name}`)
         },

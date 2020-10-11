@@ -80,7 +80,7 @@
         watch: {
             curTab () {
                 if (this.$route.path !== this.curTab) {
-                    this.$router.push(this.resolveRoutePath(this.curTab))
+                    this.$router.push(this.curTab)
                 }
             },
             $route (newVal, oldVal) {

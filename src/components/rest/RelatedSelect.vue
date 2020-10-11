@@ -73,7 +73,7 @@
             },
             toCreateModel(row){
                 let url = `${this.tableUrl}create/?${this.modelConfig.title_field || 'name'}=${this.tableQueries.search}`
-                this.$router.push(this.resolveRoutePath(url))
+                this.$router.push(url)
             }
         },
         computed: {
