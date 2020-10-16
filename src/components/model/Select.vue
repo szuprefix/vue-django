@@ -5,7 +5,7 @@
                :loading="loading" :loading-text="`${loading}`"
                :placeholder="field.placeholder || `请选择${field.label}`">
         <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
-                   v-for="c,i in optionList" :key="c.id || c.pk || c.url || c.name">
+                   v-for="c in optionList" :key="c.id || c.pk || c.url || c.name">
             <span>{{c[selectOptionsFields[0]]}}</span>
             <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
         </el-option>

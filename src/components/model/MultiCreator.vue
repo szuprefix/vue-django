@@ -122,10 +122,6 @@
                     return d
                 })
             }, 2000),
-            setCurrentValue(value) {
-                if (value === this.currentValue) return
-                this.currentValue = value
-            },
             normalizeItems() {
                 this.fieldItems = (this.items || this.viewConfig.items).map((a) => {
                     if (typeof a == 'string') {
@@ -184,7 +180,7 @@
                         } else {
                             return this.$http.post(`${this.model.getListUrl()}`, a)
                         }
-                    }).then((data) => {
+                    }).then(() => {
                         this.setResult(qi, {status: 'success', info: '成功'})
                     }).catch((error) => {
                         this.setResult(qi, {status: 'failed', info: error.msg})
@@ -222,14 +218,14 @@
             }
         },
         watch: {
-            'value'(val, oldValue) {
+            'value'(val) {
                 this.currentValue = val
             },
             currentValue () {
                 this.$emit('change', this.currentValue)
                 this.genRecords()
             },
-            items (val) {
+            items () {
                 this.normalizeItems()
             },
             splitChar () {

@@ -1,5 +1,5 @@
 <template>
-    <el-form ref="form" v-bind="[$props,$attrs]"  :model="formValue" v-if="value"
+    <el-form ref="form" v-bind="[$props,$attrs]" :model="formValue" v-if="value"
              v-loading="loading" :element-loading-text="loading"
              :label-width="$attrs.labelWidth || $attrs.noLabel && '0px' || (!$attrs.inline && '160px')">
 
@@ -7,13 +7,15 @@
         <el-alert :title="errors.non_field_errors" type="error" v-if="errors.non_field_errors"
                   :closable="false"></el-alert>
         <el-row>
-            <template v-for="f in formItems" v-if="canEdit(f)">
-                <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
-                        :key="f.name" v-if="!$attrs.inline && !$attrs.oneColumn && f.widget !== 'hidden'">
-                    <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions" :error="errors[f.name]"></item>
-                </el-col>
-                <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions"  :error="errors[f.name]" v-else></item>
-
+            <template v-for="f in formItems">
+                <template v-if="canEdit(f)">
+                    <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
+                            :key="f.name" v-if="!$attrs.inline && !$attrs.oneColumn && f.widget !== 'hidden'">
+                        <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions" :error="errors[f.name]"></item>
+                    </el-col>
+                    <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions" :error="errors[f.name]"
+                          v-else></item>
+                </template>
             </template>
             <slot name="submit">
                 <el-col :xs="$attrs.inline?12:24" :sm="$attrs.inline?8:24" :md="$attrs.inline?6:24"
@@ -87,10 +89,10 @@
                 }
             },
             canEdit (f) {
-                return ! (f.widget instanceof Function)
+                return !(f.widget instanceof Function)
             },
             genValuesWithFunctionWidget () {
-                let d  = this.formValue
+                let d = this.formValue
                 this.formItems.filter(a => a.widget instanceof Function).forEach(a => {
                     d[a.name] = a.widget(d)
                 })
@@ -129,7 +131,13 @@
             },
 
             _actions () {
-                return this.actions || [{name: 'submit', label: this.submitName, do: this.onSubmit, type: 'primary', size:this.$attrs.size}]
+                return this.actions || [{
+                        name: 'submit',
+                        label: this.submitName,
+                        do: this.onSubmit,
+                        type: 'primary',
+                        size: this.$attrs.size
+                    }]
             },
             elOptions () {
                 return this.options.elForm || {}

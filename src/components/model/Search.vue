@@ -10,7 +10,7 @@
                 ref="search"
                 v-if="searchFields.length>0">
         </el-input>
-        <template v-for="f in filterFields" v-if="! (f.name in exclude)">
+        <template v-for="f in visiableFilterFields">
             <el-select v-model="value[f.name]" clearable :placeholder="`请选择${f.label}`" v-if="f.widget =='boolean'"
                        :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`" @change="onSearch">
                 <el-option :label="f.label" :value="true"></el-option>
@@ -47,7 +47,7 @@
             model: Object,
             items: Array,
             value: Object,
-            map: {type: Object, default: {}},
+            map: {type: Object, default: () => { return {}}},
             exclude: [Array, Object]
         },
         data () {
@@ -155,6 +155,10 @@
                     let {ct_field, fk_field} = popt.generic_foreign_key
                     return ct_field
                 }
+                return null
+            },
+            visiableFilterFields () {
+                return this.filterFields.filter(f => !(f.name in this.exclude))
             }
         },
         watch: {

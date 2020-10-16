@@ -68,7 +68,7 @@ export default function (appModel, defaults, eventor) {
             let r = {}
             Object.keys(m).forEach((k) => {
                 let f = m[k]
-                let v = dvs[f.name]
+                let v = dvs[f.name] || f.default
                 r[k] = v !== undefined ? v : (f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null)
             })
             return r

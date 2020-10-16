@@ -2,7 +2,7 @@
     <el-table :data="_value" ref="table" v-loading="loading"
               :element-loading-text="loading" v-on="elListeners" v-bind="elAttrs">
         <slot name="left"></slot>
-        <column :field="f" v-for="f in _items" v-if="f.hidden !== true" :key="f.name"></column>
+        <column :field="f" v-for="f in visiableItems" :key="f.name"></column>
         <el-table-column label="" align="right" fixed="right"
                          v-if="rowActions &&  rowActions.length>0 || topActions && topActions.length>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
@@ -35,7 +35,7 @@
             value: Array,
             cellWidget: [Function, Object],
             headerWidget: [Function, Object],
-            group: false,
+            group: {type: Boolean, default: false},
             items: Array,
             topActions: {
                 type: Array, default: () => {
@@ -177,6 +177,9 @@
                 return arrayNormalize(this.items, {}, (i) => {
                     return this.normalizeItem(i)
                 })
+            },
+            visiableItems () {
+                return this._items.filter(a => a.hidden !== true)
             },
             fields () {
                 return flatten(this._items, 'subColumns')

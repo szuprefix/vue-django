@@ -320,6 +320,7 @@
                         return f
                     }
                 }
+                return null
             },
             rtAttrs () {
                 let bactions = {}

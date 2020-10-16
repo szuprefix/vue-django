@@ -332,6 +332,7 @@
                         return f
                     }
                 }
+                return null
             },
             rtAttrs () {
                 let mc = this.model.config

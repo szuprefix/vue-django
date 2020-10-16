@@ -14,7 +14,7 @@
                      v-bind="f" :class-name="f.type" :key="f.name"
                      v-else>
 
-        <template slot="header" slot-scope="scope">
+        <template slot="header">
             <component :is="f.headerWidget" v-model="f.name" :field="f" :actions="f.actions" :context="f"
                        @changed="f.headerChange"
                        v-if="f.headerWidget && typeof f.headerWidget == 'object'"></component>
