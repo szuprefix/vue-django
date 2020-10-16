@@ -37,15 +37,15 @@ export  default {
                 if (this.tab) {
                     this.tab.name = p
                 }
-                const path = this.resolveRoutePath(p)
-                this.$router.replace(path)
+                // const path = this.resolveRoutePath(p)
+                this.$router.replace(p)
                 //this.resolveCurrentTagLabel(path, `创建${form.modelFormTitle}`)
             } else {
                 this.setTitle(p)
             }
         },
         setTitle(p){
-            p = !!p ? p : this.resolveRoutePath(this.modelDetailUrl)
+            p = !!p ? p : this.modelDetailUrl
 
             const formTitle = this.$refs.form.modelFormTitle
             if (this.tab) {
