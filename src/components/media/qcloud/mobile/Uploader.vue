@@ -1,9 +1,9 @@
 <template>
-    <uploader :after-read="afterRead" @delete="onDelete" v-model="fileList" v-bind="[$props, $attrs]"/>
+    <uploader :after-read="afterRead" :preview-options="{images: previewUrls}" @delete="onDelete" v-model="fileList"
+              v-bind="[$props, $attrs]"/>
 </template>
 <script>
     import {Uploader} from 'vant'
-    import TcCos from 'cos-js-sdk-v5'
     import {format} from 'date-fns'
     import {template} from 'lodash'
     import ServerResponse from 'vue-django/src/mixins/server_response'
@@ -21,9 +21,9 @@
             return {
                 fileList: this.genFileList(),
                 elUploader: undefined,
-                tcCos: new TcCos({
-                    getAuthorization: this.getAuthorization
-                })
+//                tcCos: new TcCos({
+//                    getAuthorization: this.getAuthorization
+//                })
             }
         },
         components: {Uploader},
@@ -108,33 +108,50 @@
 //                console.log(fileName)
 //                return
                 return new Promise((resolve, reject) => {
-                    this.tcCos.putObject({
-                        Bucket: this.bucket, /* 必须 */
-                        Region: this.region, /* 存储桶所在地域，必须字段 */
-                        Key: fileName,
-                        Body: file,
-                        onProgress: function (info) {
+                    import('cos-js-sdk-v5').then(TcCos => {
+                        let tcCos = new TcCos({
+                            getAuthorization: this.getAuthorization
+                        })
+                        tcCos.putObject({
+                            Bucket: this.bucket, /* 必须 */
+                            Region: this.region, /* 存储桶所在地域，必须字段 */
+                            Key: fileName,
+                            Body: file,
+                            onProgress: function (info) {
 //                            console.log('tcCos.onProgress', info, file)
-                            req.message = `${info.percent * 100}%`
+                                req.message = `${info.percent * 100}%`
 //                            req.onProgress(info)
-                        }
-                    }, function (err, data) {
+                            }
+                        }, function (err, data) {
 //                        console.log(err || data)
-                        data.name = fn
-                        if (err) {
-                            req.status = 'failed'
-                            req.message = '上传失败'
-                            reject(err)
-                        } else {
-                            req.status = undefined
-                            req.message = undefined
-                            resolve(data)
-                        }
+                            data.name = fn
+                            if (err) {
+                                req.status = 'failed'
+                                req.message = '上传失败'
+                                reject(err)
+                            } else {
+                                req.status = undefined
+                                req.message = undefined
+                                resolve(data)
+                            }
+                        })
                     })
+                })
+            },
+            addThumbParams (fileList, size) {
+                return fileList.map(f => {
+                    if (f.url && f.url.startsWith('http')) {
+                        return f.url.concat(`?imageMogr2/thumbnail/${size}x${size}`)
+                    }
+                    return f
                 })
             }
         },
-        computed: {},
+        computed: {
+            previewUrls () {
+                return this.addThumbParams(this.fileList, 640)
+            }
+        },
         watch: {
             value () {
                 this.fileList = this.genFileList()
