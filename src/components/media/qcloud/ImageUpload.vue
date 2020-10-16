@@ -25,7 +25,6 @@
     </div>
 </template>
 <script>
-    import TcCos from 'cos-js-sdk-v5'
     import {format} from 'date-fns'
     import {template} from 'lodash'
     export default {
@@ -46,9 +45,9 @@
                     return {url: u}
                 }),
                 elUploader: undefined,
-                tcCos: new TcCos({
-                    getAuthorization: this.getAuthorization
-                }),
+//                tcCos: new TcCos({
+//                    getAuthorization: this.getAuthorization
+//                }),
                 dialogImageUrl: '',
                 dialogVisible: false
             }
@@ -128,7 +127,7 @@
             },
             getFileNameContext (fn) {
                 let ps = fn.split('.')
-                let extName = undefined
+                let extName
                 let fileName = fn
                 let baseName = fn
                 if (ps.length > 1) {
@@ -155,23 +154,27 @@
 //                console.log(fileName)
 //                return
                 return new Promise((resolve, reject) => {
-
-                    let uploader = this.tcCos.putObject({
-                        Bucket: this.bucket, /* 必须 */
-                        Region: this.region, /* 存储桶所在地域，必须字段 */
-                        Key: fileName,
-                        Body: req.file,
-                        onProgress: function (info) {
-                            console.log('tcCos.onProgress', info, req)
-                            req.onProgress(info)
-                        }
-                    }, function (err, data) {
+                    import('cos-js-sdk-v5').then(TcCos => {
+                        let tcCos = new TcCos({
+                            getAuthorization: this.getAuthorization
+                        })
+                        tcCos.putObject({
+                            Bucket: this.bucket, /* 必须 */
+                            Region: this.region, /* 存储桶所在地域，必须字段 */
+                            Key: fileName,
+                            Body: req.file,
+                            onProgress: function (info) {
+                                console.log('tcCos.onProgress', info, req)
+                                req.onProgress(info)
+                            }
+                        }, function (err, data) {
 //                        console.log(err || data)
-                        if (err) {
-                            reject(err)
-                        } else {
-                            resolve(data)
-                        }
+                            if (err) {
+                                reject(err)
+                            } else {
+                                resolve(data)
+                            }
+                        })
                     })
                 })
             }
