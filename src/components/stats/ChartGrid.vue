@@ -48,6 +48,11 @@
             }
         },
         components: {DataTable},
+        created () {
+//           import('echarts').then(echarts => {
+//               console.log('echarts imported.')
+//           })
+        },
         mounted() {
             this.loadTimeData(this.period)
         },
