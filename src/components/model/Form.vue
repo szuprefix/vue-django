@@ -23,6 +23,7 @@
     import arrayNormalize from '../../utils/array_normalize'
     import Actions from '../layout/Actions.vue'
     import RelatedSelect from './Select.vue'
+    import {get} from 'lodash'
     export default{
         mixins: [ServerResponse],
         components: {XForm, Actions},
@@ -41,11 +42,7 @@
                     return {}
                 }
             },
-            topActions: {
-                type: Array, default: function () {
-                    return ['delete', 'save', 'saveAndAnother']
-                }
-            },
+            topActions: Array
         },
         data () {
             return {
@@ -196,7 +193,8 @@
                 return this.mid ? "put" : "post"
             },
             _topActions(){
-                return arrayNormalize(this.topActions, this.avairableActions)
+                let tas = this.topActions || get(this.model.viewsConfig, 'form.topActions') || ['delete', 'save', 'saveAndAnother']
+                return arrayNormalize(tas, this.avairableActions)
             },
             disabled () {
                 return !(this.checkPermission('update', this.model) || this.checkPermission('create', this.model))
