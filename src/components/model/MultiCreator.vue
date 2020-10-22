@@ -46,6 +46,7 @@
     import Model from './Model'
     import {debounce} from 'lodash'
     import Qs from 'qs'
+    import arrayNormalize from '../../utils/array_normalize'
     export default{
         model: {
             event: "change"
@@ -123,12 +124,7 @@
                 })
             }, 2000),
             normalizeItems() {
-                this.fieldItems = (this.items || this.viewConfig.items).map((a) => {
-                    if (typeof a == 'string') {
-                        return this.model.fieldConfigs[a]
-                    }
-                    return a
-                })
+                this.fieldItems = arrayNormalize((this.items || this.viewConfig.items), this.model.fieldConfigs)
             },
             onEdit () {
                 this.edit = true
