@@ -1,5 +1,5 @@
 <template>
-    <image-upload v-bind="[$attrs, $pros, field]" :context="context" :bucket="bucket"
+    <image-upload v-bind="[$attrs, $props, field]" :context="context" :bucket="bucket"
                   :urls="imageUrls" @success="onSuccess" @remove="onRemove">
     </image-upload>
 </template>
@@ -18,7 +18,7 @@
             }
         },
         created () {
-            console.log(this.bucket)
+//            console.log(this.bucket)
         },
         components: {ImageUpload},
         methods: {

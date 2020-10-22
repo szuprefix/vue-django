@@ -5,7 +5,7 @@
                    ref="upload"
                    action="noaction"
                    accept=".jpg,.png,.jpeg,.gif"
-                   list-type="picture-card"
+                   :list-type="$attrs.listType || 'picture-card'"
                    :file-list="fileList"
                    v-bind="[$attrs, $props]"
                    :on-preview="onPreview"
