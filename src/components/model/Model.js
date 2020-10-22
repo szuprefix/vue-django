@@ -173,7 +173,47 @@ export default function (appModel, defaults, eventor) {
             return axios.all([this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((restOptions, config) => {
                 return [restOptions, config]
             }))
-        }
+        },
+        parentMultipleRelationField (parent) {
+            if (parent) {
+                let pfs = Object.values(parent.fieldConfigs)
+                let f = pfs.find(a => a.model === this.appModel)
+                if (f && f.multiple === true) {
+                    return f
+                }
+            }
+            return null
+        },
+        getParentQueries(parent, pct_id) {
+            let r = {}
+            if (parent) {
+                let f = this.parentMultipleRelationField(parent)
+                if (f) {
+                    let ids = parent.data[f.name]
+                    r['id__in'] = ids.length > 0 && ids || [0]
+                } else {
+                    let am = parent.appModel
+                    let pid = parent.id
+                    let fs = Object.values(this.fieldConfigs)
+                    let f = fs.find(a => a.model === am)
+                    if (f && f.multiple !== true) {
+                        r[f.name] = pid
+                    } else {
+                        let popt = this.options
+                        if (popt.generic_foreign_key) {
+                            let {ct_field, fk_field} = popt.generic_foreign_key
+                            r[ct_field] = pct_id
+                            if (!this.fieldConfigs[fk_field]) {
+                                throw Error(`genric foreign key id_field:${id_field} not found.`)
+                            }
+                            r[fk_field] = pid || undefined
+                        }
+                    }
+
+                }
+            }
+            return r
+        },
     }
     m.init()
     return m

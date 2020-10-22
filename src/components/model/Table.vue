@@ -10,7 +10,7 @@
                 <model-table :appModel="appModel" :options="{remoteTable:{table:{topActions:[], rowActions:[]}}}"
                              :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', confirm:false, do:addToParent}]"
                              v-if="parentMultipleRelationField"></model-table>
-                <component :is="creator" :appModel="appModel" :defaults="parentQueries" v-else
+                <component :is="creator" :appModel="appModel" :defaults="createDefaults" v-else
                            :topActions="['saveAndAnother']"></component>
 
             </slot>
@@ -384,6 +384,9 @@
                     d[a.name]={name: a.name, label: a.label}
                 })
                 return d
+            },
+            createDefaults () {
+                return {...this.baseQueries, ...this.parentQueries}
             }
         },
         watch: {

@@ -208,9 +208,12 @@
                 this.model.data = val
                 this.$emit("input", val)
             },
-            items (val) {
+            items () {
                 this.normalizeItems()
             },
+            defaults () {
+                this.normalizeItems()
+            }
         }
     }
 </script>
