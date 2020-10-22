@@ -24,6 +24,7 @@
                 </el-col>
             </el-row>
             <!--<login-view></login-view>-->
+            <drawer></drawer>
         </template>
     </div>
 </template>
@@ -32,6 +33,7 @@
     import {mapState} from 'vuex'
     import SideBar from './components/layout/SideBar.vue'
     import ViewTabs from './components/layout/ViewTabs.vue'
+    import Drawer from './components/layout/Drawer.vue'
     import LoginView from './views/auth/login.vue'
     export default {
         data () {
@@ -40,6 +42,7 @@
         components: {
             SideBar,
             ViewTabs,
+            Drawer,
             LoginView,
         },
         created(){

@@ -19,6 +19,7 @@
                 </template>
             </el-dropdown-menu>
         </el-dropdown>
+
     </el-button-group>
 </template>
 <script>
@@ -38,7 +39,8 @@
         },
         data () {
             return {
-                _items: []
+                _items: [],
+                dialog: undefined
             }
         },
         components: {},
@@ -47,7 +49,10 @@
         },
         methods: {
             handleCommand (command) {
-                command(this.context)
+                if(typeof command === 'function') {
+                    return command(this.context)
+                }
+                this.$store.state.bus.$emit('opendrawer', {component: command, context: this.context})
             },
             normalizeItem(a)
             {
@@ -65,7 +70,7 @@
             },
             normalizeItems() {
                 this._items = arrayNormalize(this.items, this.map, this.normalizeItem)
-            },
+            }
         },
         computed: {
 //            _items (){
