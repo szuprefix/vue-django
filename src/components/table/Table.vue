@@ -56,7 +56,8 @@
                     'download': {
                         icon: 'download',
                         title: '导出',
-                        do: this.dumpExcelData
+                        do: this.dumpExcelData,
+                        show: () => this.$store.state.tableDownload != false
                     },
                     ...this.$attrs.avairableActions
                 }

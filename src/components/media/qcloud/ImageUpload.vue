@@ -154,7 +154,8 @@
 //                console.log(fileName)
 //                return
                 return new Promise((resolve, reject) => {
-                    import('cos-js-sdk-v5').then(TcCos => {
+                    import('cos-js-sdk-v5').then( module => {
+                        let TcCos = module.default
                         let tcCos = new TcCos({
                             getAuthorization: this.getAuthorization
                         })
