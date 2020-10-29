@@ -1,14 +1,14 @@
 <template>
     <div>
         <el-input title="模糊搜索, 多个关键词请用空格隔开"
-                :placeholder="`搜索${searchFieldNames}`"
-                v-model="value.search"
-                suffix-icon="el-icon-search"
-                @change="onSearch"
-                clearable
-                :style="`width:${searchFieldNames.length+5}rem;min-width:10rem;`"
-                ref="search"
-                v-if="searchFields.length>0">
+                  :placeholder="`搜索${searchFieldNames}`"
+                  v-model="value.search"
+                  suffix-icon="el-icon-search"
+                  @change="onSearch"
+                  clearable
+                  :style="`width:${searchFieldNames.length+5}rem;min-width:10rem;`"
+                  ref="search"
+                  v-if="searchFields.length>0">
         </el-input>
         <template v-for="f in visiableFilterFields">
             <el-select v-model="value[f.name]" clearable :placeholder="`请选择${f.label}`" v-if="f.widget =='boolean'"
@@ -28,6 +28,9 @@
             <date-range :field="f" v-model="value[`${f.name}__range`]" separator=","
                         :title="f.label" v-else-if="f.widget === 'daterange'" @input="onSearch"></date-range>
 
+            <number-range :field="f" v-model="value[`${f.name}__range`]" separator="-"
+                          :title="f.label" v-else-if="f.widget === 'numberrange'" @input="onSearch"></number-range>
+
             <array-input v-if="f.widget === 'array'"
                          v-model="value[`${f.name}__in`]" :placeholder="`批量查询${f.label}`" style="width: 10rem;"
                          :title="f.label" :autosize="{minRows:1,maxRows:4}" @change="onSearch"></array-input>
@@ -39,6 +42,7 @@
 </template>
 <script>
     import DateRange from '../form/widgets/DateRange.vue'
+    import NumberRange from '../form/widgets/NumberRange.vue'
     import ModelSelect from './Select.vue'
     import ArrayInput from '../widgets/ArrayInput.vue'
     import arrayNormalize from '../../utils/array_normalize'
@@ -47,7 +51,11 @@
             model: Object,
             items: Array,
             value: Object,
-            map: {type: Object, default: () => { return {}}},
+            map: {
+                type: Object, default: () => {
+                    return {}
+                }
+            },
             exclude: [Array, Object]
         },
         data () {
@@ -58,7 +66,7 @@
                 baseQueries: {}
             }
         },
-        components: {ModelSelect, ArrayInput, DateRange},
+        components: {ModelSelect, ArrayInput, DateRange, NumberRange},
         created () {
             this.init()
         },
@@ -74,8 +82,22 @@
                     let label = this.map[a.name] && this.map[a.name].label || a.label
                     return {multiple: false, ...a, label, widget: this.defaultWidget(a)}
                 })
+                this.addSelectOptions(ffields)
                 this.filterFields = this.reorder(ffields)
                 this.filters = Object.assign({}, this.getFilters())
+            },
+            addSelectOptions (fields) {
+                let ss = this.model.viewsConfig.search
+                if (!ss) {
+                    return
+                }
+                console.log(ss)
+                fields.forEach(f => {
+                    let a = ss[f.name]
+                    if (a) {
+                        f.search = a
+                    }
+                })
             },
             defaultWidget (item) {
                 let f = item
@@ -87,6 +109,8 @@
                     return 'select'
                 } else if (['date', 'datetime'].includes(f.type) && f.lookups && f.lookups.includes('range')) {
                     return 'daterange'
+                } else if (['number', 'integer', 'decimal'].includes(f.type) && f.lookups && f.lookups.includes('range')) {
+                    return 'numberrange'
                 } else if (f.type === 'string' && f.lookups && f.lookups.includes('in')) {
                     return 'array'
                 } else if (f.type === 'string' && f.lookups && f.lookups.includes('exact') && !f.lookups.includes('in')) {
@@ -94,7 +118,7 @@
                 }
             },
             reorder (items) {
-                let os = ['boolean', 'select', 'modelselect', 'input', 'array', 'daterange']
+                let os = ['boolean', 'select', 'modelselect', 'input', 'array', 'numberrange', 'daterange']
                 let rs = []
                 os.forEach(w => {
                     rs = rs.concat(items.filter(a => a.widget === w))
@@ -139,7 +163,7 @@
                 })
                 let rs = this.searchFields.filter((a) => !(a in vns))
                 let vm = {}
-                if(this.map) {
+                if (this.map) {
                     Object.keys(this.map).forEach(a => {
                         let c = this.model.fieldConfigs[a]
                         if (c) {
