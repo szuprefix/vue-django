@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-if="drawer" :visible.sync="drawer" @closed="onDialogDone">
+    <el-drawer v-if="drawer" v-bind="[$attrs]" :visible.sync="drawer" @closed="onDialogDone">
         <component :is="drawer.component" v-bind="[drawer.context]" @done="onDialogDone"></component>
     </el-drawer>
 </template>
