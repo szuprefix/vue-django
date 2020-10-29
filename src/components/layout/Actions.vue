@@ -39,7 +39,7 @@
         },
         data () {
             return {
-                _items: [],
+                actionItems: [],
                 dialog: undefined
             }
         },
@@ -69,11 +69,11 @@
                 return icon && (icon.includes(' ') ? icon : `fa fa-${icon}`) || undefined
             },
             normalizeItems() {
-                this._items = arrayNormalize(this.items, this.map, this.normalizeItem)
+                this.actionItems = arrayNormalize(this.items, this.map, this.normalizeItem)
             }
         },
         computed: {
-//            _items (){
+//            actionItems (){
 //                return this.items.map(a => {
 //                    if (typeof a === 'string') {
 //                        a = this.map[a]
@@ -82,12 +82,12 @@
 //                })
 //            },
             showActions () {
-                return this._items.filter((a) => {
+                return this.actionItems.filter((a) => {
                     return !(a instanceof Array)
                 })
             },
             dropdownActions () {
-                return this._items.filter((a) => {
+                return this.actionItems.filter((a) => {
                     return (a instanceof Array)
                 }).reduce((a, b) => a.concat(b), []).filter((a) => {
                     return !a.show || a.show()

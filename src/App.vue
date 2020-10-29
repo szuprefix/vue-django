@@ -1,5 +1,5 @@
 <template>
-    <div id="app" v-cloak>
+    <div id="app" v-cloak :class="{mobile_mode:isMobile}">
         <router-view v-if="layout === 'main'">
         </router-view>
         <template v-else>
@@ -24,7 +24,7 @@
                 </el-col>
             </el-row>
             <!--<login-view></login-view>-->
-            <drawer></drawer>
+            <drawer :size="isMobile?'50%': '30%'"></drawer>
         </template>
     </div>
 </template>
@@ -54,7 +54,14 @@
             layout (){
                 return this.$route.meta.layout
             },
-            ...mapState(['user', 'system_name', 'party'])
+            ...mapState(['user', 'system_name', 'party']),
+            isMobile () {
+                let ua = navigator.userAgent
+                if (ua.match(/Android/i) || ua.match(/webOS/i) || ua.match(/iPhone/i) || ua.match(/iPad/i) || ua.match(/iPod/i) || ua.match(/BlackBerry/i) || ua.match(/Windows Phone/i)) {
+                    return true
+                }
+                return false
+            }
         },
         methods: {
             logout(){

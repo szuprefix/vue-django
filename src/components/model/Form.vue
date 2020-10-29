@@ -5,7 +5,7 @@
                 <slot name="actions"></slot>
             </el-col>
             <el-col :span="6" class="flex-right">
-                <actions :items="_topActions"></actions>
+                <actions :items="topActionItems" :context="{model: model}"></actions>
             </el-col>
         </el-row>
         <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form" :disabled="disabled"
@@ -183,6 +183,15 @@
                 m = m || this
                 let ps = this.$store.state.user.model_permissions[m.appModel]
                 return ps && ps.includes(p)
+            },
+            normalizeActions(actions){
+                return arrayNormalize(actions, this.avairableActions, (a) => {
+                    if (a instanceof Array) {
+                        return this.normalizeActions(a)
+                    } else {
+                        return a
+                    }
+                })
             }
         },
         computed: {
@@ -192,9 +201,9 @@
             method () {
                 return this.mid ? "put" : "post"
             },
-            _topActions(){
-                let tas = this.topActions || get(this.model.viewsConfig, 'form.topActions') || ['delete', 'save', 'saveAndAnother']
-                return arrayNormalize(tas, this.avairableActions)
+            topActionItems () {
+                let tas = this.topActions || get(this.model.viewsConfig, 'form.topActions') || ['save', 'saveAndAnother', ['delete']]
+                return this.normalizeActions(tas)
             },
             disabled () {
                 return !(this.checkPermission('update', this.model) || this.checkPermission('create', this.model))
