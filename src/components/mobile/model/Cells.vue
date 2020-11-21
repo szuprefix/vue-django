@@ -42,7 +42,7 @@
             },
             groups () {
                 if (!this.groupBy) {
-                    return [{cells: this.value}]
+                    return [{cells: this.value, title: this.$attrs.title}]
                 } else {
                     let gs = []
                     let ps = this.groupBy.split(':')
