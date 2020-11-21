@@ -5,7 +5,7 @@
                 <slot name="actions"></slot>
             </el-col>
             <el-col :span="6" class="flex-right">
-                <actions :items="topActionItems" :context="{model: model}"></actions>
+                <actions :items="topActionItems" :context="{model: model}" style="margin-right: 1rem"></actions>
             </el-col>
         </el-row>
         <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form" :disabled="disabled"

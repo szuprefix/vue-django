@@ -16,7 +16,7 @@
                @change="fieldValueChanged">
     </el-switch>
     <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'" :disabled="field.disabled"
-                     :controls="field.type === 'integer'" @change="fieldValueChanged">
+                   controls-position="right"  :controls="field.type === 'integer'" @change="fieldValueChanged">
     </el-input-number>
     <el-date-picker v-model="value[field.name]" :type="field.widget" value-format="yyyy-MM-ddTHH:mm:ss"
                     :placeholder="field.placeholder || field.label" :readonly="field.read_only"

@@ -146,8 +146,9 @@
                 this.count = v.count
                 this.$emit('loaded', v)
             },
-            onSearch () {
-                this.$refs.table.updateQueries({...this.search, page: 1})
+            onSearch (qd) {
+                this.search = {...qd}
+                this.$refs.table.updateQueries({...qd, page: 1})
             },
             onModelPosted ({appModel, id}) {
                 let dps = this.model.options.dependencies

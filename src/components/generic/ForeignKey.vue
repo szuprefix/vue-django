@@ -20,7 +20,7 @@
         },
         computed: {
             labelFieldName  () {
-                return this.field.labelField || 'object_name'
+                return this.field.labelField || this.field.name
             },
             label(){
                 return this.context[this.labelFieldName]

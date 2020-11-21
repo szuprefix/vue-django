@@ -10,7 +10,7 @@
                          :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
-                <actions :items="rowActionItems" :context="scope" class="hover-show" trigger="hover"
+                <actions :items="rowActionItems" :context="scope" :class="{'hover-show': hoverShow}" trigger="hover"
                          :map="avairableActions"></actions>
             </template>
         </el-table-column>
@@ -213,6 +213,9 @@
             },
             elAttrs () {
                 return {'span-method': this.spanMethod, ...this.$attrs}
+            },
+            hoverShow() {
+                return this.$store.state.hoverShow != false
             }
         }
     }

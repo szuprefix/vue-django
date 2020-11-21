@@ -75,7 +75,7 @@
                 return !this.range[0] && !this.range[1]
             },
             options () {
-                return get(this.field, 'search.options') || [] // || DEFAULT_OPTIONS
+                return get(this.field, 'options') || [] // || DEFAULT_OPTIONS
             }
         },
         watch: {

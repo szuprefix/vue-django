@@ -12,12 +12,12 @@
         <el-alert type="info" v-if="moreThanOnePage" show-icon title="记录太多未展示完全,请输入关键字进行搜索" :closable="false">
         </el-alert>
 
-        <el-alert v-if="showCreate" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
+        <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
                   :closable="false">
             <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
         </el-alert>
         <template #empty>
-            <el-alert v-if="showCreate" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
+            <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
                       :closable="false">
                 <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
             </el-alert>
@@ -96,6 +96,9 @@
             load (qs) {
                 return this.loadData(Object.assign({page_size: DEFAULT_PAGE_SIZE}, this.field.baseQueries, qs)).then(({data}) => {
                     this.data = data.results
+                    if(data.count === 1 && !this.selectedValue) {
+                        this.$emit('input', this.data[0].id)
+                    }
                     this.moreThanOnePage = data.next
                 })
             },
@@ -110,7 +113,12 @@
                 this.$refs.select.blur()
                 let url = `${this.url}create/?${this.model.config.title_field || 'name'}=${this.search}`
                 this.$router.push(url)
-            }
+            },
+            checkPermission(p, m){
+                m = m || this
+                let ps = this.$store.state.user.model_permissions[m.appModel]
+                return ps && ps.includes(p)
+            },
         },
         computed: {
             _placeholder(){
@@ -126,6 +134,9 @@
             },
             url () {
                 return this.model.getListUrl()
+            },
+            canAdd () {
+                return this.checkPermission('create')
             }
 
         },
