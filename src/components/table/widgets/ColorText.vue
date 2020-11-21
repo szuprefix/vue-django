@@ -1,5 +1,5 @@
 <template>
-  <span :style="{color}">{{value[field.name]}}
+  <span :style="{'background-color':color}" class="color-text">{{value[field.name]}}
   </span>
 </template>
 <script>
@@ -21,4 +21,9 @@
         }
     }
 </script>
+<style>
+  .color-text {
+    line-height: 200%; height: 1.3rem; display: inline-block;
+  }
+</style>
 

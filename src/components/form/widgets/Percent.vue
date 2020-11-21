@@ -1,7 +1,7 @@
 <template>
     <span class="el-input-group" style="width:6rem;">
         <el-input-number v-model="number" :controls="false" style="width:6rem;"
-                         @change="onChange"></el-input-number><span class="el-input-group__append">%</span>
+                         @change="onChange"></el-input-number><span class="el-input-group__append percent-input">%</span>
     </span>
 </template>
 <script>
@@ -12,22 +12,37 @@
         },
         data () {
             return {
-                number: this.value * 100
+                number: 0
             }
         },
         components: {},
         created () {
-            this.number = this.value * 100
+            this.calNumber(this.value)
         },
         methods: {
+            calNumber (v) {
+                this.number = (v * 100).toFixed(this.fixed)
+            },
             onChange(v) {
-                this.$emit('input', v / 100)
+                let rv = (v / 100).toFixed(this.fixed+2)
+                this.calNumber(rv)
+                this.$emit('input', rv)
             }
+        },
+        computed: {
+           fixed () {
+               return this.field.fixed || 2
+           }
         },
         watch: {
             value (v) {
-                this.number = this.value * 100
+                this.calNumber(v)
             }
         }
     }
 </script>
+<style>
+    .el-input-group__append.percent-input{
+        padding: 0 10px;
+    }
+</style>

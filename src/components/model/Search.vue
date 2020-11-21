@@ -1,8 +1,13 @@
 <template>
     <div>
+        <div>
+            <el-radio-group v-model="form[f.name]"  @change="onSearch" v-for="f in radioFilterFields" :key="f.name">
+                <el-radio-button :label="c.value" v-for="c in f.choices" :key="c.value">{{c.display_name}}</el-radio-button>
+            </el-radio-group>
+        </div>
         <el-input title="模糊搜索, 多个关键词请用空格隔开"
                   :placeholder="`搜索${searchFieldNames}`"
-                  v-model="value.search"
+                  v-model="form.search"
                   suffix-icon="el-icon-search"
                   @change="onSearch"
                   clearable
@@ -10,31 +15,31 @@
                   ref="search"
                   v-if="searchFields.length>0">
         </el-input>
-        <template v-for="f in visiableFilterFields">
-            <el-select v-model="value[f.name]" clearable :placeholder="`请选择${f.label}`" v-if="f.widget =='boolean'"
+        <template v-for="f in notRadioFilterFields">
+            <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`" v-if="f.widget =='boolean'"
                        :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`" @change="onSearch">
                 <el-option :label="f.label" :value="true"></el-option>
                 <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
             </el-select>
-            <model-select :field="f" v-model="value[f.name]" @input="onSearch"
+            <model-select :field="f" v-model="form[f.name]" @input="onSearch"
                           :showCreate="false" :appModel="f.model"
                           :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`"
                           v-else-if="f.widget === 'modelselect'" :pageSize="100"></model-select>
-            <el-select v-model="value[f.name]" clearable :placeholder="`请选择${f.label}`"
+            <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`"
                        v-else-if="f.widget === 'select'"
                        :title="f.label" @change="onSearch">
                 <el-option v-for="c in f.choices" :label="c.display_name" :value="c.value" :key="c.value"></el-option>
             </el-select>
-            <date-range :field="f" v-model="value[`${f.name}__range`]" separator=","
+            <date-range :field="f" v-model="form[`${f.name}__range`]" separator=","
                         :title="f.label" v-else-if="f.widget === 'daterange'" @input="onSearch"></date-range>
 
-            <number-range :field="f" v-model="value[`${f.name}__range`]" separator="-"
+            <number-range :field="f" v-model="form[`${f.name}__range`]" separator="-" :options="f.options"
                           :title="f.label" v-else-if="f.widget === 'numberrange'" @input="onSearch"></number-range>
 
             <array-input v-if="f.widget === 'array'"
                          v-model="value[`${f.name}__in`]" :placeholder="`批量查询${f.label}`" style="width: 10rem;"
                          :title="f.label" :autosize="{minRows:1,maxRows:4}" @change="onSearch"></array-input>
-            <el-input v-model="value[f.name]" :placeholder="`请输入${f.label}`"
+            <el-input v-model="form[f.name]" :placeholder="`请输入${f.label}`"
                       v-else-if="f.widget === 'input'"
                       :title="f.label" style="width: 10rem;" clearable @change="onSearch"></el-input>
         </template>
@@ -63,42 +68,62 @@
                 orderingFields: [],
                 filterFields: [],
                 searchFields: [],
-                baseQueries: {}
+                baseQueries: {},
+                form: {}
             }
         },
         components: {ModelSelect, ArrayInput, DateRange, NumberRange},
         created () {
             this.init()
         },
+        mounted () {
+            this.selectRadioDefault()
+        },
         methods: {
             onSearch () {
-                this.$emit('change', this.value)
+                this.$emit('change', {...this.form})
             },
             init () {
+                this.form = {...this.value}
                 let search = this.model.options.actions.SEARCH
                 this.searchFields = search.search_fields
                 let items = this.items || search.filter_fields
+                let ss = this.model.viewsConfig.search || {}
                 let ffields = arrayNormalize(items, this.model.fieldConfigs, (a) => {
                     let label = this.map[a.name] && this.map[a.name].label || a.label
-                    return {multiple: false, ...a, label, widget: this.defaultWidget(a)}
+                    let d = {widget: this.defaultWidget(a),...ss[a.name], ...a,  multiple: false, label}
+                    return d
                 })
-                this.addSelectOptions(ffields)
+//                console.log(ffields)
+//                this.addSelectOptions(ffields)
                 this.filterFields = this.reorder(ffields)
                 this.filters = Object.assign({}, this.getFilters())
             },
-            addSelectOptions (fields) {
-                let ss = this.model.viewsConfig.search
-                if (!ss) {
-                    return
-                }
-                console.log(ss)
-                fields.forEach(f => {
-                    let a = ss[f.name]
-                    if (a) {
-                        f.search = a
+            selectRadioDefault() {
+                let b = false
+                this.radioFilterFields.forEach(f => {
+                    if(!this.form[f.name]) {
+                        this.form[f.name] = f.choices[0].value
+                        b =true
                     }
                 })
+                if(b) {
+                    this.onSearch()
+                }
             },
+//            addSelectOptions (fields) {
+//                let ss = this.model.viewsConfig.search
+//                if (!ss) {
+//                    return
+//                }
+//                console.log(ss)
+//                fields.forEach(f => {
+//                    let a = ss[f.name]
+//                    if (a) {
+//                        f.search = a
+//                    }
+//                })
+//            },
             defaultWidget (item) {
                 let f = item
                 if (f.type == 'boolean') {
@@ -118,7 +143,7 @@
                 }
             },
             reorder (items) {
-                let os = ['boolean', 'select', 'modelselect', 'input', 'array', 'numberrange', 'daterange']
+                let os = ['boolean', 'radio', 'select', 'modelselect', 'input', 'array', 'numberrange', 'daterange']
                 let rs = []
                 os.forEach(w => {
                     rs = rs.concat(items.filter(a => a.widget === w))
@@ -183,9 +208,18 @@
             },
             visiableFilterFields () {
                 return this.filterFields.filter(f => !(f.name in this.exclude))
+            },
+            radioFilterFields () {
+                return this.visiableFilterFields.filter(f => f.widget === 'radio')
+            },
+            notRadioFilterFields () {
+                return this.visiableFilterFields.filter(f => f.widget !== 'radio')
             }
         },
         watch: {
+            value(v) {
+                this.form = {...v}
+            },
             map () {
                 this.init()
             }

@@ -38,7 +38,8 @@ export function genMenusFromApps(apps, menus, modelPermissions) {
             }
             return menu
         })
-        return {name: app.verbose_name, items, icon:app.icon || 'file', hidden:app.hidden}
+        let hidden = !items.find(a => !a.hidden) || app.hidden
+        return {name: app.verbose_name, items, icon:app.icon || 'file', hidden}
     })
 }
 
