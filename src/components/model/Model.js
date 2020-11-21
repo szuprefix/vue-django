@@ -162,7 +162,7 @@ export default function (appModel, defaults, eventor) {
             return import(`@/views${this.getListUrl()}config.js`).then(m => {
                 return m.default || {}
             }).catch((err) => {
-                console.warn(`找不到视图配置@/views${this.getListUrl()}config.js,将使用默认配置`)
+                console.warn(`找不到视图配置@/views${this.getListUrl()}config.js,将使用默认配置, err: ${err}`)
                 return {}
             }).then(config => {
                 this.viewsConfig = config

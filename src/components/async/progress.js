@@ -28,7 +28,7 @@ export default  function (task, context) {
                 return
             }
             ps = rs.status.split(' ')
-            progress({status:sm[ps[0]] || ps[0], text: ps[1]})
+            progress({status:sm[ps[0]] || ps[0], text: rs.status.slice(ps[0].length)})
             console.log(rs)
             if (['SUCCESS', 'FAILURE'].includes(rs.status)) {
                 ws.close()

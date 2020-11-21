@@ -58,7 +58,23 @@
                 return this.load()
             })
         },
+
+        mounted () {
+            this.$store.state.bus.$on('model-posted', this.onModelPosted)
+            this.$store.state.bus.$on('model-deleted', this.onModelPosted)
+        },
+        beforeDestroy () {
+            this.$store.state.bus.$off('model-posted', this.onModelPosted)
+            this.$store.state.bus.$off('model-deleted', this.onModelPosted)
+        },
         methods: {
+
+            onModelPosted ({appModel, id}) {
+                let dps = this.model.options.dependencies
+                if (appModel === this.appModel || dps && dps.includes(appModel)) {
+                    this.load()
+                }
+            },
             loadValueObjects(v){
                 if (['number', 'string'].includes(typeof v)) {
                     v = [v]
