@@ -5,7 +5,7 @@
                    ref="upload"
                    action="noaction"
                    accept=".jpg,.png,.jpeg,.gif"
-                   list-type="picture-card"
+                   :list-type="$attrs.listType || 'picture-card'"
                    :file-list="fileList"
                    v-bind="[$attrs, $props]"
                    :on-preview="onPreview"
@@ -154,7 +154,8 @@
 //                console.log(fileName)
 //                return
                 return new Promise((resolve, reject) => {
-                    import('cos-js-sdk-v5').then(TcCos => {
+                    import('cos-js-sdk-v5').then( module => {
+                        let TcCos = module.default
                         let tcCos = new TcCos({
                             getAuthorization: this.getAuthorization
                         })

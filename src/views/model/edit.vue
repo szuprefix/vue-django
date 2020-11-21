@@ -3,7 +3,7 @@
         <template v-slot:bottom="{model}">
             <template v-if="model.viewsConfig">
                 <el-collapse v-model="activePanels" v-if="model.viewsConfig.pannels">
-                    <el-collapse-item :title="p.label" :name="i" v-for="p, i in model.viewsConfig.pannels"
+                    <el-collapse-item :title="p.label" :name="i" v-for="p in model.viewsConfig.pannels"
                                       :key="p.name">
                         <component :is="p.component" :parent="model"></component>
                     </el-collapse-item>

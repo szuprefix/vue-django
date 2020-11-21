@@ -1,7 +1,7 @@
 <template>
     <el-button-group v-if="showActions.length>0">
         <template v-for="a in showActions">
-            <el-button :type="a.type" :title="a.title" :size="a.size || size" @click="handleCommand(a.do)"
+            <el-button v-bind="[a]" :size="a.size || size" @click="handleCommand(a.do)"
                        v-if="!a.show || a.show()" :key="a.name">
                 <i :class="getIconClass(a.icon)" v-if="a.icon"></i>{{a.label}}
             </el-button>
@@ -19,6 +19,7 @@
                 </template>
             </el-dropdown-menu>
         </el-dropdown>
+
     </el-button-group>
 </template>
 <script>
@@ -38,7 +39,8 @@
         },
         data () {
             return {
-                _items: []
+                actionItems: [],
+                dialog: undefined
             }
         },
         components: {},
@@ -47,7 +49,10 @@
         },
         methods: {
             handleCommand (command) {
-                command(this.context)
+                if(typeof command === 'function') {
+                    return command(this.context)
+                }
+                this.$store.state.bus.$emit('opendrawer', {component: command, context: this.context})
             },
             normalizeItem(a)
             {
@@ -64,11 +69,11 @@
                 return icon && (icon.includes(' ') ? icon : `fa fa-${icon}`) || undefined
             },
             normalizeItems() {
-                this._items = arrayNormalize(this.items, this.map, this.normalizeItem)
-            },
+                this.actionItems = arrayNormalize(this.items, this.map, this.normalizeItem)
+            }
         },
         computed: {
-//            _items (){
+//            actionItems (){
 //                return this.items.map(a => {
 //                    if (typeof a === 'string') {
 //                        a = this.map[a]
@@ -77,12 +82,12 @@
 //                })
 //            },
             showActions () {
-                return this._items.filter((a) => {
+                return this.actionItems.filter((a) => {
                     return !(a instanceof Array)
                 })
             },
             dropdownActions () {
-                return this._items.filter((a) => {
+                return this.actionItems.filter((a) => {
                     return (a instanceof Array)
                 }).reduce((a, b) => a.concat(b), []).filter((a) => {
                     return !a.show || a.show()

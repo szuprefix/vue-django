@@ -17,6 +17,16 @@
     import ServerResponse from 'vue-django/src/mixins/server_response'
     import DataTable from 'vue-django/src/components/table/Table.vue'
     import {zipObject} from 'lodash'
+    import Vue from 'vue'
+    import ECharts from 'vue-echarts' // refers to components/ECharts.vue in webpack
+    import 'echarts/lib/chart/bar'
+    import 'echarts/lib/chart/line'
+    import 'echarts/lib/component/tooltip'
+    import 'echarts/lib/component/visualMap'
+    import 'echarts/lib/component/title'
+    import 'echarts/lib/component/toolbox'
+    import 'echarts/lib/component/dataZoom'
+
     let OPTIONS_TOOLBOX = {
         show: true,
         right: '5%',
@@ -47,7 +57,12 @@
                 chartData: {}
             }
         },
-        components: {DataTable},
+        components: {DataTable, 'chart': ECharts},
+        created () {
+//           import('echarts').then(echarts => {
+//               console.log('echarts imported.')
+//           })
+        },
         mounted() {
             this.loadTimeData(this.period)
         },

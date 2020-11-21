@@ -1,5 +1,5 @@
 <template>
-    <div id="app" v-cloak>
+    <div id="app" v-cloak :class="{mobile_mode:isMobile}">
         <router-view v-if="layout === 'main'">
         </router-view>
         <template v-else>
@@ -24,6 +24,7 @@
                 </el-col>
             </el-row>
             <!--<login-view></login-view>-->
+            <drawer :size="isMobile?'50%': '30%'"></drawer>
         </template>
     </div>
 </template>
@@ -32,6 +33,7 @@
     import {mapState} from 'vuex'
     import SideBar from './components/layout/SideBar.vue'
     import ViewTabs from './components/layout/ViewTabs.vue'
+    import Drawer from './components/layout/Drawer.vue'
     import LoginView from './views/auth/login.vue'
     export default {
         data () {
@@ -40,6 +42,7 @@
         components: {
             SideBar,
             ViewTabs,
+            Drawer,
             LoginView,
         },
         created(){
@@ -51,7 +54,14 @@
             layout (){
                 return this.$route.meta.layout
             },
-            ...mapState(['user', 'system_name', 'party'])
+            ...mapState(['user', 'system_name', 'party']),
+            isMobile () {
+                let ua = navigator.userAgent
+                if (ua.match(/Android/i) || ua.match(/webOS/i) || ua.match(/iPhone/i) || ua.match(/iPad/i) || ua.match(/iPod/i) || ua.match(/BlackBerry/i) || ua.match(/Windows Phone/i)) {
+                    return true
+                }
+                return false
+            }
         },
         methods: {
             logout(){

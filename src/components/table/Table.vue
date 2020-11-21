@@ -1,16 +1,16 @@
 <template>
-    <el-table :data="_value" ref="table" v-loading="loading"
+    <el-table :data="tableData" ref="table" v-loading="loading"
               :element-loading-text="loading" v-on="elListeners" v-bind="elAttrs">
         <slot name="left"></slot>
-        <column :field="f" v-for="f in _items" v-if="f.hidden !== true" :key="f.name"></column>
-        <el-table-column label="" align="right" fixed="right"
+        <column :field="f" v-for="f in visiableItems" :key="f.name"></column>
+        <el-table-column label="" align="right" fixed="right" min-width="140"
                          v-if="rowActions &&  rowActions.length>0 || topActions && topActions.length>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="_topActions" :context="scope" :permissionFunction="$attrs.permissionFunction"
+                <actions :items="topActionItems" :context="scope" :permissionFunction="$attrs.permissionFunction"
                          :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
-                <actions :items="_rowActions" :context="scope" class="hover-show" trigger="hover"
+                <actions :items="rowActionItems" :context="scope" :class="{'hover-show': hoverShow}" trigger="hover"
                          :map="avairableActions"></actions>
             </template>
         </el-table-column>
@@ -35,7 +35,7 @@
             value: Array,
             cellWidget: [Function, Object],
             headerWidget: [Function, Object],
-            group: false,
+            group: {type: Boolean, default: false},
             items: Array,
             topActions: {
                 type: Array, default: () => {
@@ -56,7 +56,8 @@
                     'download': {
                         icon: 'download',
                         title: '导出',
-                        do: this.dumpExcelData
+                        do: this.dumpExcelData,
+                        show: () => this.$store.state.tableDownload != false
                     },
                     ...this.$attrs.avairableActions
                 }
@@ -167,19 +168,22 @@
             }
         },
         computed: {
-            _topActions () {
+            topActionItems () {
                 return this.normalizeActions(this.topActions)
             },
-            _rowActions () {
+            rowActionItems () {
                 return this.normalizeActions(this.rowActions)
             },
-            _items(){
+            tableItems(){
                 return arrayNormalize(this.items, {}, (i) => {
                     return this.normalizeItem(i)
                 })
             },
+            visiableItems () {
+                return this.tableItems.filter(a => a.hidden !== true)
+            },
             fields () {
-                return flatten(this._items, 'subColumns')
+                return flatten(this.tableItems, 'subColumns')
             },
             fieldNames () {
                 return this.fields.map(a => a.name)
@@ -194,14 +198,14 @@
                 })
                 return rs
             },
-            _value(){
+            tableData(){
                 if (this.group > 0) {
                     return sortBy(this.value, this.fieldNames)
                 }
                 return this.value
             },
             spanMap () {
-                return genSpanMap(this._value, this.fieldNames, this.group)
+                return genSpanMap(this.tableData, this.fieldNames, this.group)
             },
 
             elListeners () {
@@ -209,6 +213,9 @@
             },
             elAttrs () {
                 return {'span-method': this.spanMethod, ...this.$attrs}
+            },
+            hoverShow() {
+                return this.$store.state.hoverShow != false
             }
         }
     }

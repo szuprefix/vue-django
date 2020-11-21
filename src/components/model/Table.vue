@@ -10,14 +10,14 @@
                 <model-table :appModel="appModel" :options="{remoteTable:{table:{topActions:[], rowActions:[]}}}"
                              :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', confirm:false, do:addToParent}]"
                              v-if="parentMultipleRelationField"></model-table>
-                <component :is="creator" :appModel="appModel" :defaults="parentQueries" v-else
+                <component :is="creator" :appModel="appModel" :defaults="createDefaults" v-else
                            :topActions="['saveAndAnother']"></component>
 
             </slot>
         </el-drawer>
 
         <remote-table :items="tableItems" :url="model.getListUrl()" ref="table" v-if="optionLoaded"
-                @loaded="onLoaded"  v-bind="rtAttrs" v-on="$listeners" @selection-change="onSelectionChange">
+                      @loaded="onLoaded" v-bind="rtAttrs" v-on="$listeners" @selection-change="onSelectionChange">
 
             <template slot="left" v-if="$slots.left">
                 <slot name="left"></slot>
@@ -146,8 +146,9 @@
                 this.count = v.count
                 this.$emit('loaded', v)
             },
-            onSearch () {
-                this.$refs.table.updateQueries({...this.search, page: 1})
+            onSearch (qd) {
+                this.search = {...qd}
+                this.$refs.table.updateQueries({...qd, page: 1})
             },
             onModelPosted ({appModel, id}) {
                 let dps = this.model.options.dependencies
@@ -201,7 +202,7 @@
                     let orderingFields = get(this.model.options, 'actions.SEARCH.ordering_fields', [])
                     let rs = arrayNormalize(config.listItems, this.model.fieldConfigs, (a) => {
                         Object.assign(a, {field: this.model.fieldConfigs[a.name]})
-                        if(!a.formatter) {
+                        if (!a.formatter) {
                             a.formatter = this.genDefaultFormatter(a)
                         }
                         if (!a.useFormWidget) {
@@ -222,7 +223,10 @@
                 return ({selection, scope}) => {
                     let ids = selection.map((a) => a.id)
                     let qd = {...this._baseQueries, ...this.search}
-                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma'})}`, {batch_action_ids: ids, ...action.context, scope}).catch(this.onServerResponseError)
+                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma'})}`, {
+                        batch_action_ids: ids, ...action.context,
+                        scope
+                    }).catch(this.onServerResponseError)
                 }
             },
             addToParent ({selection}) {
@@ -332,6 +336,7 @@
                         return f
                     }
                 }
+                return null
             },
             rtAttrs () {
                 let mc = this.model.config
@@ -348,8 +353,10 @@
                 if (mc.itemActions) {
                     mc.itemActions.forEach(a => {
                         ractions[a.name] = a
-                        a.do = ({row}) => {
-                            this.$router.push(`${this.model.getDetailUrl(row.id)}${a.name}/`)
+                        if (!a.do) {
+                            a.do = ({row}) => {
+                                this.$router.push(`${this.model.getDetailUrl(row.id)}${a.name}/`)
+                            }
                         }
                     })
                 }
@@ -380,9 +387,12 @@
             searchMap () {
                 let d = {}
                 this.tableItems.forEach(a => {
-                    d[a.name]={name: a.name, label: a.label}
+                    d[a.name] = {name: a.name, label: a.label}
                 })
                 return d
+            },
+            createDefaults () {
+                return {...this.baseQueries, ...this.parentQueries}
             }
         },
         watch: {

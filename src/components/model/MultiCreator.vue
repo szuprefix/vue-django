@@ -46,6 +46,7 @@
     import Model from './Model'
     import {debounce} from 'lodash'
     import Qs from 'qs'
+    import arrayNormalize from '../../utils/array_normalize'
     export default{
         model: {
             event: "change"
@@ -122,17 +123,8 @@
                     return d
                 })
             }, 2000),
-            setCurrentValue(value) {
-                if (value === this.currentValue) return
-                this.currentValue = value
-            },
             normalizeItems() {
-                this.fieldItems = (this.items || this.viewConfig.items).map((a) => {
-                    if (typeof a == 'string') {
-                        return this.model.fieldConfigs[a]
-                    }
-                    return a
-                })
+                this.fieldItems = arrayNormalize((this.items || this.viewConfig.items), this.model.fieldConfigs)
             },
             onEdit () {
                 this.edit = true
@@ -184,7 +176,7 @@
                         } else {
                             return this.$http.post(`${this.model.getListUrl()}`, a)
                         }
-                    }).then((data) => {
+                    }).then(() => {
                         this.setResult(qi, {status: 'success', info: '成功'})
                     }).catch((error) => {
                         this.setResult(qi, {status: 'failed', info: error.msg})
@@ -222,14 +214,14 @@
             }
         },
         watch: {
-            'value'(val, oldValue) {
+            'value'(val) {
                 this.currentValue = val
             },
             currentValue () {
                 this.$emit('change', this.currentValue)
                 this.genRecords()
             },
-            items (val) {
+            items () {
                 this.normalizeItems()
             },
             splitChar () {
