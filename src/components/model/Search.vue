@@ -22,7 +22,7 @@
                 <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
             </el-select>
             <model-select :field="f" v-model="form[f.name]" @input="onSearch"
-                          :showCreate="false" :appModel="f.model"
+                          :showCreate="false" :appModel="f.relateModel || f.model"
                           :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`"
                           v-else-if="f.widget === 'modelselect'" :pageSize="100"></model-select>
             <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`"

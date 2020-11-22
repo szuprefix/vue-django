@@ -4,8 +4,8 @@
                :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
                :loading="loading" :loading-text="`${loading}`"
                :placeholder="field.placeholder || `请选择${field.label}`">
-        <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
-                   v-for="c in optionList" :key="c.id || c.pk || c.url || c.name">
+        <el-option :label="c.__str__ || c.name || c.title" :value="c[idField] || c.pk || c.url || c.name"
+                   v-for="c in optionList" :key="c[idField] || c.pk || c.url || c.name">
             <span>{{c[selectOptionsFields[0]]}}</span>
             <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
         </el-option>
@@ -51,6 +51,7 @@
             }
         },
         created(){
+//            console.log(this.field)
             this.model.init()
             this.selectOptionsFields = this.model.config.selectOptionsFields || ['__str__']
 //            Object.assign(this.tableQueries, this.field.baseQueries, this.baseQueries)
@@ -67,7 +68,7 @@
                     return Promise.resolve()
                 }
                 let qs = Object.assign({}, this.field.baseQueries)
-                qs['id__in'] = v.join(',')
+                qs[`${this.idField}__in`] = v.join(',')
                 qs['page_size'] = v.length
                 return this.loadData(qs).then(({data}) => {
                     this.selectedObjects = data.results
@@ -81,7 +82,7 @@
                 return this.loadData(Object.assign({page_size: DEFAULT_PAGE_SIZE}, this.field.baseQueries, qs)).then(({data}) => {
                     this.data = data.results
                     if(data.count === 1 && !this.selectedValue) {
-                        this.$emit('input', this.data[0].id)
+                        this.$emit('input', this.data[0][this.id_field])
                     }
                     this.moreThanOnePage = data.next
                 })
@@ -121,8 +122,10 @@
             },
             canAdd () {
                 return this.checkPermission('create')
+            },
+            idField() {
+                return this.field.idField || 'id'
             }
-
         },
         watch: {
             selectedValue(v){
