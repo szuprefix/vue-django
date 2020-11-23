@@ -1,24 +1,26 @@
 <template>
-    <el-select v-model="selectedValue" :disabled="field.disabled" ref="select" class="model-select"
+    <el-select v-model="selectedValue" :disabled="field.disabled" ref="select" :class="`related-select ${field.name}`"
                :multiple="field.multiple" filterable @change="changed" remote clearable reserve-keyword
-               :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
+               :remote-method="onFilter" default-first-option
                :loading="loading" :loading-text="`${loading}`"
                :placeholder="field.placeholder || `请选择${field.label}`">
         <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
                    v-for="c in optionList" :key="c.id || c.pk || c.url || c.name">
             <span>{{c[selectOptionsFields[0]]}}</span>
+            <i v-if="showLink" class="fa fa-link" title="跳转到详情页" @click="$router.push(modelDetailPath)"></i>
             <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
         </el-option>
         <el-alert type="info" v-if="moreThanOnePage" show-icon title="记录太多未展示完全,请输入关键字进行搜索" :closable="false">
         </el-alert>
 
-        <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
+        <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center
+                  style="cursor: pointer"
                   :closable="false">
             <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
         </el-alert>
         <template #empty>
-            <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
-                      :closable="false">
+            <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center
+                      style="cursor: pointer" :closable="false">
                 <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
             </el-alert>
         </template>
@@ -37,7 +39,8 @@
             placeholder: String,
             field: Object,
             showCreate: {type: Boolean, default: true},
-            value: [String, Number, Array]
+            value: [String, Number, Array],
+            showLink: {type: Boolean, default: true}
         },
         data() {
             return {
@@ -96,7 +99,7 @@
             load (qs) {
                 return this.loadData(Object.assign({page_size: DEFAULT_PAGE_SIZE}, this.field.baseQueries, qs)).then(({data}) => {
                     this.data = data.results
-                    if(data.count === 1 && !this.selectedValue) {
+                    if (data.count === 1 && !this.selectedValue) {
                         this.$emit('input', this.data[0].id)
                     }
                     this.moreThanOnePage = data.next
@@ -137,6 +140,9 @@
             },
             canAdd () {
                 return this.checkPermission('create')
+            },
+            modelDetailPath () {
+                return this.model.getDetailUrl(this.selectedValue)
             }
 
         },
@@ -155,5 +161,18 @@
         float: right;
         color: #8492a6;
         font-size: 0.8rem;
+    }
+
+    .el-select-dropdown__item .fa-link {
+        display: none;
+    }
+
+    .el-select-dropdown__item.selected .fa-link {
+        display: inline-block;
+        margin-top: 0.5rem;
+        margin-left: 0.5rem;
+        cursor: pointer;
+        color: gray;
+        float: right;
     }
 </style>
