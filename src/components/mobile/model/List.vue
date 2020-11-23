@@ -52,6 +52,7 @@
                 this.loading = true
                 return this.model.query(qd, this.url).then(data => {
                     this.loading = false
+                    this.$emit('loaded', data)
                     this.count = data.count
                     let ds = data.results
                     if (this.prepare) {

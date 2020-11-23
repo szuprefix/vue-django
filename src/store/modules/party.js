@@ -15,6 +15,7 @@ const party = {
         getPartyInfo ({commit, rootState}){
             return Vue.http.get("/saas/party/current/").then(({data}) => {
                 commit("setParty", data)
+                rootState.bus.$emit('party-ready', data)
                 return data
             })
         }

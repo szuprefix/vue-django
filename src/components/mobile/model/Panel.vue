@@ -34,7 +34,7 @@
                     ls.push(d)
                 })
                 this.list = ls
-//                console.log(this.list)
+                console.log(this.list)
             }
         },
         created () {
