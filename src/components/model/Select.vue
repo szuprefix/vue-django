@@ -37,7 +37,7 @@
         props: {
             appModel: String,
             placeholder: String,
-            field: Object,
+            field: {type:Object, default: () => {return {}}},
             showCreate: {type: Boolean, default: true},
             value: [String, Number, Array],
             showLink: {type: Boolean, default: true}
@@ -100,9 +100,11 @@
             load (qs) {
                 return this.loadData(Object.assign({page_size: DEFAULT_PAGE_SIZE}, this.field.baseQueries, qs)).then(({data}) => {
                     this.data = data.results
-                    if(data.count === 1 && !this.selectedValue) {
-                        this.$emit('input', this.data[0][this.id_field])
-                    }
+//                    if (data.count === 1 && !this.selectedValue) {
+//                        let nv = this.data[0][this.idField]
+//                        this.$emit('input', nv)
+//                        this.selectedObjects = this.data
+//                    }
                     this.moreThanOnePage = data.next
                 })
             },

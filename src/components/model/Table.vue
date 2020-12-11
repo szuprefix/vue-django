@@ -209,7 +209,7 @@
                             a.widget = a.widget || this.defaultWidget(a)
                         }
                         if (orderingFields.includes(a.name)) {
-                            a.sortable = true
+                            a.sortable = 'custom'
                         }
                         return a
                     }).filter(a => !qns.includes(a.name))
