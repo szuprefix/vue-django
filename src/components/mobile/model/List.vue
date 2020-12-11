@@ -1,13 +1,14 @@
 <template>
     <div v-infinite-scroll="loadMore" infinite-scroll-disabled="$attrs.infiniteScrollDisabled || loading"
          infinite-scroll-distance="10">
-        <panel v-bind="[$attrs,$props]" v-model="data" v-if="layout === 'panel'"></panel>
-        <cells v-bind="[$attrs,$props]" v-model="data" v-if="layout === 'cells'">
-            <template slot="icon" v-if="$scopedSlots.icon" slot-scope="scope">
-                <slot name="icon" v-bind="scope"></slot>
-            </template>
-        </cells>
-
+        <slot v-bind:data="data">
+            <panel v-bind="[$attrs,$props]" v-model="data" v-if="layout === 'panel'"></panel>
+            <cells v-bind="[$attrs,$props]" v-model="data" v-else-if="layout === 'cells'">
+                <template v-if="$scopedSlots.icon" v-slot:icon="scope">
+                    <slot name="icon" v-bind="scope"></slot>
+                </template>
+            </cells>
+        </slot>
         <load-more :tip="tip" :show-loading="loading" v-if="currentPageSize < count"></load-more>
         <div v-if="!loading && count<=0" style="text-align: center;margin: 2rem 0;">暂无数据</div>
     </div>
@@ -24,7 +25,7 @@
             appModel: String,
             owner: Object,
             queries: {type: Object, default: {}},
-            layout: {type: String, default: 'panel'},
+            layout: {type: [String, Object], default: 'panel'},
             prepare: Function,
             pageSize: {type: Number, default: 20},
             url: String
