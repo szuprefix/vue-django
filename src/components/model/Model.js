@@ -73,6 +73,17 @@ export default function (appModel, defaults, eventor) {
             })
             return r
         },
+        fillEmptyDataFromOptions (r) {
+            let m = this.fieldConfigs
+            let dvs = {...this.defaults}
+            Object.keys(m).forEach((k) => {
+                if(!(k in r)) {
+                    let f = m[k]
+                    let v = dvs[f.name] || f.default
+                    r[k] = v !== undefined ? v : (f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null)
+                }
+            })
+        },
         load () {
             return axios.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((data, restOptions, viewsConfig) => {
                 if (!this.id) {
@@ -204,7 +215,7 @@ export default function (appModel, defaults, eventor) {
                             let {ct_field, fk_field} = popt.generic_foreign_key
                             r[ct_field] = pct_id
                             if (!this.fieldConfigs[fk_field]) {
-                                throw Error(`genric foreign key id_field:${id_field} not found.`)
+                                throw Error(`genric foreign key id_field:${fk_field} not found.`)
                             }
                             r[fk_field] = pid || undefined
                         }
