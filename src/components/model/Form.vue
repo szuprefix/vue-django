@@ -189,6 +189,9 @@
                     if (a instanceof Array) {
                         return this.normalizeActions(a)
                     } else {
+                        if(!a.do) {
+                            a.do=`${this.appModel.replace('.', '/')}/${a.name}`
+                        }
                         return a
                     }
                 })

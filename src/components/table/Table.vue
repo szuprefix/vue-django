@@ -27,7 +27,9 @@
     import {genSpanMap, flatten} from './Table'
     import arrayNormalize from '../../utils/array_normalize'
     import serverResponse from '../../mixins/server_response'
-
+    import TrueFlag from '../widgets/TrueFlag.vue'
+    import ChoicesDisplay from '../widgets/ChoicesDisplay.vue'
+    import Date2Now from '../widgets/Date2Now.vue'
 
     export default{
         mixins: [serverResponse],
@@ -132,6 +134,21 @@
                 let func = ['decimal', 'number', 'integer'].includes(f.type) && toThousandslsFilter || ['percent'].includes(f.type) && percent || df
                 return (row, column, cellValue, index) => func(cellValue)
             },
+            defaultWidget(f){
+                if (f.type == 'boolean') {
+                    return TrueFlag
+                } else if (['datetime', 'date'].includes(f.type)) {
+                    return Date2Now
+                } else if (f.choices) {
+                    return ChoicesDisplay
+                } else if (f.child) {
+                    return function (value, field) {
+                        let d = value[field.name]
+                        let sfs = field.child.children
+                        return d.map(r => Object.keys(sfs).map(sf => r[sf]).join(',')).join('\n')
+                    }
+                }
+            },
             normalizeActions(actions){
                 return arrayNormalize(actions, this.avairableActions, (a) => {
                     if (a instanceof Array) {
@@ -147,7 +164,7 @@
                 }
                 f.type = f.type || 'string'
                 f.align = f.align || ['decimal', 'number', 'percent', 'integer'].includes(f.type) && 'right' || 'left'
-                f.widget = f.widget || this.cellWidget
+                f.widget = f.widget || this.cellWidget || this.defaultWidget(f)
                 f.headerWidget = f.headerWidget || this.headerWidget
                 f.formatter = f.formatter || this.genDefaultFormatter(f)
                 if (f.subColumns) {

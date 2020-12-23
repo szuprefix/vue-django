@@ -320,8 +320,23 @@
                         }
 
                     }
+                    this.addSearchParentQueries(r)
                 }
                 return r
+            },
+            addSearchParentQueries(d) {
+                let model=this.model
+                let sf = model.options.actions.SEARCH.filter_fields.find(a => {
+                    if(a.name.includes('__')){
+                        let pn = a.name.split('__').pop()
+                        if(this.parent.appModel.endsWith(`.${pn}`)){  // todo: 临时代码，这里有待写得更严谨
+                            return true
+                        }
+                    }
+                })
+                if(sf) {
+                    d[sf.name] = this.parent.id
+                }
             },
             onSelectionChange (selection) {
                 this.selection = selection
