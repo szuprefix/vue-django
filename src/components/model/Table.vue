@@ -11,7 +11,7 @@
                              :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', confirm:false, do:addToParent}]"
                              v-if="parentMultipleRelationField"></model-table>
                 <component :is="creator" :appModel="appModel" :defaults="createDefaults" v-else
-                           :topActions="['saveAndAnother']"></component>
+                       :parent="parent"  :topActions="['saveAndAnother']"></component>
 
             </slot>
         </el-drawer>

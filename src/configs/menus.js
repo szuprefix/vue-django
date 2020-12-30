@@ -15,7 +15,9 @@ export function genMenusFromApps(apps, menus, modelPermissions) {
     } else if (typeof menus == 'object') {
         menus = Object.keys(menus)
     }
-    return menus.map((a) => {
+    let others = {}
+    let menuItems = {}
+    menus.forEach((a) => {
         let app = apps[a]
         let models = menus[a]
 
@@ -25,21 +27,32 @@ export function genMenusFromApps(apps, menus, modelPermissions) {
         if (typeof models == 'string') {
             models = models.split(',')
         }
-        let items = models.map((m) => {
+        let subItems = []
+        models.forEach((m) => {
             let menu = m
+            let model = app.models[m]
             if (typeof m == 'string') {
-                let model = app.models[m]
                 let mn = `${a}.${m}`
                 let hidden = model.hidden
-                if(hidden === undefined &&  modelPermissions) {
-                    hidden = (mn in modelPermissions)? false:true
+                if (hidden === undefined && modelPermissions) {
+                    hidden = (mn in modelPermissions) ? false : true
                 }
                 menu = {name: model.verbose_name, icon: model.icon || 'file', url: `/${a}/${m}/`, hidden}
             }
-            return menu
+            if (model.menu) {
+                others[model.menu] = others[model.menu] || []
+                others[model.menu].push(menu)
+            } else {
+                subItems.push(menu)
+            }
         })
-        return {name: app.verbose_name, items, icon:app.icon || 'file', hidden:app.hidden}
+        let name =app.verbose_name
+        menuItems[name]={name , items: subItems, icon: app.icon || 'file', hidden: app.hidden}
     })
+    for(var k in others) {
+        menuItems[k]={name:k, items: others[k]}
+    }
+    return menuItems
 }
 
 let menus = {
