@@ -1,7 +1,7 @@
 <template>
     <el-button-group v-if="showActions.length>0">
         <template v-for="a in showActions">
-            <el-button :type="a.type" :title="a.title" :size="a.size || size" @click="handleCommand(a.do)"
+            <el-button v-bind="[a]" :size="a.size || size" @click="handleCommand(a)"
                        v-if="!a.show || a.show()" :key="a.name">
                 <i :class="getIconClass(a.icon)" v-if="a.icon"></i>{{a.label}}
             </el-button>
@@ -12,7 +12,7 @@
           </span>
             <el-dropdown-menu slot="dropdown">
                 <template v-for="a in dropdownActions">
-                    <el-dropdown-item :command="a.do" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
+                    <el-dropdown-item :command="a" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
                                       :icon="getIconClass(a.icon)">
                         {{a.label || a.title}}
                     </el-dropdown-item>
@@ -39,7 +39,7 @@
         },
         data () {
             return {
-                _items: [],
+                actionItems: [],
                 dialog: undefined
             }
         },
@@ -48,11 +48,12 @@
             this.normalizeItems()
         },
         methods: {
-            handleCommand (command) {
+            handleCommand (action) {
+                let command = action.do
                 if(typeof command === 'function') {
                     return command(this.context)
                 }
-                this.$store.state.bus.$emit('opendrawer', {component: command, context: this.context})
+                this.$store.state.bus.$emit('opendrawer', {component: command, context: {...action.drawer, ...this.context}})
             },
             normalizeItem(a)
             {
@@ -69,11 +70,11 @@
                 return icon && (icon.includes(' ') ? icon : `fa fa-${icon}`) || undefined
             },
             normalizeItems() {
-                this._items = arrayNormalize(this.items, this.map, this.normalizeItem)
+                this.actionItems = arrayNormalize(this.items, this.map, this.normalizeItem)
             }
         },
         computed: {
-//            _items (){
+//            actionItems (){
 //                return this.items.map(a => {
 //                    if (typeof a === 'string') {
 //                        a = this.map[a]
@@ -82,12 +83,12 @@
 //                })
 //            },
             showActions () {
-                return this._items.filter((a) => {
+                return this.actionItems.filter((a) => {
                     return !(a instanceof Array)
                 })
             },
             dropdownActions () {
-                return this._items.filter((a) => {
+                return this.actionItems.filter((a) => {
                     return (a instanceof Array)
                 }).reduce((a, b) => a.concat(b), []).filter((a) => {
                     return !a.show || a.show()

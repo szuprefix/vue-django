@@ -34,10 +34,6 @@ axios.interceptors.response.use(function (response) {
 
 Vue.prototype.$http = Vue.http = axios
 
-if (!Cookies.get('csrftoken')) {
-    axios.get('/csrf_token/')
-}
-
 axios.setBaseURL = (url) => {
     // axios.defaults.baseURL = genBaseUrl(url)
     let p = location.pathname.split(/\/(mobile|dashboard)\//g)[0]
@@ -45,6 +41,10 @@ axios.setBaseURL = (url) => {
         axios.defaults.baseURL = url
     } else {
         axios.defaults.baseURL = `${p}${url}`
+    }
+
+    if (!Cookies.get('csrftoken')) {
+        axios.get('/csrf_token/')
     }
 }
 

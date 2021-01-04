@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading" :element-loading-text="loading">
-        <x-table :items="items" v-model="data" v-on="$listeners" v-bind="tAttrs" @sort-change="onSortChange">
+        <x-table v-model="data" v-on="$listeners" v-bind="[$attrs, $props, tAttrs]" @sort-change="onSortChange">
             <template slot="left" v-if="$slots.left">
                 <slot name="left"></slot>
             </template>
@@ -28,6 +28,7 @@
     import serverResponse from '../../mixins/server_response'
     import queueLimit from '../../utils/async_queue'
     import {range} from 'lodash'
+
     export default{
         mixins: [serverResponse],
         props: {
@@ -70,17 +71,25 @@
             this.updateQueries({})
         },
         methods: {
-
             updateQueries(d){
                 this.queries = Object.assign({}, this.baseQueries, this.queries, d)
             },
-            load (queris) {
-                let d = queris || this.queries
+            load (queries) {
+                let middleware = {request: d => d, response: d => d , ...this.$attrs.middleware}
+                let d = middleware.request(queries || this.queries)
                 this.loading = '查询中'
-                return this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
-                    this.data = data.results
+                let func = (this.url instanceof Function) ?  this.url :  d => this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`)
+                return func(d).then(({data}) => {
+                    data = middleware.response(data)
                     this.count = data.count
+                    let ds = data.results
+                    if (this.$attrs.prepare) {
+                        return this.$attrs.prepare(ds, this)
+                    }
+                    return ds
+                }).then(data => {
                     this.loading = false
+                    this.data = data
                     this.$emit("loaded", data)
                 }).catch(this.onServerResponseError)
             },
@@ -130,8 +139,7 @@
             tAttrs () {
                 return {
                     excelGetAllData: this.excelGetAllData,
-                    topActions: ['refresh', 'download'],
-                    ...this.$attrs,
+                    topActions: this.$attrs.topActions || ['refresh', 'download'],
                     avairableActions: this.avairableActions
                 }
             },

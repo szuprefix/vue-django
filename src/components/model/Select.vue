@@ -1,24 +1,26 @@
 <template>
-    <el-select v-model="selectedValue" :disabled="field.disabled" ref="select" class="model-select"
+    <el-select v-model="selectedValue" :disabled="field.disabled" ref="select" :class="`related-select ${field.name}`"
                :multiple="field.multiple" filterable @change="changed" remote clearable reserve-keyword
-               :remote-method="onFilter" :class="`related-select ${field.name}`" default-first-option
+               :remote-method="onFilter" default-first-option
                :loading="loading" :loading-text="`${loading}`"
                :placeholder="field.placeholder || `请选择${field.label}`">
-        <el-option :label="c.__str__ || c.name || c.title" :value="c.id || c.pk || c.url || c.name"
-                   v-for="c in optionList" :key="c.id || c.pk || c.url || c.name">
+        <el-option :label="c.__str__ || c.name || c.title" :value="c[idField] || c.pk || c.url || c.name"
+                   v-for="c in optionList" :key="c[idField] || c.pk || c.url || c.name">
             <span>{{c[selectOptionsFields[0]]}}</span>
+            <i v-if="showLink && idField === 'id'" class="fa fa-link" title="跳转到详情页" @click="$router.push(modelDetailPath)"></i>
             <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
         </el-option>
         <el-alert type="info" v-if="moreThanOnePage" show-icon title="记录太多未展示完全,请输入关键字进行搜索" :closable="false">
         </el-alert>
 
-        <el-alert v-if="showCreate" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
+        <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center
+                  style="cursor: pointer"
                   :closable="false">
             <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
         </el-alert>
         <template #empty>
-            <el-alert v-if="showCreate" @click.native="toCreateModel" type="warning" center style="cursor: pointer"
-                      :closable="false">
+            <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center
+                      style="cursor: pointer" :closable="false">
                 <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
             </el-alert>
         </template>
@@ -35,9 +37,10 @@
         props: {
             appModel: String,
             placeholder: String,
-            field: Object,
+            field: {type:Object, default: () => {return {}}},
             showCreate: {type: Boolean, default: true},
-            value: [String, Number, Array]
+            value: [String, Number, Array],
+            showLink: {type: Boolean, default: true}
         },
         data() {
             return {
@@ -51,6 +54,7 @@
             }
         },
         created(){
+//            console.log(this.field)
             this.model.init()
             this.selectOptionsFields = this.model.config.selectOptionsFields || ['__str__']
 //            Object.assign(this.tableQueries, this.field.baseQueries, this.baseQueries)
@@ -58,7 +62,23 @@
                 return this.load()
             })
         },
+
+        mounted () {
+            this.$store.state.bus.$on('model-posted', this.onModelPosted)
+            this.$store.state.bus.$on('model-deleted', this.onModelPosted)
+        },
+        beforeDestroy () {
+            this.$store.state.bus.$off('model-posted', this.onModelPosted)
+            this.$store.state.bus.$off('model-deleted', this.onModelPosted)
+        },
         methods: {
+
+            onModelPosted ({appModel, id}) {
+                let dps = this.model.options.dependencies
+                if (appModel === this.appModel || dps && dps.includes(appModel)) {
+                    this.load()
+                }
+            },
             loadValueObjects(v){
                 if (['number', 'string'].includes(typeof v)) {
                     v = [v]
@@ -67,7 +87,7 @@
                     return Promise.resolve()
                 }
                 let qs = Object.assign({}, this.field.baseQueries)
-                qs['id__in'] = v.join(',')
+                qs[`${this.idField}__in`] = v.join(',')
                 qs['page_size'] = v.length
                 return this.loadData(qs).then(({data}) => {
                     this.selectedObjects = data.results
@@ -80,6 +100,11 @@
             load (qs) {
                 return this.loadData(Object.assign({page_size: DEFAULT_PAGE_SIZE}, this.field.baseQueries, qs)).then(({data}) => {
                     this.data = data.results
+//                    if (data.count === 1 && !this.selectedValue) {
+//                        let nv = this.data[0][this.idField]
+//                        this.$emit('input', nv)
+//                        this.selectedObjects = this.data
+//                    }
                     this.moreThanOnePage = data.next
                 })
             },
@@ -94,7 +119,12 @@
                 this.$refs.select.blur()
                 let url = `${this.url}create/?${this.model.config.title_field || 'name'}=${this.search}`
                 this.$router.push(url)
-            }
+            },
+            checkPermission(p, m){
+                m = m || this
+                let ps = this.$store.state.user.model_permissions[m.appModel]
+                return ps && ps.includes(p)
+            },
         },
         computed: {
             _placeholder(){
@@ -110,8 +140,16 @@
             },
             url () {
                 return this.model.getListUrl()
+            },
+            canAdd () {
+                return this.checkPermission('create')
+            },
+            idField() {
+                return this.field.idField || 'id'
+            },
+            modelDetailPath () {
+                return this.model.getDetailUrl(this.selectedValue)
             }
-
         },
         watch: {
             selectedValue(v){
@@ -128,5 +166,18 @@
         float: right;
         color: #8492a6;
         font-size: 0.8rem;
+    }
+
+    .el-select-dropdown__item .fa-link {
+        display: none;
+    }
+
+    .el-select-dropdown__item.selected .fa-link {
+        display: inline-block;
+        margin-top: 0.5rem;
+        margin-left: 0.5rem;
+        cursor: pointer;
+        color: gray;
+        float: right;
     }
 </style>

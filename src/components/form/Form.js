@@ -4,6 +4,24 @@
 
 import arrayNormalize from '../../utils/array_normalize'
 
+export const defaultProps = {
+    value: Object,
+    actions: Array,
+    items: {type: Array, default: () => []},
+    url: String,
+    method: {
+        type: String, default: 'post'
+    },
+    options: {
+        type: Object,
+        default: () => {
+            return {}
+        }
+    },
+    submitName: {
+        type: String, default: '提交'
+    }
+}
 export function joinErrors (errors) {
     let es = {}
     for (let n in errors) {
@@ -81,6 +99,7 @@ export default  {
     defaultRuleType,
     defaultSpan,
     defaultWidget,
+    defaultProps,
     normalizeItem,
     normalizeItems,
     getItemRules,

@@ -8,13 +8,14 @@
                :key="a.name">{{a.label}}
     </el-button>
     <el-dialog :title="dialog.title" v-if="dialog" :visible.sync="showDialog">
-      <component :is="dialog.component" v-bind="[dialog]" :submit="function() {runCommand(dialog.action)}"></component>
+      <component :is="dialog.component" v-bind="[dialog]" :submit="runCommand(dialog.action)"></component>
     </el-dialog>
   </span>
 </template>
 <script>
-    //  import _import from '../../router/_import_production'
+    import serverResponse from '../../mixins/server_response'
     export default{
+        mixins: [serverResponse],
         props: {
             items: Array,
             context: Object,
@@ -37,6 +38,15 @@
                 }
 
             },
+            getConfirm(action) {
+                if (action.confirm instanceof Function) {
+                    return action.confirm
+                } else if (action.confirm === false) {
+                    return (action, scope) => Promise.resolve()
+                } else {
+                    return (action, scope) => this.$confirm(action.notice, `确定要对${scope.label}记录执行"${action.label}"操作吗?`, {type: 'warning'})
+                }
+            },
             runCommand(action) {
                 let scope = this.scopes[this.scope]
                 if (scope.count === 0) {
@@ -44,15 +54,25 @@
                     return
                 }
                 if (action && action.do) {
-                    let confirm = action.confirm === false ? () => Promise.resolve() : () => this.$confirm(action.notice, `确定要对${scope.label}记录执行"${action.label}"操作吗?`, {type: 'warning'})
-                    confirm().then(() => {
-                        action.do({action, ...this.context, scope: this.scope}).then(({data}) => {
-                            let countInfo = data.rows >= 0 ? `${data.rows}条记录` : ''
-                            this.$message({message: `操作成功${countInfo}.`, type: 'success'})
-                            this.$emit("done", data)
+                    let confirmFunc = this.getConfirm(action)
+                    confirmFunc(action, scope).then((confirmResult) => {
+                        if (typeof action.do === 'function') {
+                            return action.do({
+                                action, ...this.context,
+                                scope: this.scope,
+                                confirmResult
+                            }).then(({data}) => {
+                                let countInfo = data.rows >= 0 ? `${data.rows}条记录` : ''
+                                this.$message({message: `操作成功${countInfo}.`, type: 'success'})
+                                this.$emit("done", data)
+                            })
+                        }
+                        this.$store.state.bus.$emit('opendrawer', {
+                            component: action.do,
+                            context: {...action.drawer, ...this.context}
                         })
-                    }).catch(this.onServerResponseError).catch(() => {
-                    })
+
+                    }).catch(this.onServerResponseError)
                 }
                 this.$emit("command", name)
             }

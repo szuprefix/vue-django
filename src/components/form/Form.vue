@@ -42,24 +42,8 @@
             ServerResponse
         ],
         props: {
-            value: Object,
-            actions: Array,
-            items: {type: Array, default: () => []},
-            url: String,
-            method: {
-                type: String, default: 'post'
-            },
-            options: {
-                type: Object,
-                default: () => {
-                    return {}
-                }
-            },
-
+            ...Form.defaultProps,
             submit: Function,
-            submitName: {
-                type: String, default: '提交'
-            },
             successInfo: String
         },
         components: {Item, Actions},

@@ -1,32 +1,19 @@
 <template>
-    <div>
-        <el-row type="flex" justify="space-between" style="padding-bottom: 20px;" v-if="!options.inline">
-            <el-col :span="18">
-                <slot name="actions"></slot>
-            </el-col>
-            <el-col :span="6" class="flex-right">
-                <actions :items="topActionItems" :context="{model: model}" style="margin-right: 1rem"></actions>
-            </el-col>
-        </el-row>
-        <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form" :disabled="disabled"
-                :successInfo="successInfo"
-                :method="method" @form-posted="onPosted" :submit="submit">
-            <span slot="submit" v-if="!options.inline"></span>
-        </x-form>
-        <slot name="bottom" :model="model"></slot>
-    </div>
+    <x-form :url="url" :items="formItems" ref="form" :disabled="disabled" @failed="onFailed"
+            :procedure="submit" v-bind="[$attrs, $props]" v-on="$listeners" v-model="formValue">
+    </x-form>
 </template>
 <script>
     import XForm from '../form/Form.vue'
-    import Model from './Model'
-    import ServerResponse from '../../mixins/server_response'
-    import arrayNormalize from '../../utils/array_normalize'
-    import Actions from '../layout/Actions.vue'
-    import RelatedSelect from './Select.vue'
+    import Model from '../../model/Model'
+    import ServerResponse from '../../../mixins/server_response'
+    import arrayNormalize from '../../../utils/array_normalize'
+    import ModelPicker from './widgets/Picker.vue'
     import {get} from 'lodash'
+    import {Toast}  from 'vant'
     export default{
         mixins: [ServerResponse],
-        components: {XForm, Actions},
+        components: {XForm, ModelPicker},
         props: {
             appModel: String,
             items: Array,
@@ -35,69 +22,27 @@
                 type: Object, default: () => {
                     return {}
                 }
-            },
-            options: {
-                type: Object,
-                default: () => {
-                    return {}
-                }
-            },
-            topActions: Array
+            }
         },
         data () {
             return {
                 mid: undefined,
                 formItems: [],
                 formValue: {},
-                intent: '',
-                successInfo: undefined,
-                model: Model(this.appModel, this.defaults, this.$store.state.bus),
-                avairableActions: {
-                    'save': {
-                        icon: 'floppy-o',
-                        title: '保存',
-                        label: '',
-                        do: this.onSubmit,
-                        show: () => this.checkPermission('create') || this.checkPermission('update'),
-                        type: 'primary'
-                    },
-                    'refresh': {
-                        icon: 'refresh',
-                        title: '刷新',
-                        label: '',
-                        do: this.load,
-                        type: 'default'
-                    },
-                    'delete': {
-                        icon: 'trash',
-                        title: '删除',
-                        label: '',
-                        do: this.toDelete,
-                        type: 'danger',
-                        show: () => this.mid && this.checkPermission('destroy')
-                    },
-                    'saveAndAnother': {
-                        icon: 'floppy-o',
-                        label: '+',
-                        title: '保存并新增另一个',
-                        do: this.saveAndAnother,
-                        show: () => this.checkPermission('create') || this.checkPermission('update')
-                    }
-                }
+                model: Model(this.appModel, this.defaults),
             }
         },
 
         created(){
             this.init()
-            this.$on("model-delete", this.onDelete)
         },
         methods: {
             init(){
+                this.formValue = this.value
                 this.mid = this.model.id = this.getId()
-//                this.formValue = this.value
                 this.model.load().then((data, options) => {
                     this.mid = this.model.id
-                    this.formValue = Object.assign({}, this.model.data)
+                    this.model.fillEmptyDataFromOptions(this.formValue)
                     this.normalizeItems()
                     this.$emit('loaded', this.model)
                 }).catch(this.onServerResponseError)
@@ -109,8 +54,8 @@
                 return id === 'create' ? undefined : id
             },
             defaultWidget (f) {
-                if (f.type == 'field' && f.model) {
-                    return RelatedSelect
+                if (f.type === 'field' && f.model) {
+                    return ModelPicker
                 } else if (['field', 'choice'].includes(f.type) && f.choices) {
                     return f.choices.length <= 2 ? (f.multiple ? 'checkbox' : 'radio') : 'select'
                 }
@@ -141,9 +86,8 @@
                 })
 
             },
-            submit()
-            {
-                return this.model.save(this.formValue)
+            submit () {
+                return this.model.save(this.formValue).then(this.onSuccess)
             },
             onPosted(data)
             {
@@ -165,23 +109,16 @@
                     return this.model.destroy()
                 }).catch(this.onServerResponseError)
             },
-            onSubmit (context) {
-                this.intent = 'save'
-                this.successInfo = '保存成功.'
-                return this.$refs.form.onSubmit()
+            onSuccess (context) {
+                Toast('保存成功.')
+//                this.successInfo = '保存成功.'
             },
-            saveAndAnother(){
-                this.intent = 'saveAndAnother'
-                this.successInfo = '保存成功, 继续添加下一个.'
-                this.$refs.form.onSubmit().then((data) => {
-                    if (data && data.id) {
-                        this.clear()
-                    }
-                })
+            onFailed (errorInfo) {
+                console.log(errorInfo)
             },
             checkPermission(p, m){
                 m = m || this
-                let ps = this.$store.state.user.model_permissions[m.appModel]
+                let ps = get(this.$store.state, 'user.model_permissions[m.appModel]')
                 return ps && ps.includes(p)
             },
             normalizeActions(actions){
@@ -189,9 +126,6 @@
                     if (a instanceof Array) {
                         return this.normalizeActions(a)
                     } else {
-                        if(!a.do) {
-                            a.do=`${this.appModel.replace('.', '/')}/${a.name}`
-                        }
                         return a
                     }
                 })

@@ -1,8 +1,9 @@
 <template>
     <div>
         <div>
-            <el-radio-group v-model="form[f.name]"  @change="onSearch" v-for="f in radioFilterFields" :key="f.name">
-                <el-radio-button :label="c.value" v-for="c in f.choices" :key="c.value">{{c.display_name}}</el-radio-button>
+            <el-radio-group v-model="form[f.name]" @change="onSearch" v-for="f in radioFilterFields" :key="f.name">
+                <el-radio-button :label="c.value" v-for="c in f.choices" :key="c.value">{{c.display_name}}
+                </el-radio-button>
             </el-radio-group>
         </div>
         <el-input title="模糊搜索, 多个关键词请用空格隔开"
@@ -13,33 +14,32 @@
                   clearable
                   :style="`width:${searchFieldNames.length+5}rem;min-width:10rem;`"
                   ref="search"
-                  v-if="searchFields.length>0">
+                  v-if="searchFieldNames.length>0">
         </el-input>
         <template v-for="f in notRadioFilterFields">
             <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`" v-if="f.widget =='boolean'"
-                       :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`" @change="onSearch">
+                       :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`" @change="onSearch"
+                       :key="f.name">
                 <el-option :label="f.label" :value="true"></el-option>
                 <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
             </el-select>
-            <model-select :field="f" v-model="form[f.name]" @input="onSearch"
-                          :showCreate="false" :appModel="f.relateModel || f.model" :showLink="false"
-                          :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`"
-                          v-else-if="f.widget === 'modelselect'" :pageSize="100"></model-select>
             <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`"
-                       v-else-if="f.widget === 'select'"
+                       v-else-if="f.widget === 'select'" :key="f.name"
                        :title="f.label" @change="onSearch">
                 <el-option v-for="c in f.choices" :label="c.display_name" :value="c.value" :key="c.value"></el-option>
             </el-select>
-            <date-range :field="f" v-model="form[`${f.name}__range`]" separator=","
+            <date-range :field="f" v-model="form[`${f.name}__range`]" separator="," :key="f.name"
                         :title="f.label" v-else-if="f.widget === 'daterange'" @input="onSearch"></date-range>
 
-            <number-range :field="f" v-model="form[`${f.name}__range`]" separator="-" :options="f.options"
+            <number-range :field="f" v-model="form[`${f.name}__range`]" separator="-" :options="f.options" :key="f.name"
                           :title="f.label" v-else-if="f.widget === 'numberrange'" @input="onSearch"></number-range>
 
-            <array-input v-if="f.widget === 'array'"
-                         v-model="form[`${f.name}__in`]" :placeholder="`批量查询${f.label}`" style="width: 10rem;"
+            <array-input v-if="f.widget === 'array'" :key="f.name"
+                         v-model="value[`${f.name}__in`]" :placeholder="`批量查询${f.label}`" style="width: 10rem;"
                          :title="f.label" :autosize="{minRows:1,maxRows:4}" @change="onSearch"></array-input>
-            <el-input v-model="form[f.name]" :placeholder="`请输入${f.label}`"
+            <component :is="f.widget" :field="f" v-bind="[f]" v-model="form[f.name]" @input="onSearch"
+                       v-else-if="f.widget instanceof Object" :pageSize="100" :key="f.name"></component>
+            <el-input v-model="form[f.name]" :placeholder="`请输入${f.label}`" :key="f.name"
                       v-else-if="f.widget === 'input'"
                       :title="f.label" style="width: 10rem;" clearable @change="onSearch"></el-input>
         </template>
@@ -48,12 +48,10 @@
 <script>
     import DateRange from '../form/widgets/DateRange.vue'
     import NumberRange from '../form/widgets/NumberRange.vue'
-    import ModelSelect from './Select.vue'
     import ArrayInput from '../widgets/ArrayInput.vue'
     import arrayNormalize from '../../utils/array_normalize'
     export default{
         props: {
-            model: Object,
             items: Array,
             value: Object,
             map: {
@@ -61,7 +59,8 @@
                     return {}
                 }
             },
-            exclude: [Array, Object]
+            exclude: {type: [Array, Object], default: () => []},
+            searchFieldNames: {type: String, default: ''}
         },
         data () {
             return {
@@ -72,7 +71,7 @@
                 form: {}
             }
         },
-        components: {ModelSelect, ArrayInput, DateRange, NumberRange},
+        components: {ArrayInput, DateRange, NumberRange},
         created () {
             this.init()
         },
@@ -85,60 +84,35 @@
             },
             init () {
                 this.form = {...this.value}
-                let search = this.model.options.actions.SEARCH
-                this.searchFields = search.search_fields
-                let items = this.items || search.filter_fields
-                let ss = this.model.viewsConfig.search || {}
-                let ffields = arrayNormalize(items, this.model.fieldConfigs, (a) => {
+                let items = this.items
+                let ffields = arrayNormalize(items, {}, (a) => {
                     let label = this.map[a.name] && this.map[a.name].label || a.label
-                    let d = {widget: this.defaultWidget(a),...ss[a.name], ...a,  multiple: false, label}
+                    let d = {widget: this.defaultWidget(a), ...a, multiple: false, label}
                     return d
                 })
-//                console.log(ffields)
-//                this.addSelectOptions(ffields)
                 this.filterFields = this.reorder(ffields)
-//                this.filters = Object.assign({}, this.getFilters())
             },
             selectRadioDefault() {
                 let b = false
                 this.radioFilterFields.forEach(f => {
-                    if(!this.form[f.name]) {
+                    if (!this.form[f.name]) {
                         this.form[f.name] = f.choices[0].value
-                        b =true
+                        b = true
                     }
                 })
-                if(b) {
+                if (b) {
                     this.onSearch()
                 }
             },
-//            addSelectOptions (fields) {
-//                let ss = this.model.viewsConfig.search
-//                if (!ss) {
-//                    return
-//                }
-//                console.log(ss)
-//                fields.forEach(f => {
-//                    let a = ss[f.name]
-//                    if (a) {
-//                        f.search = a
-//                    }
-//                })
-//            },
             defaultWidget (item) {
                 let f = item
                 if (f.type == 'boolean') {
                     return 'boolean'
-                } else if (f.model /* && f.name !== this.genericContentTypeField */) {
+                } else if (f.model) {
                     return 'modelselect'
                 } else if (f.choices) {
                     return 'select'
-                } else if (['date', 'datetime'].includes(f.type) && f.lookups && f.lookups.includes('range')) {
-                    return 'daterange'
-                } else if (['number', 'integer', 'decimal'].includes(f.type) && f.lookups && f.lookups.includes('range')) {
-                    return 'numberrange'
-                } else if (f.type === 'string' && f.lookups && f.lookups.includes('in')) {
-                    return 'array'
-                } else if (f.type === 'string' && f.lookups && f.lookups.includes('exact') && !f.lookups.includes('in')) {
+                } else {
                     return 'input'
                 }
             },
@@ -148,20 +122,11 @@
                 os.forEach(w => {
                     rs = rs.concat(items.filter(a => a.widget === w))
                 })
+                items.filter(a => !os.includes(a.widget)).forEach(a => {
+                    rs.push(a)
+                })
                 return rs
             },
-//            getFilters(){
-//                let postFields = this.model.fieldConfigs
-//                let filters = {}
-//
-//                Object.keys(postFields).forEach((k) => {
-//                    let f = postFields[k]
-//                    if (f.choices) {
-//                        filters[`${k}_name`] = filters[k] = this.choices2selectOptions(f.choices)
-//                    }
-//                })
-//                return filters
-//            },
             choices2selectOptions(choices){
                 return choices.map((a) => {
                     return {text: a.display_name, value: a.value}
@@ -177,35 +142,6 @@
             }
         },
         computed: {
-            searchFieldNames () {
-                let vns = []
-                let fns = this.exclude instanceof Array && this.exclude || Object.keys(this.exclude)
-                fns.forEach((a) => {
-                    let c = this.model.fieldConfigs[a]
-                    if (c) {
-                        vns.push(c.label)
-                    }
-                })
-                let rs = this.searchFields.filter((a) => !(a in vns))
-                let vm = {}
-                if (this.map) {
-                    Object.keys(this.map).forEach(a => {
-                        let c = this.model.fieldConfigs[a]
-                        if (c) {
-                            vm[c.label] = this.map[a].label
-                        }
-                    })
-                }
-                return rs.map(a => vm[a] || a).join(',')
-            },
-            genericContentTypeField () {
-                let popt = this.model.options
-                if (popt.generic_foreign_key) {
-                    let {ct_field, fk_field} = popt.generic_foreign_key
-                    return ct_field
-                }
-                return null
-            },
             visiableFilterFields () {
                 return this.filterFields.filter(f => !(f.name in this.exclude))
             },

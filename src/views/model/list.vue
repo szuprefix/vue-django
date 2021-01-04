@@ -1,7 +1,7 @@
 <template>
     <div v-if="config">
         <model-grid v-if="config.mode ==='grid'" :appModel="appModel"></model-grid>
-        <model-table v-else :appModel="appModel" v-model="data" ref="table"></model-table>
+        <model-table v-else :appModel="appModel" :baseQueries="config.baseQueries" v-model="data" ref="table"></model-table>
     </div>
 </template>
 <script>

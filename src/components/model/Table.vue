@@ -2,7 +2,7 @@
     <div>
         <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search"
                 v-if="showSearch && optionLoaded" :map="searchMap" @change="onSearch"></search>
-        <batch-actions :items="batchActionItems" @done="refresh" :context="{selection,count}"
+        <batch-actions :items="batchActionItems" @done="refresh" :context="{selection,count,parent,model}"
                        v-if="batchActionItems.length>0"></batch-actions>
         <el-drawer :visible.sync="editing" direction="rtl"
                    :title="`${parentMultipleRelationField?'添加':'创建'}${model.config.verbose_name}`" size="66%">
@@ -146,8 +146,9 @@
                 this.count = v.count
                 this.$emit('loaded', v)
             },
-            onSearch () {
-                this.$refs.table.updateQueries({...this.search, page: 1})
+            onSearch (qd) {
+                this.search = {...qd}
+                this.$refs.table.updateQueries({...qd, page: 1})
             },
             onModelPosted ({appModel, id}) {
                 let dps = this.model.options.dependencies
@@ -155,13 +156,13 @@
                     this.$refs.table.load()
                 }
             },
-            onRowSelect (row, column, cell, event) {
-                if (this.onDBClick) {
-                    this.onDBClick(row, column, cell, event)
-                } else if (this.rowActions.includes('edit') && this.modelCheckPermission('change')) {
-                    this.toEditModel({row, column, cell, event})
-                }
-            },
+//            onRowSelect (row, column, cell, event) {
+//                if (this.onDBClick) {
+//                    this.onDBClick(row, column, cell, event)
+//                } else if (this.rowActions.includes('edit') && this.modelCheckPermission('change')) {
+//                    this.toEditModel({row, column, cell, event})
+//                }
+//            },
 
             toEditModel ({row}){
                 this.$router.push(this.model.getDetailUrl(row.id))
@@ -208,7 +209,7 @@
                             a.widget = a.widget || this.defaultWidget(a)
                         }
                         if (orderingFields.includes(a.name)) {
-                            a.sortable = true
+                            a.sortable = 'custom'
                         }
                         return a
                     }).filter(a => !qns.includes(a.name))
@@ -319,8 +320,23 @@
                         }
 
                     }
+                    this.addSearchParentQueries(r)
                 }
                 return r
+            },
+            addSearchParentQueries(d) {
+                let model=this.model
+                let sf = model.options.actions.SEARCH.filter_fields.find(a => {
+                    if(a.name.includes('__')){
+                        let pn = a.name.split('__').pop()
+                        if(this.parent.appModel.endsWith(`.${pn}`)){  // todo: 临时代码，这里有待写得更严谨
+                            return true
+                        }
+                    }
+                })
+                if(sf) {
+                    d[sf.name] = this.parent.id
+                }
             },
             onSelectionChange (selection) {
                 this.selection = selection

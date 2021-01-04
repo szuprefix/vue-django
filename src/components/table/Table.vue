@@ -1,16 +1,16 @@
 <template>
-    <el-table :data="_value" ref="table" v-loading="loading"
+    <el-table :data="tableData" ref="table" v-loading="loading"
               :element-loading-text="loading" v-on="elListeners" v-bind="elAttrs">
         <slot name="left"></slot>
         <column :field="f" v-for="f in visiableItems" :key="f.name"></column>
-        <el-table-column label="" align="right" fixed="right" min-width="140"
-                         v-if="rowActions &&  rowActions.length>0 || topActions && topActions.length>0">
+        <el-table-column label="" align="right" fixed="right" :min-width="actionsColumnWidth"
+                         v-if="actionsColumnWidth>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="_topActions" :context="scope" :permissionFunction="$attrs.permissionFunction"
+                <actions :items="topActionItems" :context="scope" :permissionFunction="$attrs.permissionFunction"
                          :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
-                <actions :items="_rowActions" :context="scope" class="hover-show" trigger="hover"
+                <actions :items="rowActionItems" :context="scope" :class="{'hover-show': hoverShow}" trigger="hover"
                          :map="avairableActions"></actions>
             </template>
         </el-table-column>
@@ -27,7 +27,9 @@
     import {genSpanMap, flatten} from './Table'
     import arrayNormalize from '../../utils/array_normalize'
     import serverResponse from '../../mixins/server_response'
-
+    import TrueFlag from '../widgets/TrueFlag.vue'
+    import ChoicesDisplay from '../widgets/ChoicesDisplay.vue'
+    import Date2Now from '../widgets/Date2Now.vue'
 
     export default{
         mixins: [serverResponse],
@@ -132,6 +134,21 @@
                 let func = ['decimal', 'number', 'integer'].includes(f.type) && toThousandslsFilter || ['percent'].includes(f.type) && percent || df
                 return (row, column, cellValue, index) => func(cellValue)
             },
+            defaultWidget(f){
+                if (f.type == 'boolean') {
+                    return TrueFlag
+                } else if (['datetime', 'date'].includes(f.type)) {
+                    return Date2Now
+                } else if (f.choices) {
+                    return ChoicesDisplay
+                } else if (f.child) {
+                    return function (value, field) {
+                        let d = value[field.name]
+                        let sfs = field.child.children
+                        return d.map(r => Object.keys(sfs).map(sf => r[sf]).join(',')).join('\n')
+                    }
+                }
+            },
             normalizeActions(actions){
                 return arrayNormalize(actions, this.avairableActions, (a) => {
                     if (a instanceof Array) {
@@ -147,7 +164,7 @@
                 }
                 f.type = f.type || 'string'
                 f.align = f.align || ['decimal', 'number', 'percent', 'integer'].includes(f.type) && 'right' || 'left'
-                f.widget = f.widget || this.cellWidget
+                f.widget = f.widget || this.cellWidget || this.defaultWidget(f)
                 f.headerWidget = f.headerWidget || this.headerWidget
                 f.formatter = f.formatter || this.genDefaultFormatter(f)
                 if (f.subColumns) {
@@ -168,22 +185,22 @@
             }
         },
         computed: {
-            _topActions () {
+            topActionItems () {
                 return this.normalizeActions(this.topActions)
             },
-            _rowActions () {
+            rowActionItems () {
                 return this.normalizeActions(this.rowActions)
             },
-            _items(){
+            tableItems(){
                 return arrayNormalize(this.items, {}, (i) => {
                     return this.normalizeItem(i)
                 })
             },
             visiableItems () {
-                return this._items.filter(a => a.hidden !== true)
+                return this.tableItems.filter(a => a.hidden !== true)
             },
             fields () {
-                return flatten(this._items, 'subColumns')
+                return flatten(this.tableItems, 'subColumns')
             },
             fieldNames () {
                 return this.fields.map(a => a.name)
@@ -198,14 +215,14 @@
                 })
                 return rs
             },
-            _value(){
+            tableData(){
                 if (this.group > 0) {
                     return sortBy(this.value, this.fieldNames)
                 }
                 return this.value
             },
             spanMap () {
-                return genSpanMap(this._value, this.fieldNames, this.group)
+                return genSpanMap(this.tableData, this.fieldNames, this.group)
             },
 
             elListeners () {
@@ -213,6 +230,19 @@
             },
             elAttrs () {
                 return {'span-method': this.spanMethod, ...this.$attrs}
+            },
+            hoverShow() {
+                return this.$store.state.hoverShow != false
+            },
+            actionsColumnWidth () {
+                let a = 0
+                if(this.topActionItems) {
+                    a = Math.max(this.topActionItems.length, a)
+                }
+                if(this.rowActionItems) {
+                    a = Math.max(this.rowActionItems.length, a)
+                }
+                return a*70
             }
         }
     }

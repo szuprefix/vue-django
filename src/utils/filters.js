@@ -102,8 +102,12 @@ export function formatTime(time, option) {
 }
 
 /* 数字 格式化 */
-export function nFormatter (num, digits) {
-    const si = [
+export function nFormatter (num, digits, inChinese) {
+    const si = inChinese ? [
+        {value: 1E12, symbol: '兆'},
+        {value: 1E8, symbol: '亿'},
+        {value: 1E4, symbol: '万'}
+    ] : [
         {value: 1E18, symbol: 'E'},
         {value: 1E15, symbol: 'P'},
         {value: 1E12, symbol: 'T'},

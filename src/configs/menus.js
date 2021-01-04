@@ -47,7 +47,8 @@ export function genMenusFromApps(apps, menus, modelPermissions) {
             }
         })
         let name =app.verbose_name
-        menuItems[name]={name , items: subItems, icon: app.icon || 'file', hidden: app.hidden}
+        let hidden = !subItems.find(a => !a.hidden) || app.hidden
+        menuItems[name]={name , items: subItems, icon: app.icon || 'file', hidden}
     })
     for(var k in others) {
         menuItems[k]={name:k, items: others[k]}
