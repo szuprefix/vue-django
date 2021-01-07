@@ -29,7 +29,7 @@
     import {mapState} from 'vuex'
     import menus from '@/configs/menus'
     import {reload} from '@/configs/menus'
-    import {genMenusFromApps} from 'vue-django/src/configs/menus'
+//    import {genMenusFromApps} from 'vue-django/src/configs/menus'
 
     export default {
         computed: mapState(['user']),
@@ -41,7 +41,7 @@
         },
         methods: {
             reload () {
-                this.menu = Object.assign({}, reload(this.user.model_permissions))
+                this.menus = Object.assign({}, reload(this.user.model_permissions))
 //                console.log(this.menu)
             }
         },

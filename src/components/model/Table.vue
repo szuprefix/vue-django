@@ -2,7 +2,7 @@
     <div>
         <search v-model="search" :model="model" :items="searchItems" :exclude="_baseQueries" ref="search"
                 v-if="showSearch && optionLoaded" :map="searchMap" @change="onSearch"></search>
-        <batch-actions :items="batchActionItems" @done="refresh" :context="{selection,count}"
+        <batch-actions :items="batchActionItems" @done="refresh" :context="{selection,count,parent,model}"
                        v-if="batchActionItems.length>0"></batch-actions>
         <el-drawer :visible.sync="editing" direction="rtl"
                    :title="`${parentMultipleRelationField?'添加':'创建'}${model.config.verbose_name}`" size="66%">
@@ -11,7 +11,7 @@
                              :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', confirm:false, do:addToParent}]"
                              v-if="parentMultipleRelationField"></model-table>
                 <component :is="creator" :appModel="appModel" :defaults="createDefaults" v-else
-                           :topActions="['saveAndAnother']"></component>
+                       :parent="parent"  :topActions="['saveAndAnother']"></component>
 
             </slot>
         </el-drawer>
@@ -156,13 +156,13 @@
                     this.$refs.table.load()
                 }
             },
-            onRowSelect (row, column, cell, event) {
-                if (this.onDBClick) {
-                    this.onDBClick(row, column, cell, event)
-                } else if (this.rowActions.includes('edit') && this.modelCheckPermission('change')) {
-                    this.toEditModel({row, column, cell, event})
-                }
-            },
+//            onRowSelect (row, column, cell, event) {
+//                if (this.onDBClick) {
+//                    this.onDBClick(row, column, cell, event)
+//                } else if (this.rowActions.includes('edit') && this.modelCheckPermission('change')) {
+//                    this.toEditModel({row, column, cell, event})
+//                }
+//            },
 
             toEditModel ({row}){
                 this.$router.push(this.model.getDetailUrl(row.id))

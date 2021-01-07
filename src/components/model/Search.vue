@@ -37,7 +37,7 @@
                           :title="f.label" v-else-if="f.widget === 'numberrange'" @input="onSearch"></number-range>
 
             <array-input v-if="f.widget === 'array'"
-                         v-model="value[`${f.name}__in`]" :placeholder="`批量查询${f.label}`" style="width: 10rem;"
+                         v-model="form[`${f.name}__in`]" :placeholder="`批量查询${f.label}`" style="width: 10rem;"
                          :title="f.label" :autosize="{minRows:1,maxRows:4}" @change="onSearch"></array-input>
             <el-input v-model="form[f.name]" :placeholder="`请输入${f.label}`"
                       v-else-if="f.widget === 'input'"
