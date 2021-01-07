@@ -138,7 +138,7 @@
                     return 'numberrange'
                 } else if (f.type === 'string' && f.lookups && f.lookups.includes('in')) {
                     return 'array'
-                } else if (f.type === 'string' && f.lookups && f.lookups.includes('exact') && !f.lookups.includes('in')) {
+                } else if (['string', 'integer'].includes(f.type) && f.lookups && f.lookups.includes('exact') && !f.lookups.includes('in')) {
                     return 'input'
                 }
             },

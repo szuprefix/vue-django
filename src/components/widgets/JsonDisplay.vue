@@ -6,7 +6,9 @@
             <el-col :xs="a.span.xs" :sm="a.span.sm" :md="a.span.md" :lg="a.span.lg" :xl="a.span.xl"
                     :key="a.name">
                 <span class="label">{{a.label}}</span>
-                <span>{{a.value}}&nbsp;</span>
+                <span> <template v-if="a.choices">
+                        {{displayChoice(a.choices, a.value)}}
+                    </template> <template v-else>{{a.value}}</template>&nbsp;</span>
             </el-col>
         </template>
 
@@ -45,6 +47,10 @@
                     }, a.span)
                     return a
                 })
+            },
+            displayChoice(choices, v) {
+                let b = choices.find(a => a.value === v)
+                return b && b.display_name || v
             }
         },
         watch: {
@@ -61,7 +67,8 @@
     .json-display {
         background-color: #F2F6FC;
     }
-    .json-display .label{
+
+    .json-display .label {
         width: 10rem;
         display: inline-block;
         background-color: #EBEEF5;
