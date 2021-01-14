@@ -91,13 +91,10 @@
                 let ss = this.model.viewsConfig.search || {}
                 let ffields = arrayNormalize(items, this.model.fieldConfigs, (a) => {
                     let label = this.map[a.name] && this.map[a.name].label || a.label
-                    let d = {widget: this.defaultWidget(a),...ss[a.name], ...a,  multiple: false, label}
+                    let d = {widget: this.defaultWidget(a),...a, multiple: false, label, ...ss[a.name]}
                     return d
                 })
-//                console.log(ffields)
-//                this.addSelectOptions(ffields)
                 this.filterFields = this.reorder(ffields)
-//                this.filters = Object.assign({}, this.getFilters())
             },
             selectRadioDefault() {
                 let b = false
@@ -111,19 +108,6 @@
                     this.onSearch()
                 }
             },
-//            addSelectOptions (fields) {
-//                let ss = this.model.viewsConfig.search
-//                if (!ss) {
-//                    return
-//                }
-//                console.log(ss)
-//                fields.forEach(f => {
-//                    let a = ss[f.name]
-//                    if (a) {
-//                        f.search = a
-//                    }
-//                })
-//            },
             defaultWidget (item) {
                 let f = item
                 if (f.type == 'boolean') {
@@ -150,18 +134,6 @@
                 })
                 return rs
             },
-//            getFilters(){
-//                let postFields = this.model.fieldConfigs
-//                let filters = {}
-//
-//                Object.keys(postFields).forEach((k) => {
-//                    let f = postFields[k]
-//                    if (f.choices) {
-//                        filters[`${k}_name`] = filters[k] = this.choices2selectOptions(f.choices)
-//                    }
-//                })
-//                return filters
-//            },
             choices2selectOptions(choices){
                 return choices.map((a) => {
                     return {text: a.display_name, value: a.value}
@@ -174,6 +146,12 @@
                         l.startsWith('是') ? `非${l.substr(1)}` : `非${l}`
                     )
                 )
+            },
+            getRelatedModel(name) {
+                let model = this.model
+                name.split('__').forEach(n => {
+
+                })
             }
         },
         computed: {

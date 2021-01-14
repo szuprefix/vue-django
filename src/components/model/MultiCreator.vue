@@ -118,7 +118,7 @@
                 if (!this.loaded) {
                     return []
                 }
-                this.records = s.split('\n').map((l) => {
+                this.records = s.split('\n').filter(l=> l.trim()).map((l) => {
                     if(this.extractor) {
                         return this.extractor(l)
                     }
@@ -127,7 +127,7 @@
                         d[this.fieldItems[i].name] = v
                     })
                     return d
-                })
+                }).filter(a => a)
             }, 2000),
             normalizeItems() {
                 this.fieldItems = arrayNormalize((this.items || this.viewConfig.items), this.model.fieldConfigs)

@@ -8,7 +8,7 @@
                 <span class="label">{{a.label}}</span>
                 <span> <template v-if="a.choices">
                         {{displayChoice(a.choices, a.value)}}
-                    </template> <template v-else>{{a.value}}</template>&nbsp;</span>
+                    </template><a :href="a.value" target='_blank' v-if="isLink(a.value)">{{a.value}}</a> <template v-else>{{a.value}}</template>&nbsp;</span>
             </el-col>
         </template>
 
@@ -51,6 +51,9 @@
             displayChoice(choices, v) {
                 let b = choices.find(a => a.value === v)
                 return b && b.display_name || v
+            },
+            isLink(a) {
+                return typeof a === 'string' && (a.startsWith('http://') || a.startsWith('https://'))
             }
         },
         watch: {
