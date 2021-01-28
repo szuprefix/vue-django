@@ -236,11 +236,16 @@
             },
             actionsColumnWidth () {
                 let a = 0
+                let len = (ls) => {
+                    return ls.filter((a) => {
+                        return !(a instanceof Array)
+                    }).length
+                }
                 if(this.topActionItems) {
-                    a = Math.max(this.topActionItems.length, a)
+                    a = Math.max(len(this.topActionItems), a)
                 }
                 if(this.rowActionItems) {
-                    a = Math.max(this.rowActionItems.length, a)
+                    a = Math.max(len(this.rowActionItems), a)
                 }
                 return a*70
             }
