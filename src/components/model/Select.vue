@@ -7,7 +7,7 @@
         <el-option :label="c.__str__ || c.name || c.title" :value="c[idField] || c.pk || c.url || c.name"
                    v-for="c in optionList" :key="c[idField] || c.pk || c.url || c.name">
             <span>{{c[selectOptionsFields[0]]}}</span>
-            <i v-if="showLink" class="fa fa-link" title="跳转到详情页" @click="$router.push(modelDetailPath)"></i>
+            <i v-if="showLink && idField === 'id'" class="fa fa-link" title="跳转到详情页" @click="$router.push(modelDetailPath)"></i>
             <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
         </el-option>
         <el-alert type="info" v-if="moreThanOnePage" show-icon title="记录太多未展示完全,请输入关键字进行搜索" :closable="false">
@@ -37,7 +37,7 @@
         props: {
             appModel: String,
             placeholder: String,
-            field: Object,
+            field: {type:Object, default: () => {return {}}},
             showCreate: {type: Boolean, default: true},
             value: [String, Number, Array],
             showLink: {type: Boolean, default: true}
@@ -100,9 +100,11 @@
             load (qs) {
                 return this.loadData(Object.assign({page_size: DEFAULT_PAGE_SIZE}, this.field.baseQueries, qs)).then(({data}) => {
                     this.data = data.results
-                    if(data.count === 1 && !this.selectedValue) {
-                        this.$emit('input', this.data[0][this.id_field])
-                    }
+//                    if (data.count === 1 && !this.selectedValue) {
+//                        let nv = this.data[0][this.idField]
+//                        this.$emit('input', nv)
+//                        this.selectedObjects = this.data
+//                    }
                     this.moreThanOnePage = data.next
                 })
             },

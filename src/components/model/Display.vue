@@ -1,5 +1,5 @@
 <template>
-    <json-display v-model="value" :field="jsonField" v-if="loaded"></json-display>
+    <json-display v-model="formValue" :field="jsonField" v-if="loaded"></json-display>
 </template>
 <script>
     import Model from './Model'
@@ -31,6 +31,7 @@
         },
         methods: {
             init(){
+                console.log(this.value)
                 this.mid = this.model.id = this.getId()
                 this.model.load().then((data, options) => {
                     this.mid = this.model.id
@@ -46,13 +47,6 @@
                     || undefined
                 return id === 'create' ? undefined : id
             },
-            defaultWidget (f) {
-                if (f.type == 'field' && f.model) {
-                    return RelatedSelect
-                } else if (['field', 'choice'].includes(f.type) && f.choices) {
-                    return f.choices.length <= 2 ? (f.multiple ? 'checkbox' : 'radio') : 'select'
-                }
-            },
             getItems () {
                 if (this.items) {
                     return Promise.resolve(this.items)
@@ -63,11 +57,11 @@
                 }).catch(() => {
                     return {}
                 }).then(config => {
-                    return config.items || Object.values(this.model.options.actions.POST).filter(a => a.read_only !== true)
+                    return config.items || Object.values(this.model.options.actions.POST)
                 })
             },
             normalizeItems() {
-                this.getItems().then(items => {
+                return this.getItems().then(items => {
                     this.formItems = arrayNormalize(items, this.model.fieldConfigs)
                 })
 
@@ -86,10 +80,7 @@
         },
         watch: {
             value(val){
-                this.formValue = val
-            },
-            formValue(val){
-                this.model.data = val
+                this.init()
             },
             items () {
                 this.normalizeItems()

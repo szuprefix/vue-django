@@ -55,6 +55,7 @@
               :type="['password', 'textarea'].includes(field.widget)?field.widget:'text'"
               v-on:keyup.enter="field.onEnter || doNothing" :disabled="field.disabled">
         <i slot="prefix" v-if="field.icon" :class="`fa fa-${field.icon}`"></i>
+        <i slot="suffix" v-if="isLink(value[field.name])" :class="`fa fa-link`" style="cursor: pointer" title="点击跳转" @click="goLink"></i>
     </el-input>
 </template>
 <script>
@@ -86,6 +87,12 @@
             },
             doNothing(){
                 console.log('do nothing')
+            },
+            isLink(v) {
+                return v && (v.startsWith('http://') || v.startsWith('https://'))
+            },
+            goLink() {
+                window.open(this.value[this.field.name])
             }
         },
         computed: {}

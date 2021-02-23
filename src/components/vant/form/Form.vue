@@ -1,48 +1,72 @@
 <template>
-    <van-form>
-        <template v-if="field.widget !== 'hidden'" v-for="field in formItems">
-            <template v-if="field.widget === 'readonly'">
-                {{formValue[field.name]}}
-            </template>
-            <field  v-model="formValue[field.name]"  v-else v-bind="[field]" :placeholder="field.placeholder || `请输入${field.label}`" :rules="formRules[field.name]" clearable></field>
+    <van-form @submit="onSubmit" v-on="$listeners">
+        <template v-for="field in formItems">
+            <widget v-model="formValue" :field="field" :key="field.name"></widget>
         </template>
-        <div style="margin: 16px;">
-            <van-button round block type="info" native-type="button"  @click.native="onSubmit">
-                {{formSubmitName}}
+
+        <div style="margin: 16px;" v-if="method">
+            <van-button block :loading="loading" :disabled="loading" :loading-text='loading' type="info" native-type="submit">
+                {{submitName}}
             </van-button>
         </div>
+        <notice-bar v-if="errors.non_field_errors">{{errors.non_field_errors}}</notice-bar>
     </van-form>
 </template>
 <script>
-    import formView from '../../../mixins/form_view'
+    import Form from '../../form/Form'
+    import Widget from './Widget.vue'
+    import ServerResponse from 'vue-django/src/mixins/server_response'
     import {
         Form as VanForm,
         Button as VanButton,
-        Field
+        Field,
+        NoticeBar
     } from 'vant'
     export default{
-        mixins: [
-            formView
-        ],
-
+        mixins: [ServerResponse],
         props: {
-            value: Object,
-            title: String
+            ...Form.defaultProps,
+            procedure: Function
         },
         components: {
             VanForm,
             VanButton,
-            Field
+            Field,
+            Widget,
+            NoticeBar
         },
         data () {
             return {
-                userName: ''
+                errors: {},
+                formValue: {},
+                formItems: []
             }
         },
         created () {
+//            console.log(this.$listeners)
             this.formValue = this.value
+            this.formItems = Form.normalizeItems(this.items)
         },
         methods: {
+
+            doSubmit () {
+                this.$emit('beforesubmit', this.formValue)
+                this.loading = `正在${this.submitName}`
+                if (this.procedure) {
+                    return this.procedure()
+                } else {
+                    let action = this.method === 'post' ? this.$http.post : this.$http.put
+                    return action(this.url, this.formValue).then(({data}) => {
+                        return data
+                    })
+                }
+            },
+            onPosted(data){
+                this.loading = false
+                this.$message({message: this.successInfo || `${this.submitName}成功`, type: 'success'})
+                this.$emit('form-posted', data)
+                return data
+            },
             showError (field) {
                 this.$message({message: this.formErrors[field.name], type: 'error'})
             },
@@ -54,10 +78,26 @@
                     return {key: a.value, value: a.display_name}
                 })
                 return ops
+            },
+            onSubmit() {
+                this.doSubmit().then(this.onPosted).catch(e => {
+//                        this.loading = false
+                        if (e === false) {
+                            this.$message({message: '表单检验未通过，请按提示修改', type: 'error'})
+                        } else {
+                            let error = this.onServerResponseError(e)
+                            if (error.code === 400) {
+                                this.errors = Form.joinErrors(error.msg)
+                            }
+                        }
+                    }
+                )
+
             }
         },
+        computed: {},
         watch: {
-            value (val) {
+            value(val){
                 this.formValue = val
             },
             formErrors (val) {
@@ -68,6 +108,9 @@
                         f.$data.valid = false
                     })
                 }
+            },
+            items(){
+                this.formItems = Form.normalizeItems(this.items)
             }
         }
     }

@@ -1,16 +1,18 @@
 <template>
     <div>
-        <div>
-            <el-button-group>
-                <el-button type="plain" size="mini" icon="el-icon-edit" @click="onEdit">编辑</el-button>
-                <el-button type="plain" size="mini" icon="el-icon-view" @click="onView">预览</el-button>
-            </el-button-group>
-            <el-radio-group v-model="splitChar" size="mini">
-                <el-radio-button :label="'\t'" title="字段用Tab符分隔">TAB</el-radio-button>
-                <el-radio-button label="," title="字段用逗号分隔">,</el-radio-button>
-                <el-radio-button label="|" title="字段用竖线分隔">|</el-radio-button>
-            </el-radio-group>
-        </div>
+        <slot name="setting">
+            <div>
+                <el-button-group>
+                    <el-button type="plain" size="mini" icon="el-icon-edit" @click="onEdit">编辑</el-button>
+                    <el-button type="plain" size="mini" icon="el-icon-view" @click="onView">预览</el-button>
+                </el-button-group>
+                <el-radio-group v-model="splitChar" size="mini">
+                    <el-radio-button :label="'\t'" title="字段用Tab符分隔">TAB</el-radio-button>
+                    <el-radio-button label="," title="字段用逗号分隔">,</el-radio-button>
+                    <el-radio-button label="|" title="字段用竖线分隔">|</el-radio-button>
+                </el-radio-group>
+            </div>
+        </slot>
         <el-row :gutter="40">
             <el-col :span="editZoneSpan">
                 <el-input ref="content" type="textarea" :autosize="{ minRows: 24}" v-model="currentValue"
@@ -41,7 +43,7 @@
         </el-row>
     </div>
 </template>
-<script> 
+<script>
     import ForeignKeyTranslater from '../../utils/foreign_key_translater'
     import Model from './Model'
     import {debounce} from 'lodash'
@@ -63,6 +65,7 @@
                     return {}
                 }
             },
+            extractor: Function,
             pk: {type: String}
         },
         data () {
@@ -115,13 +118,16 @@
                 if (!this.loaded) {
                     return []
                 }
-                this.records = s.split('\n').map((l) => {
+                this.records = s.split('\n').filter(l=> l.trim()).map((l) => {
+                    if(this.extractor) {
+                        return this.extractor(l)
+                    }
                     let d = {}
                     l.split(this.splitChar).forEach((v, i) => {
                         d[this.fieldItems[i].name] = v
                     })
                     return d
-                })
+                }).filter(a => a)
             }, 2000),
             normalizeItems() {
                 this.fieldItems = arrayNormalize((this.items || this.viewConfig.items), this.model.fieldConfigs)
