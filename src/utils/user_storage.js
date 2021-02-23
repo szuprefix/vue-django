@@ -19,6 +19,7 @@ export function Cache (key, db) {
             return db.get(k || key).value()
         },
         destroy () {
+            console.log('destroy', key)
             try {
                 db.unset(key).write()
             } catch (e) {

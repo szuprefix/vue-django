@@ -3,7 +3,7 @@
         <tab v-model="tab" :animate="false">
             <tab-item :active-class="`active-${i%4+1}`" :badge-label="a.badge" v-for="a, i in tabItems" :key="a.name">{{a.label}}</tab-item>
         </tab>
-        <component :is="tabItems[tab].component" :owner="owner" v-bind="[tabItems[tab]]"
+        <component :is="tabItems[tab].component" :owner="owner" v-bind="[$attrs, tabItems[tab]]"
                    v-if="loaded"></component>
     </div>
 </template>

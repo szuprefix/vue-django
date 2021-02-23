@@ -49,6 +49,7 @@
                 if (this.owner) {
                     qd.owner_type = this.owner.options.content_type_id
                     qd.owner_id = this.owner.id
+                    qd.relation_limit = this.owner.appModel
                 }
                 this.loading = true
                 return this.model.query(qd, this.url).then(data => {
