@@ -4,7 +4,7 @@
                    class="image-uploader"
                    ref="upload"
                    action="noaction"
-                   accept=".jpg,.png,.jpeg,.gif"
+                   accept=".mp3,.m4a"
                    :list-type="$attrs.listType || 'picture-card'"
                    :file-list="fileList"
                    v-bind="[$attrs, $props]"
@@ -19,9 +19,7 @@
             <i class="el-icon-plus"></i>
         </el-upload>
 
-        <el-dialog :visible.sync="dialogVisible">
-            <img width="100%" :src="dialogImageUrl" alt="">
-        </el-dialog>
+        <audio :src="fileList[0].url" controls v-if="fileList.length>0"></audio>
     </div>
 </template>
 <script>
