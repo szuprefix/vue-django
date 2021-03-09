@@ -79,13 +79,12 @@
             },
             genDailyOption(item, data){
                 item.fields = item.fields || ['日期', item.title]
-                item.fields = arrayNormalise(item.fields,{})
+                item.fields = arrayNormalise(item.fields, {})
 
                 let series = [{
                     type: 'line',
                     smooth: true,
                     name: item.fields[1] && item.fields[1].name || '数量',
-                    data: data.map((a) => a[1])
                 }]
                 let yAxis = [{
                     type: 'value',
@@ -96,19 +95,20 @@
                         type: 'bar',
                         yAxisIndex: 1,
                         name: item.fields[2] && item.fields[2].name || '数量2',
-                        data: data.map((a) => a[2])
                     })
                     yAxis.push({
                         type: 'value',
-                        name:item.fields[2] && item.fields[2].name
+                        name: item.fields[2] && item.fields[2].name
                     })
                 }
                 return {
                     visualMap: item.visualMap,
+                    dataset: {
+                        source: data
+                    },
 //                    title: item.title,
                     xAxis: {
-                        type: 'category',
-                        data: data.map((a) => a[0])
+                        type: 'category'
                     },
                     yAxis,
                     series
@@ -170,36 +170,44 @@
             },
             genBarOption (item, data){
                 let dataZoom = []
+                let axisLabel = {}
+                let grid = undefined
+                if (data.length >= 8) {
+
+                    axisLabel = {rotate: 30, interval: 0}
+                }
                 if (data.length >= 16) {
                     dataZoom.push(
                         {
-                            id: 'dataZoomY',
+                            id: 'dataZoomX',
                             type: 'slider',
-                            yAxisIndex: [0],
+                            xAxisIndex: [0],
                             filterMode: 'filter',
                             show: true,
                             start: 0,
                             end: 900 / data.length
                         })
+                    grid = {
+                        bottom: '33%',
+                    }
                 }
                 return {
                     dataZoom,
-                    yAxis: {
-                        type: 'category',
-                        data: data.map((a) => a[0])
-                    },
-                    grid: {
-                        left: '33%',
+                    dataset: {
+                        source: data
                     },
                     xAxis: {
-                        position: 'top',
+                        type: 'category', axisLabel
+                    },
+                    grid,
+                    yAxis: {
+//                        position: 'top',
                         type: 'value',
                     },
                     series: [{
                         type: 'bar',
                         smooth: true,
-                        name: item.title,
-                        data: data.map((a) => a[1])
+                        name: item.title
                     }]
                 }
             },

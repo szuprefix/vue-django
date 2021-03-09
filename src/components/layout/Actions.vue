@@ -2,7 +2,7 @@
     <el-button-group v-if="showActions.length>0">
         <template v-for="a in showActions">
             <el-button v-bind="[a]" :size="a.size || size" @click="handleCommand(a)"
-                       v-if="!a.show || a.show()" :key="a.name">
+                       v-if="!a.show || a.show(context)" :key="a.name">
                 <i :class="getIconClass(a.icon)" v-if="a.icon"></i>{{a.label}}
             </el-button>
         </template>
@@ -12,7 +12,7 @@
           </span>
             <el-dropdown-menu slot="dropdown">
                 <template v-for="a in dropdownActions">
-                    <el-dropdown-item :command="a" v-if="!a.show || a.show()" :key="a.name" :title="a.title"
+                    <el-dropdown-item :command="a" v-if="!a.show || a.show(context)" :key="a.name" :title="a.title"
                                       :icon="getIconClass(a.icon)">
                         {{a.label || a.title}}
                     </el-dropdown-item>
@@ -91,7 +91,7 @@
                 return this.actionItems.filter((a) => {
                     return (a instanceof Array)
                 }).reduce((a, b) => a.concat(b), []).filter((a) => {
-                    return !a.show || a.show()
+                    return !a.show || a.show(this.context)
                 })
             }
         },

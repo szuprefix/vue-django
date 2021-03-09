@@ -155,7 +155,6 @@
                 return this.genFileNameContext(file, fnt).then(ctx => {
                     file.uploadContext = ctx
                     let fileName = template(fnt)(ctx)
-                    console.log(fileName)
                     return import('ali-oss').then(module => {
                         let OSS = module.default
                         return new Promise((resolve, reject) => {
@@ -180,7 +179,7 @@
         },
         computed: {
             urlPrefix() {
-                return `https://${this.$store.state.party.settings.aliyun.oss.domain}/`
+                return this.$attrs.urlPrefix || `https://${this.$store.state.party.settings.aliyun.oss.domain}/`
             }
         },
         watch: {
