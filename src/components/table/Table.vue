@@ -247,7 +247,7 @@
                 if(this.rowActionItems) {
                     a = Math.max(len(this.rowActionItems), a)
                 }
-                return a*70
+                return a*70+10
             }
         }
     }

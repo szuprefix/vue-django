@@ -4,9 +4,12 @@
                 :key="c.name" v-loading="loading"
                 :element-loading-text="loading">
             <template v-if="chartData[c.name]">
-                <data-table v-if="c.type === 'table'" :title="c.title" :group="c.group" :value="genTableData(c)"
-                            :items="c.fields"
-                            :options="Object.assign({maxHeight:500},c.options)"></data-table>
+                <template v-if="c.type === 'table'">
+                    <h4>{{c.title}}</h4>
+                    <data-table :title="c.title" :group="c.group" :value="genTableData(c)"
+                                :items="c.fields"
+                                :options="Object.assign({maxHeight:500},c.options)"></data-table>
+                </template>
                 <chart v-else :options="chartOptions[c.name]" :auto-resize="true"></chart>
             </template>
         </el-col>
@@ -14,8 +17,9 @@
 </template>
 <script>
     import Qs from 'qs'
-    import ServerResponse from 'vue-django/src/mixins/server_response'
-    import DataTable from 'vue-django/src/components/table/Table.vue'
+    import ServerResponse from '../../mixins/server_response'
+    import DataTable from '../table/Table.vue'
+    import arrayNormalise from '../../utils/array_normalize'
     import {zipObject} from 'lodash'
     import Vue from 'vue'
     import ECharts from 'vue-echarts' // refers to components/ECharts.vue in webpack
@@ -74,21 +78,40 @@
                 return data
             },
             genDailyOption(item, data){
+                item.fields = item.fields || ['日期', item.title]
+                item.fields = arrayNormalise(item.fields, {})
+
+                let series = [{
+                    type: 'line',
+                    smooth: true,
+                    name: item.fields[1] && item.fields[1].name || '数量',
+                }]
+                let yAxis = [{
+                    type: 'value',
+                    name: item.fields[1].name
+                }]
+                if (item.fields.length >= 3) {
+                    series.push({
+                        type: 'bar',
+                        yAxisIndex: 1,
+                        name: item.fields[2] && item.fields[2].name || '数量2',
+                    })
+                    yAxis.push({
+                        type: 'value',
+                        name: item.fields[2] && item.fields[2].name
+                    })
+                }
                 return {
                     visualMap: item.visualMap,
+                    dataset: {
+                        source: data
+                    },
+//                    title: item.title,
                     xAxis: {
-                        type: 'category',
-                        data: data.map((a) => a[0])
+                        type: 'category'
                     },
-                    yAxis: {
-                        type: 'value',
-                    },
-                    series: [{
-                        type: 'line',
-                        smooth: true,
-                        name: item.title,
-                        data: data.map((a) => a[1])
-                    }]
+                    yAxis,
+                    series
                 }
             },
             genTreeMapOption(item, data){
@@ -147,36 +170,44 @@
             },
             genBarOption (item, data){
                 let dataZoom = []
+                let axisLabel = {}
+                let grid = undefined
+                if (data.length >= 8) {
+
+                    axisLabel = {rotate: 30, interval: 0}
+                }
                 if (data.length >= 16) {
                     dataZoom.push(
                         {
-                            id: 'dataZoomY',
+                            id: 'dataZoomX',
                             type: 'slider',
-                            yAxisIndex: [0],
+                            xAxisIndex: [0],
                             filterMode: 'filter',
                             show: true,
                             start: 0,
                             end: 900 / data.length
                         })
+                    grid = {
+                        bottom: '33%',
+                    }
                 }
                 return {
                     dataZoom,
-                    yAxis: {
-                        type: 'category',
-                        data: data.map((a) => a[0])
-                    },
-                    grid: {
-                        left: '33%',
+                    dataset: {
+                        source: data
                     },
                     xAxis: {
-                        position: 'top',
+                        type: 'category', axisLabel
+                    },
+                    grid,
+                    yAxis: {
+//                        position: 'top',
                         type: 'value',
                     },
                     series: [{
                         type: 'bar',
                         smooth: true,
-                        name: item.title,
-                        data: data.map((a) => a[1])
+                        name: item.title
                     }]
                 }
             },
