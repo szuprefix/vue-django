@@ -9,7 +9,7 @@
             </template>
         </x-table>
         <!--<div class="pager-container">-->
-        <el-pagination v-if="showPagger && count>pageSize"
+        <el-pagination v-if="showPagger"
                        background
                        layout="total, sizes, prev, pager, next, jumper"
                        :page-size="pageSize"

@@ -7,6 +7,9 @@ export default function (items, templates, normalize) {
     // if(!(templates instanceof Array)) {
     //     templates = [templates]
     // }
+    if (items === 'all' && templates) {
+        items = Object.keys(templates)
+    }
     return items.map((a, i) => {
         let d = {}
         if (typeof a === 'string' || a instanceof String) {

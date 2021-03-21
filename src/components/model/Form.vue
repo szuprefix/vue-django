@@ -112,7 +112,7 @@
                 if (f.type == 'field' && f.model) {
                     return RelatedSelect
                 } else if (['field', 'choice'].includes(f.type) && f.choices) {
-                    return f.choices.length <= 2 ? (f.multiple ? 'checkbox' : 'radio') : 'select'
+                    return f.choices.length <= 2 ? (f.multiple ? 'switch' : 'radio') : 'select'
                 }
             },
             getItems () {

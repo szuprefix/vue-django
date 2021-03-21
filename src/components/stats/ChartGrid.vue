@@ -114,6 +114,73 @@
                     series
                 }
             },
+            genLineBarOption(item, data){
+                let type = item.type
+                if(!type){
+                    if(data.length>0 && /^\d+-\d+-\d+$/.test(data[0][0])){
+                        type = 'daily'
+                    }
+                }
+                let dataZoom = []
+                let axisLabel = {}
+                let grid = undefined
+                if (type !== 'daily' && data.length >= 8) {
+                    axisLabel = {rotate: 30, interval: 0}
+                }
+                if (data.length >= 16) {
+                    dataZoom.push(
+                        {
+                            id: 'dataZoomX',
+                            type: 'slider',
+                            xAxisIndex: [0],
+                            filterMode: 'filter',
+                            show: true,
+                            start: 0,
+                            end: 900 / data.length
+                        })
+                    if (type !== 'daily') {
+                        grid = {
+                            bottom: '25%',
+                        }
+                    }
+                }
+                item.fields = item.fields || ['日期', item.title]
+                item.fields = arrayNormalise(item.fields, {})
+
+                let series = [{
+                    type: 'line',
+                    smooth: true,
+                    name: item.fields[1] && item.fields[1].name || '数量',
+                }]
+                let yAxis = [{
+                    type: 'value',
+                    name: item.fields[1].name
+                }]
+                if (item.fields.length >= 3) {
+                    series.push({
+                        type: 'bar',
+                        yAxisIndex: 1,
+                        name: item.fields[2] && item.fields[2].name || '数量2',
+                    })
+                    yAxis.push({
+                        type: 'value',
+                        name: item.fields[2] && item.fields[2].name
+                    })
+                }
+//                console.log('genLineBarOption', item.title, type)
+                return {
+                    dataZoom,
+                    dataset: {
+                        source: data
+                    },
+                    xAxis: {
+                        type: 'category', axisLabel
+                    },
+                    grid,
+                    yAxis,
+                    series
+                }
+            },
             genTreeMapOption(item, data){
 
             },
@@ -173,7 +240,6 @@
                 let axisLabel = {}
                 let grid = undefined
                 if (data.length >= 8) {
-
                     axisLabel = {rotate: 30, interval: 0}
                 }
                 if (data.length >= 16) {
@@ -234,7 +300,12 @@
             chartOptions(){
                 let res = {}
                 this.items.forEach((a) => {
-                    let optionFunc = a.type == 'daily' ? this.genDailyOption : (a.type === 'funnel' ? this.genFunnelOption : this.genBarOption)
+                    let om = {
+                        daily: this.genLineBarOption,
+                        funnel: this.genFunnelOption,
+                        linebar: this.genLineBarOption
+                    }
+                    let optionFunc = om[a.type] || this.genLineBarOption
                     res[a.name] = {
                         ...COMMON_OPTIONS,
                         title: {

@@ -1,8 +1,6 @@
 <template>
     <el-row class="json-display">
         <template v-for="a in items">
-            <!--<el-col :span="8" class="label">{{a.label || a.name}}</el-col>-->
-            <!--<el-col :span="16">{{a.value}}&nbsp;</el-col>-->
             <el-col :xs="a.span.xs" :sm="a.span.sm" :md="a.span.md" :lg="a.span.lg" :xl="a.span.xl"
                     :key="a.name">
                 <span class="label">{{a.label}}</span>
@@ -15,7 +13,7 @@
     </el-row>
 </template>
 <script>
-    import arrayNormalize from '../../utils/array_normalize'
+    import arrayNormalize from '../../../utils/array_normalize'
     export default{
         props: {
             value: Object,
@@ -33,7 +31,7 @@
         components: {},
         methods: {
             normalizeItems () {
-                let d = this.value
+                let d = this.value[this.field.name]
                 let items = this.field.items || []
                 this.items = arrayNormalize(items, {}, a => {
                     a.value = d[a.name]
