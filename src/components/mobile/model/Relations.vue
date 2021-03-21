@@ -1,7 +1,7 @@
 <template>
     <div>
         <tab v-model="tab" :animate="false">
-            <tab-item :active-class="`active-${i%4+1}`" :badge-label="a.badge" v-for="a, i in tabItems" :key="a.name">{{a.label}}</tab-item>
+            <tab-item :active-class="`active-${i%4+1}`" :badge-label="badges[a.name]" v-for="a, i in tabItems" :key="a.name">{{a.label}}</tab-item>
         </tab>
         <component :is="tabItems[tab].component" :owner="owner" v-bind="[$attrs, tabItems[tab]]"
                    v-if="loaded"></component>
@@ -24,7 +24,8 @@
                 cache: this.$store.state.user.storage.newCache(`${this.owner.appModel}.n${this.owner.id}.relations.tab`),
                 tab: undefined,
                 tabItems: [],
-                loaded: false
+                loaded: false,
+                badges: {}
             }
         },
         components: {Tab, TabItem},
@@ -39,7 +40,8 @@
                     a.component = a.component || `${a.name.replace('.', '/')}/components/List`
                     if (a.getAsyncInfo) {
                         a.getAsyncInfo().then(info => {
-                            this.tabItems[i] = {...this.tabItems[i], ...info}
+                            this.badges[a.name] = info.badge
+                            this.badges={...this.badges}
                             this.$emit('syncinfo', info)
                         })
                     }
