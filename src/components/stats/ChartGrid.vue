@@ -78,8 +78,14 @@
                 return data
             },
             genDailyOption(item, data){
+                console.log(data)
                 item.fields = item.fields || ['日期', item.title]
-                item.fields = arrayNormalise(item.fields, {})
+                item.fields = arrayNormalise(item.fields || [], {})
+                let columns = item.fields.map(a => a.name)
+                if(!(data instanceof Array)) {
+                    columns = data.columns
+                    data = data.data
+                }
 
                 let series = [{
                     type: 'line',
@@ -116,6 +122,15 @@
             },
             genLineBarOption(item, data){
                 let type = item.type
+                let columns
+                if(!(data instanceof Array)) {
+                    columns = data.columns
+                    data = data.data
+                }
+                if(item.fields) {
+                    item.fields = arrayNormalise(item.fields, {})
+                    columns = item.fields.map(a => a.name)
+                }
                 if(!type){
                     if(data.length>0 && /^\d+-\d+-\d+$/.test(data[0][0])){
                         type = 'daily'
@@ -124,47 +139,46 @@
                 let dataZoom = []
                 let axisLabel = {}
                 let grid = undefined
-                if (type !== 'daily' && data.length >= 8) {
-                    axisLabel = {rotate: 30, interval: 0}
-                }
-                if (data.length >= 16) {
-                    dataZoom.push(
-                        {
-                            id: 'dataZoomX',
-                            type: 'slider',
-                            xAxisIndex: [0],
-                            filterMode: 'filter',
-                            show: true,
-                            start: 0,
-                            end: 900 / data.length
-                        })
-                    if (type !== 'daily') {
+                if (type !== 'daily') {
+
+                    if (data.length >= 8) {
+                        axisLabel = {rotate: 30, interval: 0}
+                    }
+                    if (data.length >= 16) {
+                        dataZoom.push(
+                            {
+                                id: 'dataZoomX',
+                                type: 'slider',
+                                xAxisIndex: [0],
+                                filterMode: 'filter',
+                                show: true,
+                                start: 0,
+                                end: 900 / data.length
+                            })
                         grid = {
                             bottom: '25%',
                         }
                     }
                 }
-                item.fields = item.fields || ['日期', item.title]
-                item.fields = arrayNormalise(item.fields, {})
 
                 let series = [{
                     type: 'line',
                     smooth: true,
-                    name: item.fields[1] && item.fields[1].name || '数量',
+                    name: columns[1] || '数量',
                 }]
                 let yAxis = [{
                     type: 'value',
-                    name: item.fields[1].name
+                    name: columns[1]
                 }]
-                if (item.fields.length >= 3) {
+                if (columns.length >= 3) {
                     series.push({
                         type: 'bar',
                         yAxisIndex: 1,
-                        name: item.fields[2] && item.fields[2].name || '数量2',
+                        name: columns[2] || '数量2',
                     })
                     yAxis.push({
                         type: 'value',
-                        name: item.fields[2] && item.fields[2].name
+                        name: columns[2]
                     })
                 }
 //                console.log('genLineBarOption', item.title, type)
@@ -174,7 +188,9 @@
                         source: data
                     },
                     xAxis: {
-                        type: 'category', axisLabel
+                        type: 'category',
+                        axisLabel,
+//                        name: columns[0]
                     },
                     grid,
                     yAxis,
@@ -277,6 +293,34 @@
                     }]
                 }
             },
+            genStackOptions(item, data) {
+                item.fields = arrayNormalise(item.fields || [], {})
+                let columns = item.fields.map(a => a.name)
+                if(!(data instanceof Array)) {
+                    columns = data.columns
+                    data = data.data
+                }
+                return {
+                    dataset: {
+                        source: data
+                    },
+                    xAxis: {
+                        type: 'category',
+//                        name: columns[0]
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: columns[1][0]
+                    },
+                    series: columns.slice(1).map( c => {
+                        return {
+                            type: 'bar',
+                            stack: c[0],
+                            name: c[1]
+                        }
+                    })
+                }
+            },
             loadTimeData(period){
                 period = period instanceof Array ? `${period[0]}至${period[1]}` : period
                 let context = {measures: this.items.map((a) => a.name), period, time_field: this.$attrs.timeField}
@@ -292,7 +336,7 @@
                     if (this.base) {
                         ds = ds[this.base]
                     }
-                    this.chartData = Object.assign({}, ds)
+                    this.chartData = {...ds}
                 }).catch(this.onServerResponseError)
             },
         },
@@ -303,7 +347,8 @@
                     let om = {
                         daily: this.genLineBarOption,
                         funnel: this.genFunnelOption,
-                        linebar: this.genLineBarOption
+                        linebar: this.genLineBarOption,
+                        stack: this.genStackOptions
                     }
                     let optionFunc = om[a.type] || this.genLineBarOption
                     res[a.name] = {

@@ -90,7 +90,7 @@
                 }).then(data => {
                     this.loading = false
                     this.data = data
-                    this.$emit("loaded", data)
+                    this.$emit("loaded", {data, count:this.count})
                 }).catch(this.onServerResponseError)
             },
             onSearch(){
