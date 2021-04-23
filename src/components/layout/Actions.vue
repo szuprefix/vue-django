@@ -54,7 +54,7 @@
                 if (action.confirm instanceof Function) {
                     return action.confirm
                 } else if (action.confirm) {
-                    return (action) => this.$confirm(action.notice, `确定要执行"${action.label}"操作吗?`, {type: action.type || 'warning'})
+                    return (action) => this.$confirm(action.notice, `确定要执行"${action.label || action.title}"操作吗?`, {type: action.type || 'warning'})
                 } else {
                     return (action) => Promise.resolve()
                 }

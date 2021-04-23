@@ -1,5 +1,5 @@
 <template>
-    <span v-if="field.widget === 'readonly'" style="white-space: pre-wrap">{{value[field.name]}}</span>
+    <span v-if="field.widget === 'readonly'" style="white-space: pre-wrap"><a v-if="isLink(value[field.name])" :href="value[field.name]" target="_blank">{{value[field.name]}}</a><template v-else>{{value[field.name]}}</template></span>
     <span v-else-if="typeof(field.widget) === 'function'" v-html="field.widget(value,field)"></span>
     <el-radio-group v-model="value[field.name]" v-else-if="field.widget === 'radio'" @change="fieldValueChanged"
                     :disabled="field.disabled">
@@ -89,7 +89,7 @@
                 console.log('do nothing')
             },
             isLink(v) {
-                return v && (v.startsWith('http://') || v.startsWith('https://'))
+                return v && (typeof v === 'string') && (v.startsWith('http://') || v.startsWith('https://'))
             },
             goLink() {
                 window.open(this.value[this.field.name])
