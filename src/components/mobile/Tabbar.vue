@@ -1,8 +1,15 @@
 <template>
-    <tabbar v-show="show" style="position: fixed;" v-on="$listeners">
-        <tabbar-item :show-dot="t.showDot" :selected="t.link === $route.fullPath" :badge="t.badge" v-for="t in tabItems" :link="t.link" :key="t.name">
-            <i slot="icon" :class="`iconfont icon-${t.icon}`"></i>
-            <span slot="label">{{t.label}}</span>
+    <tabbar v-show="show" style="position: fixed;" v-bind="[$attrs]" v-on="$listeners">
+        <tabbar-item :show-dot="t.showDot" :selected="t.link === $route.fullPath" :badge="t.badge" v-for="t in tabItems"
+                     :link="t.link" :key="t.name">
+            <template #icon>
+                <component v-if="t.iconComponent" :is="t.iconComponent" v-bind="[t]"></component>
+                <i :class="t.iconClass || `iconfont icon-${t.icon}`"></i>
+            </template>
+            <template #label>
+                <component v-if="t.labelComponent" :is="t.labelComponent" v-bind="[t]"></component>
+                <span :class="$attrs.labelClass"  v-else>{{t.label}}</span>
+            </template>
         </tabbar-item>
     </tabbar>
 </template>
