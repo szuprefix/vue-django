@@ -95,7 +95,7 @@
                         icon: 'pencil',
                         title: '编辑',
                         do: this.toEditModel,
-                        show: () => this.checkPermission('update') || this.checkPermission('partial_update')
+                        show: () => this.checkPermission('update') || this.checkPermission('partial_update') || this.checkPermission('retrieve')
                     },
                     'delete': {
                         icon: 'trash',

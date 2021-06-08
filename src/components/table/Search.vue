@@ -20,8 +20,8 @@
             <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`" v-if="f.widget =='boolean'"
                        :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`" @change="onSearch"
                        :key="f.name">
-                <el-option :label="f.label" :value="true"></el-option>
-                <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
+                <el-option :label="f.label" :value="f.useNumber? 1 : true"></el-option>
+                <el-option :label="getBoolFieldFalseLabel(f.label)" :value="f.useNumber? 0 : false"></el-option>
             </el-select>
             <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`"
                        v-else-if="f.widget === 'select'" :key="f.name"

@@ -23,8 +23,10 @@
     </el-button-group>
 </template>
 <script>
+    import serverResponse from '../../mixins/server_response'
     import arrayNormalize from '../../utils/array_normalize'
     export default{
+        mixins: [serverResponse],
         props: {
             items: Array,
             context: Object,
@@ -48,16 +50,31 @@
             this.normalizeItems()
         },
         methods: {
-            handleCommand (action) {
-                let command = action.do
-                if(typeof command === 'function') {
-                    return command(this.context)
+            getConfirm(action) {
+                if (action.confirm instanceof Function) {
+                    return action.confirm
+                } else if (action.confirm) {
+                    return (action) => this.$confirm(action.notice, `确定要执行"${action.label || action.title}"操作吗?`, {type: action.type || 'warning'})
+                } else {
+                    return (action) => Promise.resolve()
                 }
-                this.$store.state.bus.$emit('opendrawer', {component: command, context: {...action.drawer, ...this.context}})
+            },
+            handleCommand (action) {
+                let confirmFunc = this.getConfirm(action)
+                confirmFunc(action).then(() => {
+                    let command = action.do
+                    if (typeof command === 'function') {
+                        return command(this.context)
+                    }
+                    this.$store.state.bus.$emit('opendrawer', {
+                        component: command,
+                        context: {...action.drawer, ...this.context}
+                    })
+                }).catch(this.onServerResponseError)
             },
             normalizeItem(a)
             {
-                if(a instanceof Array) {
+                if (a instanceof Array) {
                     return arrayNormalize(a, this.map, this.normalizeItem)
                 }
                 if (!a.show && this.permissionFunction && a.permission) {

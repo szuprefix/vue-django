@@ -9,7 +9,7 @@
             </template>
         </x-table>
         <!--<div class="pager-container">-->
-        <el-pagination v-if="showPagger && count>pageSize"
+        <el-pagination v-if="showPagger"
                        background
                        layout="total, sizes, prev, pager, next, jumper"
                        :page-size="pageSize"
@@ -90,7 +90,7 @@
                 }).then(data => {
                     this.loading = false
                     this.data = data
-                    this.$emit("loaded", data)
+                    this.$emit("loaded", {data, count:this.count})
                 }).catch(this.onServerResponseError)
             },
             onSearch(){
