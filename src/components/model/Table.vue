@@ -11,7 +11,7 @@
                              :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', confirm:false, do:addToParent}]"
                              v-if="parentMultipleRelationField"></model-table>
                 <component :is="creator" :appModel="appModel" :defaults="createDefaults" v-else
-                       :parent="parent"  :topActions="['saveAndAnother']"></component>
+                           :parent="parent" :topActions="['saveAndAnother']"></component>
 
             </slot>
         </el-drawer>
@@ -325,16 +325,16 @@
                 return r
             },
             addSearchParentQueries(d) {
-                let model=this.model
+                let model = this.model
                 let sf = model.options.actions.SEARCH.filter_fields.find(a => {
-                    if(a.name.includes('__')){
+                    if (a.name.includes('__')) {
                         let pn = a.name.split('__').pop()
-                        if(this.parent.appModel.endsWith(`.${pn}`)){  // todo: 临时代码，这里有待写得更严谨
+                        if (this.parent.appModel.endsWith(`.${pn}`)) {  // todo: 临时代码，这里有待写得更严谨
                             return true
                         }
                     }
                 })
-                if(sf) {
+                if (sf) {
                     d[sf.name] = this.parent.id
                 }
             },
@@ -359,8 +359,13 @@
                 if (mc.actions) {
                     mc.actions.forEach(a => {
                         bactions[a.name] = a
-                        a.do = () => {
-                            this.$router.push(`${this.model.getListUrl()}${a.name}/`)
+                        a.do = ({row}) => {
+                            if (a.detail) {
+                                console.log(row, mc.idField || 'id')
+                                this.$router.push(`${this.model.getDetailUrl(row[mc.idField || 'id'])}${a.name}`)
+                            } else {
+                                this.$router.push(`${this.model.getListUrl()}${a.name}`)
+                            }
                         }
                     })
                 }

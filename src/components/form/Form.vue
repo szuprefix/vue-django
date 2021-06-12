@@ -83,6 +83,9 @@
             },
             onPosted(data){
                 this.loading = false
+                if(data === false){
+                    return
+                }
                 this.$message({message: this.successInfo || `${this.submitName}成功`, type: 'success'})
                 this.$emit('form-posted', data)
                 return data
