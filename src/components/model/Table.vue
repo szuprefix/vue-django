@@ -320,7 +320,11 @@
                         }
 
                     }
-                    this.addSearchParentQueries(r)
+                    try{
+                        this.addSearchParentQueries(r)
+                    }catch(e){
+                        console.error(e)
+                    }
                 }
                 return r
             },

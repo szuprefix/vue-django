@@ -1,6 +1,6 @@
 <template>
-    <el-select v-model="selectedValue" :disabled="field.disabled" ref="select" :class="`related-select ${field.name}`"
-               :multiple="field.multiple" filterable @change="changed" remote clearable reserve-keyword
+    <el-select v-model="selectedValue" v-bind="[field]" ref="select" :class="`related-select ${field.name}`"
+               filterable @change="changed" remote clearable reserve-keyword
                :remote-method="onFilter" default-first-option
                :loading="loading" :loading-text="`${loading}`"
                :placeholder="field.placeholder || `请选择${field.label}`">
@@ -14,8 +14,7 @@
         </el-alert>
 
         <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center
-                  style="cursor: pointer"
-                  :closable="false">
+                  style="cursor: pointer" :closable="false">
             <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
         </el-alert>
         <template #empty>
