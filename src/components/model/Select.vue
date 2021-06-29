@@ -83,6 +83,7 @@
                     v = [v]
                 }
                 if (!v || v.length === 0) {
+                    this.selectedObjects = []
                     return Promise.resolve()
                 }
                 let qs = Object.assign({}, this.field.baseQueries)
