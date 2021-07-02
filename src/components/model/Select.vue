@@ -7,7 +7,7 @@
         <el-option :label="c.__str__ || c.name || c.title" :value="c[idField] || c.pk || c.url || c.name"
                    v-for="c in optionList" :key="c[idField] || c.pk || c.url || c.name">
             <span>{{c[selectOptionsFields[0]]}}</span>
-            <i v-if="showLink && idField === 'id'" class="fa fa-link" title="跳转到详情页" @click="$router.push(modelDetailPath)"></i>
+            <i v-if="showLink && idField === 'id'" class="fa fa-link" title="跳转到详情页" @click.stop="$router.push(model.getDetailUrl(c.id))"></i>
             <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
         </el-option>
         <el-alert type="info" v-if="moreThanOnePage" show-icon title="记录太多未展示完全,请输入关键字进行搜索" :closable="false">
@@ -176,6 +176,7 @@
         display: inline-block;
         margin-top: 0.5rem;
         margin-left: 0.5rem;
+        margin-right:2rem;
         cursor: pointer;
         color: gray;
         float: right;
