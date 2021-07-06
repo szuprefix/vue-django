@@ -3,8 +3,8 @@
             v-model="period"
             :type="`${type}range`"
             :range-separator="defaultSeparator"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
+            :start-placeholder="`最小${field.label}`"
+            :end-placeholder="`最大${field.label}`"
             :value-format="valueFormat"
             align="right"
             :picker-options="date_picker_options">
