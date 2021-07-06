@@ -1,7 +1,7 @@
 /**
  * Created by denishuang on 2021/2/1.
  */
-export function copyContentH5(content) {
+export default function copyContentH5(content) {
     var copyDom = document.createElement('div');
     copyDom.innerText = content;
     copyDom.style.position = 'absolute';

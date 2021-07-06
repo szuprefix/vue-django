@@ -27,7 +27,7 @@
                 return this.proxy || this.field.proxy || ''
             },
             rootPath () {
-                return this.$store.state.party.settings.imageRoot || ''
+                return this.field.imageRoot || this.$store.state.party.settings.imageRoot || ''
             },
             url () {
                 let url = this.value[this.field.name]

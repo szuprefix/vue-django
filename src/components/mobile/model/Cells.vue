@@ -1,10 +1,13 @@
 <template>
     <div>
-        <group :title="group.title" v-for="group in groups" :key="group.title">
+        <group v-bind="[$attrs, $props]" :title="group.title" v-for="group in groups" :key="group.title">
             <cell :title="c.name" :is-link="true" :link="getLink(c)" v-for="c, i in group.cells"
                   :key="c.id">
                 <template slot="icon" v-if="$scopedSlots.icon">
                     <slot name="icon" :data="c"></slot>
+                </template>
+                <template v-if="$scopedSlots.title" v-slot:title="scope">
+                    <slot name="title" :data="c"></slot>
                 </template>
             </cell>
         </group>

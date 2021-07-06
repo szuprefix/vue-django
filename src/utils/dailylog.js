@@ -6,7 +6,7 @@ import axios from 'axios'
 import Qs from 'qs'
 import {parseTime} from './filters'
 let INTERVAL = 5
-function DailyLog () {
+function DailyLog() {
     let a = {
         m: {},
         saveTime: undefined,
@@ -41,7 +41,7 @@ export default DailyLog()
 //     }
 // })
 
-export function Performance (app, model, ownerId, target, interval) {
+export function Performance(app, model, ownerId, target, interval) {
     let qd = {app, model, owner_id: ownerId}
     return {
         data: {
@@ -84,4 +84,13 @@ export function Performance (app, model, ownerId, target, interval) {
             return this
         }
     }
+}
+
+export function userOnlineTimeCounter(callBack) {
+    let seconds = 30
+    function action () {
+        axios.post(`/dailylog/user/count/`, {metics: 'online_time', delta:  seconds}).then(callBack)
+    }
+    action()
+    setInterval(action, seconds * 1000)
 }

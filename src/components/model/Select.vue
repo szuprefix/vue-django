@@ -1,21 +1,20 @@
 <template>
-    <el-select v-model="selectedValue" :disabled="field.disabled" ref="select" :class="`related-select ${field.name}`"
-               :multiple="field.multiple" filterable @change="changed" remote clearable reserve-keyword
+    <el-select v-model="selectedValue" v-bind="[field]" ref="select" :class="`related-select ${field.name}`"
+               filterable @change="changed" remote clearable reserve-keyword
                :remote-method="onFilter" default-first-option
                :loading="loading" :loading-text="`${loading}`"
                :placeholder="field.placeholder || `请选择${field.label}`">
         <el-option :label="c.__str__ || c.name || c.title" :value="c[idField] || c.pk || c.url || c.name"
                    v-for="c in optionList" :key="c[idField] || c.pk || c.url || c.name">
             <span>{{c[selectOptionsFields[0]]}}</span>
-            <i v-if="showLink && idField === 'id'" class="fa fa-link" title="跳转到详情页" @click="$router.push(modelDetailPath)"></i>
+            <i v-if="showLink && idField === 'id'" class="fa fa-link" title="跳转到详情页" @click.stop="$router.push(model.getDetailUrl(c.id))"></i>
             <span class="label-right" v-if="selectOptionsFields[1]">{{c[selectOptionsFields[1]]}}</span>
         </el-option>
         <el-alert type="info" v-if="moreThanOnePage" show-icon title="记录太多未展示完全,请输入关键字进行搜索" :closable="false">
         </el-alert>
 
         <el-alert v-if="showCreate && canAdd" @click.native="toCreateModel" type="warning" center
-                  style="cursor: pointer"
-                  :closable="false">
+                  style="cursor: pointer" :closable="false">
             <i class="fa fa-plus" style="margin-right: 1rem"></i>新增{{field.label}}
         </el-alert>
         <template #empty>
@@ -84,6 +83,7 @@
                     v = [v]
                 }
                 if (!v || v.length === 0) {
+                    this.selectedObjects = []
                     return Promise.resolve()
                 }
                 let qs = Object.assign({}, this.field.baseQueries)
@@ -176,6 +176,7 @@
         display: inline-block;
         margin-top: 0.5rem;
         margin-left: 0.5rem;
+        margin-right:2rem;
         cursor: pointer;
         color: gray;
         float: right;
