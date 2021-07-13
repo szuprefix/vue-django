@@ -5,7 +5,7 @@
 
 </template>
 <script>
-   import {copyContentH5} from 'vue-django/src/utils/clip'
+   import copyContentH5 from 'vue-django/src/utils/clip'
    function maskMobile(s) {
        if(!s || s.length<8) {
            return s
