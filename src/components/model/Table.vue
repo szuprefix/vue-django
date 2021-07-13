@@ -425,6 +425,11 @@
             },
             batchActions (val) {
                 this.normalizeItems()
+            },
+            appModel (val) {
+                this.model = Model(this.appModel, {}, this.$store.state.bus)
+                this.optionLoaded = false
+                this.init()
             }
         }
     }
