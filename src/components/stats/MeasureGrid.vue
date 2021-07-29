@@ -1,5 +1,5 @@
 <template>
-    <el-row>
+    <el-row :gutter="10">
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" v-for="m, i in value" :key="i">
             <measure :name="m.name" :number="m.number" :icon="m.icon" :iconColor="m.iconColor"
                      :filter="m.filter"></measure>
