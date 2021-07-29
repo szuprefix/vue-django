@@ -122,7 +122,7 @@
             },
             genLineBarOption(item, data){
                 let type = item.type
-                let columns
+                let columns=[]
                 if(!(data instanceof Array)) {
                     columns = data.columns
                     data = data.data
