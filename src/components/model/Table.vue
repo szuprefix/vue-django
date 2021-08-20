@@ -58,6 +58,7 @@
                 }
             },
             parent: Object,
+            parentMultipleRelationFieldName: String,
             options: {
                 type: Object,
                 default: () => {
@@ -299,6 +300,9 @@
                     let f = this.parentMultipleRelationField
                     if (f) {
                         let ids = parent.data[f.name]
+                        if(typeof ids === 'string' && ids.startsWith('[')){
+                            ids = JSON.parse(ids)
+                        }
                         r['id__in'] = ids.length > 0 && ids || [0]
                     } else {
                         let am = parent.appModel
@@ -350,6 +354,9 @@
             parentMultipleRelationField () {
                 if (this.parent) {
                     let pfs = Object.values(this.parent.fieldConfigs)
+                    if(this.parentMultipleRelationFieldName) {
+                        return pfs.find(a => a.name === this.parentMultipleRelationFieldName)
+                    }
                     let f = pfs.find(a => a.model === this.model.appModel)
                     if (f && f.multiple === true) {
                         return f
