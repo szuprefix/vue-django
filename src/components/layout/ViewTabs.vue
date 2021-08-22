@@ -53,11 +53,8 @@
                 }
                 this.curTab = tab.name
             },
-            changeRoute (newVal, oldVal) {
-//                console.log(newVal)
-//                console.log(oldVal)
+            changeRoute (newVal) {
                 let to = newVal
-                // let view = to.matched[0]
                 let view = null
                 if (to.matched.length > 0) {
                     view = to.matched[to.matched.length - 1]

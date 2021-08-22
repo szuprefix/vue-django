@@ -1,7 +1,8 @@
 <template>
     <div id="app" v-cloak :class="{mobile_mode:isMobile}">
-        <router-view v-if="layout === 'main'">
-        </router-view>
+        <template v-if="layout === 'main'">
+            <component :is="view"></component>
+        </template>
         <template v-else>
             <el-menu class="el-menu-demo" mode="horizontal" router>
                 <el-menu-item index="/" class="brand">
@@ -37,7 +38,9 @@
     import LoginView from './views/auth/login.vue'
     export default {
         data () {
-            return {}
+            return {
+                view: null
+            }
         },
         components: {
             SideBar,
@@ -49,6 +52,19 @@
             this.$store.state.bus.$on("user-logout", () => {
                 this.$router.replace('/auth/login/')
             })
+        },
+        methods: {
+            logout(){
+                this.$confirm("确定要退出登录吗?").then(() => {
+                    this.$store.dispatch('logout')
+
+                }).catch(this.onServerResponseError)
+            },
+            changeRoute(to) {
+                if (to.matched.length > 0) {
+                    this.view =  {...to.matched[to.matched.length - 1].components.default}
+                }
+            }
         },
         computed: {
             layout (){
@@ -62,14 +78,13 @@
                 }
                 return false
             }
-        },
-        methods: {
-            logout(){
-                this.$confirm("确定要退出登录吗?").then(() => {
-                    this.$store.dispatch('logout')
 
-                }).catch(this.onServerResponseError)
+        },
+        watch: {
+            $route (newVal, oldVal) {
+                this.changeRoute(newVal, oldVal)
             }
+
         }
     }
 </script>
