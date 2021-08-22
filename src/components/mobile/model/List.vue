@@ -63,6 +63,8 @@
                     if (this.prepare) {
                         ds = this.prepare(ds)
                     }
+                    return ds
+                }).then(ds => {
                     this.data = ds
                 }).catch(this.onServerResponseError)
             },
