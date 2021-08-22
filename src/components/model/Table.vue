@@ -11,7 +11,7 @@
                              :batchActions="[{name:'add', label:`添加到${parent.title()}`, type:'primary', confirm:false, do:addToParent}]"
                              v-if="parentMultipleRelationField"></model-table>
                 <component :is="creator" :appModel="appModel" :defaults="createDefaults" v-else
-                       :parent="parent"  :topActions="['saveAndAnother']"></component>
+                           :parent="parent" :topActions="['saveAndAnother']"></component>
 
             </slot>
         </el-drawer>
@@ -58,6 +58,7 @@
                 }
             },
             parent: Object,
+            parentMultipleRelationFieldName: String,
             options: {
                 type: Object,
                 default: () => {
@@ -299,6 +300,9 @@
                     let f = this.parentMultipleRelationField
                     if (f) {
                         let ids = parent.data[f.name]
+                        if(typeof ids === 'string' && ids.startsWith('[')){
+                            ids = JSON.parse(ids)
+                        }
                         r['id__in'] = ids.length > 0 && ids || [0]
                     } else {
                         let am = parent.appModel
@@ -320,21 +324,25 @@
                         }
 
                     }
-                    this.addSearchParentQueries(r)
+                    try{
+                        this.addSearchParentQueries(r)
+                    }catch(e){
+                        console.error(e)
+                    }
                 }
                 return r
             },
             addSearchParentQueries(d) {
-                let model=this.model
+                let model = this.model
                 let sf = model.options.actions.SEARCH.filter_fields.find(a => {
-                    if(a.name.includes('__')){
+                    if (a.name.includes('__')) {
                         let pn = a.name.split('__').pop()
-                        if(this.parent.appModel.endsWith(`.${pn}`)){  // todo: 临时代码，这里有待写得更严谨
+                        if (this.parent.appModel.endsWith(`.${pn}`)) {  // todo: 临时代码，这里有待写得更严谨
                             return true
                         }
                     }
                 })
-                if(sf) {
+                if (sf) {
                     d[sf.name] = this.parent.id
                 }
             },
@@ -346,6 +354,9 @@
             parentMultipleRelationField () {
                 if (this.parent) {
                     let pfs = Object.values(this.parent.fieldConfigs)
+                    if(this.parentMultipleRelationFieldName) {
+                        return pfs.find(a => a.name === this.parentMultipleRelationFieldName)
+                    }
                     let f = pfs.find(a => a.model === this.model.appModel)
                     if (f && f.multiple === true) {
                         return f
@@ -359,8 +370,13 @@
                 if (mc.actions) {
                     mc.actions.forEach(a => {
                         bactions[a.name] = a
-                        a.do = () => {
-                            this.$router.push(`${this.model.getListUrl()}${a.name}/`)
+                        a.do = ({row}) => {
+                            if (a.detail) {
+                                console.log(row, mc.idField || 'id')
+                                this.$router.push(`${this.model.getDetailUrl(row[mc.idField || 'id'])}${a.name}`)
+                            } else {
+                                this.$router.push(`${this.model.getListUrl()}${a.name}`)
+                            }
                         }
                     })
                 }
@@ -416,6 +432,11 @@
             },
             batchActions (val) {
                 this.normalizeItems()
+            },
+            appModel (val) {
+                this.model = Model(this.appModel, {}, this.$store.state.bus)
+                this.optionLoaded = false
+                this.init()
             }
         }
     }

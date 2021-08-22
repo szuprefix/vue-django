@@ -1,5 +1,5 @@
 <template>
-    <el-row>
+    <el-row :gutter="10">
         <el-col :sm="c.sm || c.span || 24" :md="c.md || c.span ||  12" :xl="c.xl || c.span || 8" v-for="c in items"
                 :key="c.name" v-loading="loading"
                 :element-loading-text="loading">
@@ -122,7 +122,7 @@
             },
             genLineBarOption(item, data){
                 let type = item.type
-                let columns
+                let columns=[]
                 if(!(data instanceof Array)) {
                     columns = data.columns
                     data = data.data
@@ -348,6 +348,7 @@
                         daily: this.genLineBarOption,
                         funnel: this.genFunnelOption,
                         linebar: this.genLineBarOption,
+                        bar: this.genBarOption,
                         stack: this.genStackOptions
                     }
                     let optionFunc = om[a.type] || this.genLineBarOption

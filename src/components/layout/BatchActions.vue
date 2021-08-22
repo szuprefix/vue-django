@@ -39,9 +39,15 @@
 
             },
             getConfirm(action) {
-                if (action.confirm instanceof Function) {
-                    return action.confirm
-                } else if (action.confirm === false) {
+                let cfm = action.confirm
+                if (typeof cfm === 'string'){
+                    this.$store.state.bus.$emit('opendrawer', {
+                        component: cfm,
+                        context: {...action.drawer, ...this.context}
+                    })
+                }else if (cfm instanceof Function) {
+                    return cfm
+                } else if (cfm === false) {
                     return (action, scope) => Promise.resolve()
                 } else {
                     return (action, scope) => this.$confirm(action.notice, `确定要对${scope.label}记录执行"${action.label}"操作吗?`, {type: 'warning'})

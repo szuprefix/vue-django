@@ -1,8 +1,8 @@
 <template>
-  <a :href="`#${url}`"  title="点击跳转" class="foreignkey-link" v-if="hasLink">
-    {{label}}
-  </a>
-  <span v-else>
+    <a :href="`#${url}`" title="点击跳转" class="foreignkey-link" v-if="hasLink">
+        {{label}}
+    </a>
+    <span v-else>
         {{label}}
     </span>
 </template>
@@ -13,7 +13,7 @@
     export default{
         props: {
             value: [String, Number],
-            field: Object ,
+            field: Object,
             context: Object
         },
         created () {

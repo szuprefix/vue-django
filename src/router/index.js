@@ -38,6 +38,22 @@ function import_or_use_template(path, template) {
     }
 }
 
+export function setDefaultLayout(rs) {
+    let ps =location.href.split(/app_default_layout=([^#&]*)/g)
+    if(ps.length<3) {
+        return
+    }
+    let dl = ps[1]
+    rs.forEach(r => {
+        if(!r.meta.layout) {
+            r.meta.layout = dl
+        }
+        if(r.children) {
+            setDefaultLayout(r.children)
+        }
+    })
+}
+
 export default router
 
 export var genModelRouters = function (apps, importFunc, defaultLayout) {

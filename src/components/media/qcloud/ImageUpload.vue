@@ -27,6 +27,7 @@
 <script>
     import {format} from 'date-fns'
     import {template} from 'lodash'
+    import {getFileMd5Async} from '../../../utils/file_md5'
     export default {
         model: {
             event: 'change'
@@ -125,7 +126,8 @@
                     return m[1]
                 }
             },
-            getFileNameContext (fn) {
+            genFileNameContext (file, fnt) {
+                let fn = file.name
                 let ps = fn.split('.')
                 let extName
                 let fileName = fn
@@ -136,45 +138,54 @@
                 }
                 let d = new Date()
                 let dateTime = format(d, 'YYYYMMDDHHmmssSSS')
-                return {
+                let ctx = {
+                    ...this.context,
                     extName,
                     fileName,
                     baseName,
                     dateTime,
                     number: this.getFileNumber(fn)
                 }
+                return Promise.resolve(ctx).then(ctx => {
+                    if (fnt.includes('${md5}')) {
+                        return getFileMd5Async(file).then(md5 => {
+                            ctx.md5 = md5
+                            return ctx
+                        })
+                    } else {
+                        return ctx
+                    }
+                })
             },
             uploadFile (req) {
                 let file = req.file
-                let fn = file.name
-                let ctx = {...this.context, ...this.getFileNameContext(fn)}
-                file.uploadContext = ctx
-//                console.log(ctx)
-                let fileName = template(this.fileName || '${dateTime}.${extName}')(ctx)
-//                console.log(fileName)
-//                return
-                return new Promise((resolve, reject) => {
-                    import('cos-js-sdk-v5').then( module => {
-                        let TcCos = module.default
-                        let tcCos = new TcCos({
-                            getAuthorization: this.getAuthorization
-                        })
-                        tcCos.putObject({
-                            Bucket: this.bucket, /* 必须 */
-                            Region: this.region, /* 存储桶所在地域，必须字段 */
-                            Key: fileName,
-                            Body: req.file,
-                            onProgress: function (info) {
-                                console.log('tcCos.onProgress', info, req)
-                                req.onProgress(info)
-                            }
-                        }, function (err, data) {
+                let fnt = this.fileName || '${dateTime}.${extName}'
+                return this.genFileNameContext(file, fnt).then(ctx => {
+                    file.uploadContext = ctx
+                    let fileName = template(fnt)(ctx)
+                    return new Promise((resolve, reject) => {
+                        import('cos-js-sdk-v5').then(module => {
+                            let TcCos = module.default
+                            let tcCos = new TcCos({
+                                getAuthorization: this.getAuthorization
+                            })
+                            tcCos.putObject({
+                                Bucket: this.bucket, /* 必须 */
+                                Region: this.region, /* 存储桶所在地域，必须字段 */
+                                Key: fileName,
+                                Body: file,
+                                onProgress: function (info) {
+                                    console.log('tcCos.onProgress', info, req)
+                                    req.onProgress(info)
+                                }
+                            }, function (err, data) {
 //                        console.log(err || data)
-                            if (err) {
-                                reject(err)
-                            } else {
-                                resolve(data)
-                            }
+                                if (err) {
+                                    reject(err)
+                                } else {
+                                    resolve(data)
+                                }
+                            })
                         })
                     })
                 })

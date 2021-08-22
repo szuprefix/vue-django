@@ -28,6 +28,9 @@ export function genMenusFromApps(apps, menus, modelPermissions) {
             models = models.split(',')
         }
         let subItems = []
+        if(app.home_page) {
+            subItems.push({url: `/${a}/index/`, ...app.home_page})
+        }
         models.forEach((m) => {
             let menu = m
             let model = app.models[m]

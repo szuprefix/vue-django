@@ -18,13 +18,15 @@
             }
         },
         created () {
-//            console.log(this.bucket)
+            console.log(this.context)
         },
         components: {ImageUpload},
         methods: {
             onSuccess({fileList}) {
-
                 this.changeFileList(fileList)
+                if(this.field.onSuccess) {
+                    this.field.onSuccess({fileList, ...this.$props})
+                }
             },
             onRemove ({fileList}) {
                 this.changeFileList(fileList)
