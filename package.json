@@ -1,6 +1,6 @@
 {
   "name": "vue-django",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "description": "个人实验项目, 本框架的目标是借鉴并超越django admin的自动化思想, 实现UI前端的极简快速定制开发",
   "main": "index.js",
   "files": [
