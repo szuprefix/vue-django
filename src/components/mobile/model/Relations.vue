@@ -1,11 +1,12 @@
 <template>
     <div>
-        <tab v-model="tab" :animate="false">
-            <tab-item :active-class="`active-${i%4+1}`" :badge-label="badges[a.name]" v-for="a, i in tabItems"
-                      :key="a.name">{{a.label}}
+        <tab v-model="tab" :line-width="2" custom-bar-width="30px" class="model-relations_tabs">
+            <tab-item :badge-label="badges[a.name]" v-for="a, i in tabItems" :key="a.name">
+                {{a.label}}
             </tab-item>
         </tab>
-        <component :is="tabItems[tab].component" :owner="owner" v-bind="[$attrs, tabItems[tab]]"
+        <component :is="tabItems[tab].component" :owner="owner" class="model-relations_item"
+                   v-bind="[$attrs, tabItems[tab]]"
                    v-if="loaded"></component>
     </div>
 </template>
