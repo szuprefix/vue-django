@@ -1,7 +1,8 @@
 <template>
-   <el-avatar :src="`${theProxy}${value[field.name]}`" v-if="value[field.name]"></el-avatar>
+   <el-avatar :src="url" v-if="fieldValue"></el-avatar>
 </template>
 <script>
+   import {get} from 'lodash'
     export default{
         props: {
             value: String,
@@ -17,6 +18,12 @@
         computed: {
             theProxy () {
                 return this.proxy || this.field.proxy || ''
+            },
+            fieldValue () {
+                return get(this.value,this.field.name)
+            },
+            url () {
+                return `${this.theProxy}${this.fieldValue}`
             }
         }
     }

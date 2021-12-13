@@ -78,7 +78,7 @@
                 let middleware = {request: d => d, response: d => d , ...this.$attrs.middleware}
                 let d = middleware.request(queries || this.queries)
                 this.loading = '查询中'
-                let func = (this.url instanceof Function) ?  this.url :  d => this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`)
+                let func = (this.url instanceof Function) ?  this.url :  d => this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma', skipNulls: true })}`)
                 return func(d).then(({data}) => {
                     data = middleware.response(data)
                     this.count = data.count
