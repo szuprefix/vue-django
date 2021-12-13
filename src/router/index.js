@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import {routerMode} from '@/configs/apps'
 
 Vue.use(Router)
 
@@ -21,6 +22,7 @@ export const constRoutes = [
     }
 ]
 let router = new Router({
+    mode: routerMode,
     routes: constRoutes
 })
 

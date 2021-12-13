@@ -108,6 +108,13 @@ export default function (appModel, defaults, eventor) {
                 return data
             }) // .catch((error) => this.onErrors(error))
         },
+        doAction (action, data) {
+            if (!this.id) {
+                return axios.post(`${this.getListUrl()}${action}/`, data)
+            } else {
+                return axios.post(`${this.getDetailUrl()}${action}/`, data)
+            }
+        },
         selectOrCreate (d) {
             let url = this.getListUrl()
             return axios.get(`${url}?${Qs.stringify(d)}`).then(({data}) => {
