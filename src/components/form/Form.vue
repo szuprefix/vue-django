@@ -8,13 +8,13 @@
                   :closable="false"></el-alert>
         <el-row>
             <template v-for="f in formItems">
-                <template v-if="canEdit(f)">
+                <template v-if="!f.hidden">
                     <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
                             :key="f.name" v-if="!$attrs.inline && !$attrs.oneColumn && f.widget !== 'hidden'">
                         <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions" :error="errors[f.name]"></item>
                     </el-col>
                     <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions" :error="errors[f.name]"
-                          v-else></item>
+                        :key="f.name"  v-else></item>
                 </template>
             </template>
             <slot name="submit">

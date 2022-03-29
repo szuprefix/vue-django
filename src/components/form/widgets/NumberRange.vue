@@ -4,7 +4,7 @@
             {{field.label}} {{selectValue}}<i class="el-icon-arrow-down el-icon--right"></i>
         </el-button>
         <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item v-for="o in options" :command="o" v-key="o.text">{{o.text}}</el-dropdown-item>
+            <el-dropdown-item v-for="o in options" :command="o" :key="o.text">{{o.text}}</el-dropdown-item>
             <el-dropdown-item :command="undefined">无</el-dropdown-item>
             <el-dropdown-item>
                 <div @click.stop="noCommand">

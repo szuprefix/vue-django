@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import router from './index'
 import store from '../store'
 import NProgress from 'nprogress' // progress bar

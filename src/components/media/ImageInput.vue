@@ -18,7 +18,7 @@
             }
         },
         created () {
-            console.log(this.context)
+//            console.log(this.context)
         },
         components: {ImageUpload},
         methods: {
