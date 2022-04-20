@@ -8,13 +8,13 @@
     import ServerResponse from '../../mixins/server_response'
     import Qs from 'qs'
     import {get} from 'lodash'
-    import BatchActions from '../layout/BatchActions.vue'
+//    import BatchActions from '../layout/BatchActions.vue'
 
     import TrueFlag from '../widgets/TrueFlag.vue'
     import ChoicesDisplay from '../widgets/ChoicesDisplay.vue'
     import Date2Now from '../widgets/Date2Now.vue'
     import ForeignKey from '../widgets/ForeignKey.vue'
-    import Search from './Search.vue'
+//    import Search from './Search.vue'
 
     export default{
         name: 'ModelTable',
@@ -92,7 +92,7 @@
                 }
             }
         },
-        components: {Grid, Search, BatchActions},
+        components: {Grid},
         mounted () {
             this.init()
             this.$store.state.bus.$on('model-posted', this.onModelPosted)
@@ -297,7 +297,7 @@
                                 let {ct_field, fk_field} = popt.generic_foreign_key
                                 r[ct_field] = this.parent.options.content_type_id
                                 if (!this.model.fieldConfigs[fk_field]) {
-                                    throw Error(`genric foreign key id_field:${id_field} not found.`)
+                                    throw Error(`genric foreign key id_field:${fk_field} not found.`)
                                 }
                                 r[fk_field] = pid
                             }

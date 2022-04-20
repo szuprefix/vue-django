@@ -32,7 +32,7 @@
             },
             createEditor() {
                 console.log('createEditor')
-                tinymce.init({
+                window.tinymce.init({
                     selector: '.tinymce-editor',
                     plugins: 'a11ychecker advcode casechange export formatpainter linkchecker autolink lists checklist media mediaembed pageembed permanentpen powerpaste table advtable tinycomments tinymcespellchecker',
                     toolbar: 'a11ycheck addcomment showcomments casechange checklist code export formatpainter pageembed permanentpen table',
