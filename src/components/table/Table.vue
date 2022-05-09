@@ -137,7 +137,7 @@
             defaultWidget(f){
                 if (f.type == 'boolean') {
                     return TrueFlag
-                } else if (['datetime', 'date'].includes(f.type)) {
+                } else if (['datetime'].includes(f.type)) {
                     return Date2Now
                 } else if (f.choices) {
                     return ChoicesDisplay

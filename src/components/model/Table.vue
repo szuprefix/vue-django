@@ -36,10 +36,6 @@
     import Qs from 'qs'
     import {get} from 'lodash'
     import BatchActions from '../layout/BatchActions.vue'
-
-    import TrueFlag from '../widgets/TrueFlag.vue'
-    import ChoicesDisplay from '../widgets/ChoicesDisplay.vue'
-    import Date2Now from '../widgets/Date2Now.vue'
     import ForeignKey from '../widgets/ForeignKey.vue'
     import Search from './Search.vue'
     import ContentType from '../generic/ContentType'
@@ -59,6 +55,7 @@
             },
             parent: Object,
             parentMultipleRelationFieldName: String,
+            parentRelationQueryName: String,
             options: {
                 type: Object,
                 default: () => {
@@ -266,12 +263,6 @@
             defaultWidget(f){
                 if (f.model) {
                     return ForeignKey
-                } else if (f.type == 'boolean') {
-                    return TrueFlag
-                } else if (['datetime', 'date'].includes(f.type)) {
-                    return Date2Now
-                } else if (f.choices) {
-                    return ChoicesDisplay
                 } else if (f.child) {
                     return function (value, field) {
                         let d = value[field.name]
@@ -297,6 +288,10 @@
                 let r = {}
                 if (this.parent) {
                     let parent = this.parent
+                    if(this.parentRelationQueryName){
+                        r[this.parentRelationQueryName]= parent.id
+                        return r
+                    }
                     let f = this.parentMultipleRelationField
                     if (f) {
                         let ids = parent.data[f.name]

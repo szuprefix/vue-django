@@ -47,5 +47,7 @@ axios.setBaseURL = (url) => {
         axios.get('/csrf_token/')
     }
 }
-
+axios.setAuthToken = (token) => {
+    axios.defaults.headers['Authorization'] = `Token ${token}`
+}
 export default axios

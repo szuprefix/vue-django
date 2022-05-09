@@ -19,7 +19,7 @@
     import {
         Form as VanForm,
         Button as VanButton,
-        Field,
+//        Field,
         NoticeBar
     } from 'vant'
     export default{
@@ -31,7 +31,7 @@
         components: {
             VanForm,
             VanButton,
-            Field,
+//            Field,
             Widget,
             NoticeBar
         },
