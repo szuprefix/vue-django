@@ -9,11 +9,11 @@
     </div>
 </template>
 <script>
-    import {Field, Popup, Picker} from 'vant'
+    import {Popup, Picker} from 'vant'
     export default{
         props: {
             field: Object,
-            value: [Number,String],
+            value: [Number, String],
             context: Object
         },
         data () {
@@ -22,7 +22,7 @@
                 text: '',
             }
         },
-        components: {Field, Popup, Picker},
+        components: {Popup, Picker},
         methods: {
             onConfirm(value, index) {
                 this.$emit(this.field.choices[index].value)

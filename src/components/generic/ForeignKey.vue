@@ -1,6 +1,6 @@
 <template>
     <a :href="`#${url}`" title="点击跳转" class="foreignkey-link" v-if="hasLink">
-        {{label}}
+        {{label}}({{this.model.config.verbose_name}})
     </a>
     <span v-else>
         {{label}}
@@ -17,6 +17,7 @@
             context: Object
         },
         created () {
+            console.log(this.model)
         },
         computed: {
             labelFieldName  () {

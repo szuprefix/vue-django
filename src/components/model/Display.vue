@@ -1,5 +1,8 @@
 <template>
-    <json-display v-model="formValue" :field="jsonField" v-if="loaded"></json-display>
+    <div v-if="loaded">
+        <json-display v-model="formValue" :field="jsonField"></json-display>
+        <slot name="bottom" :model="model"></slot>
+    </div>
 </template>
 <script>
     import Model from './Model'
@@ -80,6 +83,9 @@
         },
         watch: {
             value(val){
+                this.init()
+            },
+            $route(val){
                 this.init()
             },
             items () {
