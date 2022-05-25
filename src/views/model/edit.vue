@@ -1,7 +1,7 @@
 <template>
     <model-form :appModel="appModel" v-model="data" ref="form">
         <template v-slot:bottom="{model}">
-            <template v-if="model.viewsConfig">
+            <template v-if="model.viewsConfig && model.data.id">
                 <el-collapse v-model="activePanels" v-if="model.viewsConfig.pannels">
                     <el-collapse-item :title="p.label" :name="i" v-for="p,i in model.viewsConfig.pannels"
                                       :key="p.name">

@@ -24,7 +24,7 @@
     </div>
 </template>
 <script>
-    import * as tus from "tus-js-client"
+    import tus from "tus-js-client"
     export default{
         data () {
             return {
