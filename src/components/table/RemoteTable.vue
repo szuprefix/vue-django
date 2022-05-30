@@ -103,7 +103,7 @@
                 this.pageSize = val
             },
             refresh(){
-                this.load()
+                return this.load()
             },
             excelGetAllData(){
                 let promise = Promise.resolve()
