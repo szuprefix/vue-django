@@ -12,7 +12,7 @@
           </span>
             <el-dropdown-menu slot="dropdown">
                 <template v-for="a in dropdownActions">
-                    <el-dropdown-item :command="a" v-if="!a.show || a.show(context)" :key="a.name" :title="a.title"
+                    <el-dropdown-item :command="a" v-if="!a.show || a.show(context)" :key="a.name" v-bind="[a]"
                                       :icon="getIconClass(a.icon)">
                         {{a.label || a.title}}
                     </el-dropdown-item>

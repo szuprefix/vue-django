@@ -31,6 +31,11 @@
             normalizeItems () {
                 let items = this.items || this.parent.viewsConfig.relations || []
                 this.modelItems = arrayNormalize(items, {}, (a, i) => {
+                    let ps = a.name.split(':')
+                    a.name = ps[0]
+                    if(ps.length>1) {
+                        a.parentRelationQueryName=ps[1]
+                    }
                     let m = a.model = Model(a.name)
                     a.icon = a.icon || m.config.icon
                     a.label = a.label || m.config.verbose_name

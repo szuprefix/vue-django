@@ -19,7 +19,11 @@
         computed: {
             theValue(){
                 let n = `${this.field.name}_name`
-                return this.value[n] || this.value[this.field.name]
+                let s = this.value[n] || this.value[this.field.name]
+                if(this.field.labelFormat) {
+                    s = this.field.labelFormat(s)
+                }
+                return s
             },
             hasLink(){
                 return Register.configs[this.field.model]
