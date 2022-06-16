@@ -138,7 +138,7 @@
                 }).catch(this.onServerResponseError)
             },
             refresh () {
-                this.$refs.table.refresh()
+                return this.$refs.table.refresh()
             },
             onLoaded (v) {
                 this.count = v.count
@@ -288,14 +288,14 @@
                 let r = {}
                 if (this.parent) {
                     let parent = this.parent
-                    if(this.parentRelationQueryName){
-                        r[this.parentRelationQueryName]= parent.id
+                    if (this.parentRelationQueryName) {
+                        r[this.parentRelationQueryName] = parent.id
                         return r
                     }
                     let f = this.parentMultipleRelationField
                     if (f) {
                         let ids = parent.data[f.name]
-                        if(typeof ids === 'string' && ids.startsWith('[')){
+                        if (typeof ids === 'string' && ids.startsWith('[')) {
                             ids = JSON.parse(ids)
                         }
                         r['id__in'] = ids.length > 0 && ids || [0]
@@ -319,9 +319,9 @@
                         }
 
                     }
-                    try{
+                    try {
                         this.addSearchParentQueries(r)
-                    }catch(e){
+                    } catch (e) {
                         console.error(e)
                     }
                 }
@@ -349,7 +349,7 @@
             parentMultipleRelationField () {
                 if (this.parent) {
                     let pfs = Object.values(this.parent.fieldConfigs)
-                    if(this.parentMultipleRelationFieldName) {
+                    if (this.parentMultipleRelationFieldName) {
                         return pfs.find(a => a.name === this.parentMultipleRelationFieldName)
                     }
                     let f = pfs.find(a => a.model === this.model.appModel)
@@ -365,12 +365,14 @@
                 if (mc.actions) {
                     mc.actions.forEach(a => {
                         bactions[a.name] = a
-                        a.do = ({row}) => {
-                            if (a.detail) {
-                                console.log(row, mc.idField || 'id')
-                                this.$router.push(`${this.model.getDetailUrl(row[mc.idField || 'id'])}${a.name}`)
-                            } else {
-                                this.$router.push(`${this.model.getListUrl()}${a.name}`)
+                        if (!a.do) {
+                            a.do = ({row}) => {
+                                if (a.detail) {
+                                    console.log(row, mc.idField || 'id')
+                                    this.$router.push(`${this.model.getDetailUrl(row[mc.idField || 'id'])}${a.name}`)
+                                } else {
+                                    this.$router.push(`${this.model.getListUrl()}${a.name}`)
+                                }
                             }
                         }
                     })
@@ -397,6 +399,7 @@
                 return {
                     topActions,
                     rowActions,
+                    topActionContext: {table: this},
 //                    excelFormat: this.excelFormat,
                     permissionFunction: this.checkPermission,
                     dblClickAction: 'edit',
