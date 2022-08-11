@@ -31,6 +31,9 @@
             },
             url () {
                 let url = this.value[this.field.name]
+                if (this.field.formatter) {
+                    url = this.field.formatter(url)
+                }
                 if (!this.isLink(url)) {
                     url = `${this.rootPath}${url}`
                 }
