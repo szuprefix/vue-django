@@ -1,13 +1,13 @@
-.flex-right{
+.flex-right {
     display: flex;
-    justify-content:flex-end;
+    justify-content: flex-end;
 }
-
 
 .flex-col {
     display: flex;
     flex-direction: column;
 }
+
 .flex-row {
     display: flex;
     flex-direction: row;
@@ -26,21 +26,23 @@
     cursor: pointer;
     /*font-size: 18px;*/
 }
+
 .hover-show__parent:hover .hover-show {
     visibility: visible;
 }
-.table-row-actions .fa{
+
+.table-row-actions .fa {
     /*margin: 10px 0;*/
-   /*display: block;*/
+    /*display: block;*/
 }
 
-.hide-text{
-    overflow : hidden;
+.hide-text {
+    overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 1; /* 限制在一个块元素显示的文本的行数 */
     -webkit-box-orient: vertical; /* 垂直排列 */
-    word-break: break-all;  /* 内容自动换行 */
+    word-break: break-all; /* 内容自动换行 */
 }
 
 .el-drawer__body {
@@ -48,4 +50,14 @@
     box-sizing: border-box;
     overflow-y: auto;
     /*padding: 20px; // According to the situation*/
+}
+
+.clearfix:before,
+.clearfix:after {
+    display: table;
+    content: "";
+}
+
+.clearfix:after {
+    clear: both
 }
