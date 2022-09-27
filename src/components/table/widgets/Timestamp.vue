@@ -1,31 +1,22 @@
 <template>
-   <el-avatar :src="url" v-if="fieldValue"></el-avatar>
+   <span :title="localStr">{{now}}</span>
 </template>
 <script>
-   import {get} from 'lodash'
+    import {formatTime, localTimeStr} from '../../utils/filters'
     export default{
         props: {
-            value: String,
-            field: Object,
-            context: Object,
-            proxy: {type:String, default: ''}
+            value: Object,
+            field: Object
         },
-        data () {
-            return {}
-        },
-        components: {},
-        methods: {},
-        computed: {
-            theProxy () {
-                return this.proxy || this.field.proxy || ''
+        computed:{
+            localStr (){
+                let v = this.value[this.field.name]
+                return  v && localTimeStr(v*1000)  || ''
             },
-            fieldValue () {
-                return get(this.value,this.field.name)
-            },
-            url () {
-                return `${this.theProxy}${this.fieldValue}`
+            now(){
+                let v = this.value[this.field.name]
+                return v && formatTime(v*1000) || ''
             }
         }
     }
 </script>
-

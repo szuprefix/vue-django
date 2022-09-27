@@ -10,6 +10,11 @@
         </template>
     </el-table-column>
     <el-table-column :type="f.type" v-else-if="f.type === 'selection'"></el-table-column>
+    <el-table-column :type="f.type" v-else-if="f.type === 'expand'">
+        <template slot-scope="{row,$index}">
+            <widget :field="f" :value.sync="row" :context="context(row,$index)"></widget>
+        </template>
+    </el-table-column>
     <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
                      v-bind="f" :class-name="f.type" :key="f.name"
                      v-else>

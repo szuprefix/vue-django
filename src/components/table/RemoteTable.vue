@@ -128,7 +128,7 @@
                     this.loading = '正在获取数据'
                     return queueLimit(range(1, page + 1), 1, (p) => {
                         if (p > 1) {
-                            this.loading = `第${p}页`
+                            this.loading = `第${p}/${page}页`
                         }
                         return downloadFunc(p).then(table => allData = allData.concat(table))
                     })

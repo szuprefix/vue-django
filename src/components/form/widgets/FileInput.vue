@@ -13,7 +13,9 @@
         components: {},
         methods: {
             onChange(e) {
-                this.$emit('input', e.target.files[0])
+                let f = e.target.files[0]
+                this.$emit('input', f)
+                console.log(f)
             }
         },
         computed: {}

@@ -29,7 +29,7 @@
         mixins: [serverResponse],
         props: {
             items: Array,
-            context: Object,
+            context: [Object, Function],
             trigger: {type: String, default: "hover"},
             map: {
                 type: Object, default: () => {
@@ -61,14 +61,18 @@
             },
             handleCommand (action) {
                 let confirmFunc = this.getConfirm(action)
+                let context = this.context
+                if(typeof context === 'function') {
+                    context = context()
+                }
                 confirmFunc(action).then(() => {
                     let command = action.do
                     if (typeof command === 'function') {
-                        return command(this.context)
+                        return command(context)
                     }
                     this.$store.state.bus.$emit('opendrawer', {
                         component: command,
-                        context: {...action.drawer, ...this.context}
+                        context: {...action.drawer, ...context}
                     })
                 }).catch(this.onServerResponseError)
             },

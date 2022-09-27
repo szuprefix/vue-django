@@ -1,13 +1,8 @@
 <template>
-    <el-image fit='fill' v-bind="[field, $attrs, $props]" :src="url"
-              v-if="url" style="cursor: pointer" @click="open" v-loading="loading">
-        <div slot="error" class="image-error"  @click="open">
-            <i class="el-icon-picture-outline"></i>
-        </div>
-    </el-image>
+    <video controls v-bind="[field, $attrs, $props]" :src="url"
+              v-if="value[field.name]" style="cursor: pointer" @click="open"></video>
 </template>
 <script>
-    import {get} from 'lodash'
     export default{
         props: {
             value: String,
@@ -16,29 +11,15 @@
             proxy: {type: String, default: ''}
         },
         data () {
-            return {
-                loading:false
-            }
+            return {}
         },
         components: {},
         methods: {
             isLink(a) {
                 return typeof a === 'string' && (a.startsWith('http://') || a.startsWith('https://'))
             },
-            async open () {
-                let url = null
-                if(this.field.openUrl) {
-                    url = this.field.openUrl(this.context)
-                }
-                if(url instanceof Promise){
-                    this.loading = true
-                    url = await url
-                    this.loading = false
-                }
-                if(!url) {
-                    url = this.url
-                }
-                window.open(url, '_blank')
+            open () {
+                window.open(this.url, '_blank')
             }
         },
         computed: {
@@ -49,7 +30,7 @@
                 return this.field.imageRoot || this.$store.state.party.settings.imageRoot || ''
             },
             url () {
-                let url = get(this.context,this.field.name)
+                let url = this.value[this.field.name]
                 if (this.field.formatter) {
                     url = this.field.formatter(this.value, this.field.name, url)
                 }
