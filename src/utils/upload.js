@@ -4,6 +4,7 @@
 import {getFileMd5Async} from './file_md5'
 import {template} from 'lodash'
 import {format} from 'date-fns'
+import axios from 'axios'
 
 export function getNameParts(fn) {
     let ps = fn.split('.')
@@ -37,7 +38,7 @@ export function aliOssLoad() {
     })
 }
 export function aliOssClient(OSS, signUrl) {
-    return window.axios.post(signUrl).then(({data}) => {
+    return window.http.post(signUrl).then(({data}) => {
         let creds = data.Credentials
         const client = new OSS({
             region: data.region,
@@ -63,6 +64,23 @@ export function aliUpload(fileName, file, options) {
         console.log(co)
         return client.multipartUpload(fileName, file, options).then(res => {
             return {fileName, file, url: `https://${co.bucket}.${co.endpoint.hostname}/${res.name}`}
+        })
+    })
+}
+
+export function awsUpload(fileName, file, options) {
+    return window.http.post(`${options.signUrl}?name=${fileName}`).then(({data}) => {
+        let url = data.url
+        let hs = {
+            'Content-Type':'application/octet-stream',
+            'x-amz-acl': 'public-read',
+            // 'Expect': '100-continue'
+        }
+        let region = data.region
+        return axios.put(url,file, {headers: hs}).then((r) => {
+            console.log(r)
+            let durl =  url.split('?')[0].replace('.s3.amazonaws.', `.s3.${region}.amazonaws.`)
+            return {fileName, file, url: durl}
         })
     })
 }
@@ -106,7 +124,7 @@ export function genFileName(file, nameTemplate) {
 }
 
 export function upload(file, options) {
-    return genFileName(file, options.fileName).then(fileName => aliUpload(fileName, file, options))
+    return genFileName(file, options.fileName).then(fileName => awsUpload(fileName, file, options))
 }
 
 export default upload

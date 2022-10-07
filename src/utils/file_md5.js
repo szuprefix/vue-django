@@ -15,7 +15,7 @@ export function getFileMd5Async(file) {
 
 
             fileReader.onload = function (e) {
-                console.log('read chunk nr', currentChunk + 1, 'of', chunks)
+                // console.log('read chunk nr', currentChunk + 1, 'of', chunks)
                 spark.append(e.target.result)                   // Append array buffer
                 currentChunk++
 
@@ -23,7 +23,7 @@ export function getFileMd5Async(file) {
                     loadNext()
                 } else {
                     let md5 =  spark.end()
-                    console.log('finished loading')
+                    // console.log('finished loading')
                     resolve(md5)
                 }
             }
