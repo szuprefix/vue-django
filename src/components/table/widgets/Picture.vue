@@ -4,6 +4,9 @@
         <div slot="error" class="image-error"  @click="open">
             <i class="el-icon-picture-outline"></i>
         </div>
+        <div slot="placeholder" @click="open">
+            <i class="el-icon-loading"></i>
+        </div>
     </el-image>
 </template>
 <script>

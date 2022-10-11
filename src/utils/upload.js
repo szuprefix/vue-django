@@ -72,7 +72,7 @@ export function awsUpload(fileName, file, options) {
     return window.http.post(`${options.signUrl}?name=${fileName}`).then(({data}) => {
         let url = data.url
         let hs = {
-            'Content-Type':'application/octet-stream',
+            'Content-Type': file.type,
             'x-amz-acl': 'public-read',
             // 'Expect': '100-continue'
         }

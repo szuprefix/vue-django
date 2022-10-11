@@ -11,6 +11,9 @@
         computed: {
             val () {
                 let v = this.value[this.field.name]
+                if(typeof v === 'string' && !v.includes('-')) {
+                    v = parseInt(v)
+                }
                 if (typeof v === 'number') {
                     if (v < 10000000000) {
                         v = v * 1000
