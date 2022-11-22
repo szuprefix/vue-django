@@ -17,7 +17,7 @@
             context: Object
         },
         created () {
-            console.log(this.model)
+//            console.log(this.model)
         },
         computed: {
             labelFieldName  () {

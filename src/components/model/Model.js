@@ -69,7 +69,20 @@ export default function (appModel, defaults, eventor) {
             Object.keys(m).forEach((k) => {
                 let f = m[k]
                 let v = dvs[f.name] || f.default
-                r[k] = v !== undefined ? v : (f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null)
+                if(v !== undefined){
+                    r[k] = v
+                } else if (f.type === 'boolean') {
+                    r[k] = true
+                } else if (f.multiple) {
+                    r[k] = []
+                }  else if ( f.type === 'string' ) {
+                    r[k] = ''
+                } else if ( f.type === 'nested object' ) {
+                    r[k] = {}
+                } else {
+                    r[k] = null
+                }
+                // r[k] = v !== undefined ? v : (f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null)
             })
             return r
         },

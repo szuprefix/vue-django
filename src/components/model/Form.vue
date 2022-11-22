@@ -9,8 +9,7 @@
             </el-col>
         </el-row>
         <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form" :disabled="disabled"
-                :successInfo="successInfo"
-                :method="method" @form-posted="onPosted" :submit="submit">
+                :successInfo="successInfo" :method="method" @form-posted="onPosted" :submit="submit">
             <span slot="submit" v-if="!options.inline"></span>
         </x-form>
         <slot name="bottom" :model="model"></slot>
