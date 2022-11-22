@@ -61,7 +61,7 @@ export function aliUpload(fileName, file, options) {
             ...options
         }
         let co = client.options
-        console.log(co)
+        // console.log(co)
         return client.multipartUpload(fileName, file, options).then(res => {
             return {fileName, file, url: `https://${co.bucket}.${co.endpoint.hostname}/${res.name}`}
         })
@@ -78,7 +78,7 @@ export function awsUpload(fileName, file, options) {
         }
         let region = data.region
         return axios.put(url,file, {headers: hs}).then((r) => {
-            console.log(r)
+            // console.log(r)
             let durl =  url.split('?')[0].replace('.s3.amazonaws.', `.s3.${region}.amazonaws.`)
             return {fileName, file, url: durl}
         })
