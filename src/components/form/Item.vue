@@ -1,7 +1,7 @@
 <template>
     <el-form-item :prop="field.name" v-bind="[field, $attrs]" :error="error" :ref="field.name"
-                  :style="$attrs.noLabel && {} || $attrs.itemStyle || {minWidth: '350px'}">
-        <template slot="label" v-if="!$attrs.noLabel">
+                  :style="noLabel && {} || $attrs.itemStyle || {minWidth: '350px'}">
+        <template slot="label" v-if="!noLabel">
             {{field.label}}
             <el-tooltip placement="top" v-if="field.help_text">
                 <div slot="content" v-html="field.help_text"></div>
@@ -35,7 +35,11 @@
             Widget,
         },
         methods: {},
-        computed: {}
+        computed: {
+            noLabel() {
+                return this.$attrs.noLabel || this.field.noLabel
+            }
+        }
     }
 </script>
 

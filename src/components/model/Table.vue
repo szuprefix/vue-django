@@ -312,7 +312,7 @@
                                 let {ct_field, fk_field} = popt.generic_foreign_key
                                 r[ct_field] = ContentType.getId(this.parent.appModel)
                                 if (!this.model.fieldConfigs[fk_field]) {
-                                    throw Error(`genric foreign key id_field:${id_field} not found.`)
+                                    throw Error(`genric foreign key fk_field:${fk_field} not found.`)
                                 }
                                 r[fk_field] = pid || undefined
                             }

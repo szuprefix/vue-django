@@ -6,7 +6,7 @@
         <el-table-column label="" align="right" fixed="right" :min-width="actionsColumnWidth"
                          v-if="actionsColumnWidth>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="topActionItems" :context="topActionContext" :permissionFunction="$attrs.permissionFunction"
+                <actions :items="topActionItems" :context="getTopActionContext" :permissionFunction="$attrs.permissionFunction"
                          :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
@@ -72,6 +72,12 @@
         },
         methods: {
             excelFormat(data){
+                let dumpAllFields = this.fields.find(f => f.name==='__dump_all__')
+                if(dumpAllFields){
+                    let fs = Object.keys(data[0])
+                    let ds = data.map(a => Object.values(a))
+                    return [fs].concat(ds)
+                }
                 let ds = data.map((d) => {
                     let rs = []
                     this.fields.forEach(f => {
@@ -173,6 +179,7 @@
                 }
                 if (f.rows) {
                     f.rows = f.rows.map(i => this.normalizeItem(i))
+                    console.log(f.rows)
                 }
                 return f
             },
@@ -183,6 +190,10 @@
                         action.do({row, column, cell, event})
                     }
                 }
+            },
+            getTopActionContext() {
+                let ctx = {tableData: this.tableData, ...this.topActionContext}
+                return ctx
             }
         },
         computed: {
@@ -198,7 +209,7 @@
                 })
             },
             visiableItems () {
-                return this.tableItems.filter(a => a.hidden !== true)
+                return this.tableItems.filter(a => a.hidden !== true && a.name !== '__dump_all__')
             },
             fields () {
                 return flatten(this.tableItems, 'subColumns')

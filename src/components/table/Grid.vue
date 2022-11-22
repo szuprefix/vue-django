@@ -4,7 +4,7 @@
             <el-card :body-style="{padding: '0px' }">
                 <template v-for="f in items">
                    <widget :field="f" :value.sync="row" :key="f.name">
-                    </widget><br/>
+                    </widget>
                 </template>
             </el-card>
         </el-col>

@@ -17,30 +17,30 @@
         </el-input>
         <template v-for="f in notRadioFilterFields">
             <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`" v-if="f.widget =='boolean'"
-                       :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`" @change="onSearch">
+                       :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`" @change="onSearch" :key="f.name">
                 <el-option :label="f.label" :value="true"></el-option>
                 <el-option :label="getBoolFieldFalseLabel(f.label)" :value="false"></el-option>
             </el-select>
             <model-select :field="f" v-model="form[f.name]" @input="onSearch"
                           :showCreate="false" :appModel="f.relateModel || f.model" :showLink="false"
                           :title="f.label" :style="`width:${f.label.length+5}rem;min-width:8rem;`"
-                          v-else-if="f.widget === 'modelselect'" :pageSize="100"></model-select>
+                          v-else-if="f.widget === 'modelselect'" :pageSize="100" :key="f.name"></model-select>
             <el-select v-model="form[f.name]" clearable :placeholder="`请选择${f.label}`"
-                       v-else-if="f.widget === 'select'"
+                       v-else-if="f.widget === 'select'" :key="f.name"
                        :title="f.label" @change="onSearch">
                 <el-option v-for="c in f.choices" :label="c.display_name" :value="c.value" :key="c.value"></el-option>
             </el-select>
-            <date-range :field="f" v-model="form[`${f.name}__range`]" separator=","
+            <date-range :field="f" v-model="form[`${f.name}__range`]" separator="," :key="f.name"
                         :title="f.label" v-else-if="f.widget === 'daterange'" @input="onSearch"></date-range>
 
-            <number-range :field="f" v-model="form[`${f.name}__range`]" separator="-" :options="f.options"
+            <number-range :field="f" v-model="form[`${f.name}__range`]" separator="-" :options="f.options" :key="f.name"
                           :title="f.label" v-else-if="f.widget === 'numberrange'" @input="onSearch"></number-range>
 
-            <array-input v-if="f.widget === 'array'"
+            <array-input v-if="f.widget === 'array'" :key="f.name"
                          v-model="form[`${f.name}__in`]" :placeholder="`批量查询${f.label}`" style="width: 10rem;"
                          :title="f.label" :autosize="{minRows:1,maxRows:4}" @change="onSearch"></array-input>
             <el-input v-model="form[f.name]" :placeholder="`请输入${f.label}`"
-                      v-else-if="f.widget === 'input'"
+                      v-else-if="f.widget === 'input'" :key="f.name"
                       :title="f.label" style="width: 10rem;" clearable @change="onSearch"></el-input>
         </template>
     </div>

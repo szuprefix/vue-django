@@ -2,7 +2,7 @@
     <el-button-group v-if="showActions.length>0">
         <template v-for="a in showActions">
             <el-button v-bind="[a]" :size="a.size || size" @click="handleCommand(a)"
-                       v-if="!a.show || a.show(context)" :key="a.name">
+                       v-if="!a.show || a.show(context)" :loading='loadingMap[a.name]' :key="a.name">
                 <i :class="getIconClass(a.icon)" v-if="a.icon"></i>{{a.label}}
             </el-button>
         </template>
@@ -12,7 +12,7 @@
           </span>
             <el-dropdown-menu slot="dropdown">
                 <template v-for="a in dropdownActions">
-                    <el-dropdown-item :command="a" v-if="!a.show || a.show(context)" :key="a.name" :title="a.title"
+                    <el-dropdown-item :command="a" v-if="!a.show || a.show(context)" :key="a.name" v-bind="[a]"
                                       :icon="getIconClass(a.icon)">
                         {{a.label || a.title}}
                     </el-dropdown-item>
@@ -29,7 +29,7 @@
         mixins: [serverResponse],
         props: {
             items: Array,
-            context: Object,
+            context: [Object, Function],
             trigger: {type: String, default: "hover"},
             map: {
                 type: Object, default: () => {
@@ -42,6 +42,7 @@
         data () {
             return {
                 actionItems: [],
+                loadingMap: {},
                 dialog: undefined
             }
         },
@@ -50,6 +51,10 @@
             this.normalizeItems()
         },
         methods: {
+            setLoading(name, b) {
+                this.loadingMap[name] = b
+                this.loadingMap = {...this.loadingMap}
+            },
             getConfirm(action) {
                 if (action.confirm instanceof Function) {
                     return action.confirm
@@ -61,15 +66,29 @@
             },
             handleCommand (action) {
                 let confirmFunc = this.getConfirm(action)
+                let context = this.context
+                if (typeof context === 'function') {
+                    context = context()
+                }
                 confirmFunc(action).then(() => {
                     let command = action.do
+                    let result
+                    this.setLoading(action.name, true)
                     if (typeof command === 'function') {
-                        return command(this.context)
+                        result = command(context)
+                    } else {
+                        result = this.$store.state.bus.$emit('opendrawer', {
+                            component: command,
+                            context: {...action.drawer, ...context}
+                        })
                     }
-                    this.$store.state.bus.$emit('opendrawer', {
-                        component: command,
-                        context: {...action.drawer, ...this.context}
-                    })
+                    if (result instanceof Promise) {
+                        result.finally(() => {
+                            this.setLoading(action.name, false)
+                        })
+                    } else {
+                        this.setLoading(action.name, false)
+                    }
                 }).catch(this.onServerResponseError)
             },
             normalizeItem(a)
@@ -91,14 +110,6 @@
             }
         },
         computed: {
-//            actionItems (){
-//                return this.items.map(a => {
-//                    if (typeof a === 'string') {
-//                        a = this.map[a]
-//                    }
-//                    return a
-//                })
-//            },
             showActions () {
                 return this.actionItems.filter((a) => {
                     return !(a instanceof Array)

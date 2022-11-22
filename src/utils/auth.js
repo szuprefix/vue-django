@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-import axios from 'axios'
+import axios from '../configs/axios'
 
 const TokenKey = 'access_token'
 
