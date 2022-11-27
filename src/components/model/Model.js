@@ -98,13 +98,14 @@ export default function (appModel, defaults, eventor) {
             })
         },
         load () {
-            return axios.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((data, restOptions, viewsConfig) => {
+            return Promise.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(rs => {
+                let data = rs[0], restOptions=rs[1]
                 if (!this.id) {
                     data = this.emptyDataFromOptions(restOptions.actions.POST)
                 }
                 this.data = Object.assign({}, this.data, data)
-                return [data, restOptions, viewsConfig]
-            }))
+                return rs
+            })
         },
         save (data) {
             let d = Object.assign({}, this.defaults, this.data, data)
@@ -201,9 +202,7 @@ export default function (appModel, defaults, eventor) {
             })
         },
         loadOptionsAndViewsConfig () {
-            return axios.all([this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((restOptions, config) => {
-                return [restOptions, config]
-            }))
+            return Promise.all([this.loadOptions(), this.loadViewsConfig()])
         },
         parentMultipleRelationField (parent) {
             if (parent) {
