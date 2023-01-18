@@ -74,22 +74,24 @@
             updateQueries(d){
                 this.queries = Object.assign({}, this.baseQueries, this.queries, d)
             },
+            dealResponse(data){
+                data = this.requestMiddleWare.response(data)
+                this.count = data.count
+                let ds = data.results
+                if (this.$attrs.prepare) {
+                    return this.$attrs.prepare(ds, this)
+                }
+                return ds
+            },
             load (queries) {
-                let middleware = {request: d => d, response: d => d, ...this.$attrs.middleware}
-                let d = middleware.request(queries || this.queries)
+                let d = this.requestMiddleWare.request(queries || this.queries)
                 this.loading = '查询中'
                 let func = (this.url instanceof Function) ? this.url : d => this.$http.get(`${this.url}?${Qs.stringify(d, {
                     arrayFormat: 'comma',
                     skipNulls: true
                 })}`)
                 return func(d).then(({data}) => {
-                    data = middleware.response(data)
-                    this.count = data.count
-                    let ds = data.results
-                    if (this.$attrs.prepare) {
-                        return this.$attrs.prepare(ds, this)
-                    }
-                    return ds
+                    return this.dealResponse(data)
                 }).then(data => {
                     this.loading = false
                     this.data = data
@@ -120,7 +122,7 @@
                 let downloadFunc = (page) => {
                     let d = Object.assign({}, this.queries, {page, page_size: this.maxPageSize})
                     return this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
-                        return data.results
+                        return this.dealResponse(data)
                     })
                 }
                 let allData = []
@@ -145,6 +147,9 @@
             }
         },
         computed: {
+            requestMiddleWare(){
+                return {request: d => d, response: d => d, ...this.$attrs.middleware}
+            },
             tAttrs () {
                 return {
                     excelGetAllData: this.excelGetAllData,

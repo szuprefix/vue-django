@@ -35,6 +35,7 @@
 
                     readWorkbookFromLocalFile(XLSX, file, (wb) => {
                         let data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])
+                        console.log(data)
                         this.$emit('read', {file, data, wb})
                     })
 
