@@ -113,7 +113,7 @@ export default function (appModel, defaults, eventor) {
             if (!this.id) {
                 promise = axios.post(this.getListUrl(), d)
             } else {
-                promise = axios.put(this.getDetailUrl(), d)
+                promise = axios.patch(this.getDetailUrl(), d)
             }
             return promise.then(({data}) => {
                 this.id = data.id

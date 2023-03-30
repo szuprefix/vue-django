@@ -92,7 +92,7 @@
                     all: {count: ac, label: `全部${ac}条`},
                     exclude: {count: ac - sc, label: `其余${ac - sc}条`}
                 }
-            },
+            }
         },
         watch: {
             context(v) {
