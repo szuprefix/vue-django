@@ -28,6 +28,7 @@ export default function (appModel, defaults, eventor) {
 
         init () {
             this.config = Register.getConfig(this.appModel)
+            this.loadOptions()
         },
         clear () {
             Object.assign(this.data, this.emptyDataFromOptions(this.fieldConfigs))

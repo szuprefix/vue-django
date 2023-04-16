@@ -1,11 +1,13 @@
 <template>
     <van-form @submit="onSubmit" v-on="$listeners">
-        <template v-for="field in formItems">
-            <widget v-model="formValue" :field="field" :key="field.name"></widget>
-        </template>
-
+        <van-cell-group :title="g.name" v-for="g in formGroups" :key="g.name">
+            <template v-for="field in g.items">
+                <widget v-model="formValue" :field="field" :key="field.name"></widget>
+            </template>
+        </van-cell-group>
         <div style="margin: 16px;" v-if="method">
-            <van-button block :loading="loading" :disabled="loading" :loading-text='loading' type="info" native-type="submit">
+            <van-button block :loading="loading" :disabled="loading" :loading-text='loading' type="info"
+                        native-type="submit">
                 {{submitName}}
             </van-button>
         </div>
@@ -13,19 +15,21 @@
     </van-form>
 </template>
 <script>
-    import Form from '../../form/Form'
+    //    import Form from '../../form/Form'
+    import FormMixin from '../../form/FormMixin'
     import Widget from './Widget.vue'
-    import ServerResponse from 'vue-django/src/mixins/server_response'
+    //    import ServerResponse from 'vue-django/src/mixins/server_response'
     import {
         Form as VanForm,
         Button as VanButton,
         Field,
-        NoticeBar
+        NoticeBar,
+        CellGroup as VanCellGroup
     } from 'vant'
     export default{
-        mixins: [ServerResponse],
+        mixins: [FormMixin],
         props: {
-            ...Form.defaultProps,
+//            ...Form.defaultProps,
             procedure: Function
         },
         components: {
@@ -33,7 +37,8 @@
             VanButton,
             Field,
             Widget,
-            NoticeBar
+            NoticeBar,
+            VanCellGroup
         },
         data () {
             return {
@@ -44,8 +49,8 @@
         },
         created () {
 //            console.log(this.$listeners)
-            this.formValue = this.value
-            this.formItems = Form.normalizeItems(this.items)
+//            this.formValue = this.value
+//            this.formItems = Form.normalizeItems(this.items)
         },
         methods: {
 
@@ -97,21 +102,21 @@
         },
         computed: {},
         watch: {
-            value(val){
-                this.formValue = val
-            },
-            formErrors (val) {
-                if ((val instanceof Object) && !(val instanceof Array)) {
-                    Object.keys(val).forEach(k => {
-                        let f = this.$refs[k][0]
-                        f.$data.errors.invalid = val[k]
-                        f.$data.valid = false
-                    })
-                }
-            },
-            items(){
-                this.formItems = Form.normalizeItems(this.items)
-            }
+//            value(val){
+//                this.formValue = val
+//            },
+//            formErrors (val) {
+//                if ((val instanceof Object) && !(val instanceof Array)) {
+//                    Object.keys(val).forEach(k => {
+//                        let f = this.$refs[k][0]
+//                        f.$data.errors.invalid = val[k]
+//                        f.$data.valid = false
+//                    })
+//                }
+//            },
+//            items(){
+//                this.formItems = Form.normalizeItems(this.items)
+//            }
         }
     }
 </script>

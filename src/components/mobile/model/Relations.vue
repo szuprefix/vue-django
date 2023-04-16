@@ -44,6 +44,7 @@
                     if (a.getAsyncInfo) {
                         a.getAsyncInfo().then(info => {
                             if (info) {
+                                a.data = info
                                 this.badges[a.name] = info.badge
                                 this.badges = {...this.badges}
                                 this.$emit('syncinfo', info)
