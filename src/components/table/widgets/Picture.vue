@@ -1,8 +1,16 @@
 <template>
     <el-image fit='fill' v-bind="[field, $attrs, $props]" :src="url"
-              v-if="value[field.name]" style="cursor: pointer" @click="open"></el-image>
+              v-if="url" style="cursor: pointer" @click="open" v-loading="loading">
+        <div slot="error" class="image-error"  @click="open">
+            <i class="el-icon-picture-outline"></i>
+        </div>
+        <div slot="placeholder" @click="open">
+            <i class="el-icon-loading"></i>
+        </div>
+    </el-image>
 </template>
 <script>
+    import {get} from 'lodash'
     export default{
         props: {
             value: String,
@@ -11,15 +19,29 @@
             proxy: {type: String, default: ''}
         },
         data () {
-            return {}
+            return {
+                loading:false
+            }
         },
         components: {},
         methods: {
             isLink(a) {
                 return typeof a === 'string' && (a.startsWith('http://') || a.startsWith('https://'))
             },
-            open () {
-                window.open(this.url, '_blank')
+            async open () {
+                let url = null
+                if(this.field.openUrl) {
+                    url = this.field.openUrl(this.context)
+                }
+                if(url instanceof Promise){
+                    this.loading = true
+                    url = await url
+                    this.loading = false
+                }
+                if(!url) {
+                    url = this.url
+                }
+                window.open(url, '_blank')
             }
         },
         computed: {
@@ -30,14 +52,16 @@
                 return this.field.imageRoot || this.$store.state.party.settings.imageRoot || ''
             },
             url () {
-                let url = this.value[this.field.name]
+                let url = get(this.context,this.field.name)
+                if (this.field.formatter) {
+                    url = this.field.formatter(this.value, this.field.name, url)
+                }
                 if (!this.isLink(url)) {
                     url = `${this.rootPath}${url}`
                 }
                 if (this.theProxy) {
                     url = `${this.theProxy}${url}`
                 }
-//                console.log(url)
                 return url
             }
         }

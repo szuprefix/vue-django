@@ -35,7 +35,7 @@
         components: {
             VanForm,
             VanButton,
-            Field,
+//            Field,
             Widget,
             NoticeBar,
             VanCellGroup

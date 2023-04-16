@@ -6,6 +6,7 @@ import Cookies from 'js-cookie'
 
 import Vue from 'vue'
 
+let instance = axios.create()
 
 function genBaseUrl (tpl) {
     let a = tpl
@@ -18,11 +19,11 @@ function genBaseUrl (tpl) {
     return a
 }
 
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-axios.defaults.headers['X-REQUESTED-WITH'] = 'XMLHttpRequest'
+instance.defaults.xsrfCookieName = 'csrftoken'
+instance.defaults.xsrfHeaderName = 'X-CSRFToken'
+instance.defaults.headers['X-REQUESTED-WITH'] = 'XMLHttpRequest'
 
-axios.interceptors.response.use(function (response) {
+instance.interceptors.response.use(function (response) {
     return response
 }, function (error) {
     if (error.response) {
@@ -32,20 +33,22 @@ axios.interceptors.response.use(function (response) {
     }
 })
 
-Vue.prototype.$http = Vue.http = axios
+Vue.prototype.$http = Vue.http = instance
 
-axios.setBaseURL = (url) => {
-    // axios.defaults.baseURL = genBaseUrl(url)
+instance.setBaseURL = (url) => {
+    // instance.defaults.baseURL = genBaseUrl(url)
     let p = location.pathname.split(/\/(mobile|dashboard)\//g)[0]
     if (['/', ''].includes(p)) {
-        axios.defaults.baseURL = url
+        instance.defaults.baseURL = url
     } else {
-        axios.defaults.baseURL = `${p}${url}`
+        instance.defaults.baseURL = `${p}${url}`
     }
 
     if (!Cookies.get('csrftoken')) {
-        axios.get('/csrf_token/')
+        instance.get('/csrf_token/')
     }
 }
-
-export default axios
+instance.setAuthToken = (token) => {
+    instance.defaults.headers['Authorization'] = `Token ${token}`
+}
+export default instance

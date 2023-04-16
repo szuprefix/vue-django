@@ -5,7 +5,7 @@
        </div>
         <draggable v-model="ids">
             <transition-group>
-                <el-card v-for="s, i in objects" :key="s.id" class="item hover-show__parent">
+                <el-card v-for="(s, i) in objects" :key="s.id" class="item hover-show__parent">
                     <el-image v-if="s.logo" :src="s.logo" style="width: 4rem;"></el-image>
                     <div>{{s.name}}</div>
                     <span class="number">{{i + 1}}</span>

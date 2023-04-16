@@ -33,3 +33,15 @@ export default function (key, interval) {
         destroy
     }
 }
+
+export function RouterMemory(router) {
+
+    return {
+        getKey(k) {
+            return `${router.currentRoute}:${k}`
+        },
+        read(key) {
+            localStorage.getItem(this.getKey(key))
+        }
+    }
+}

@@ -10,7 +10,6 @@
 </template>
 <script>
     import DataTable from '../table/DataTable.vue'
-    import ActionLabel from './ActionLabel.vue'
     import EditableLabel from '../widgets/EditableLabel.vue'
     import select_actions from './mixins/select_action'
     import {set, unset, uniqueId, pick, range} from 'lodash'
@@ -23,7 +22,6 @@
         data () {
             return {
                 loading: false,
-                ActionLabel,
                 EditableLabel,
                 actions: [
                     {name: 'drop', label: '删除整列', do: this.toDoSelectionAction},
@@ -33,7 +31,7 @@
                 ]
             }
         },
-        components: {DataTable, ActionLabel},
+        components: {DataTable},
         methods: {
             normalizeFields (fields){
                 fields.forEach(f => {

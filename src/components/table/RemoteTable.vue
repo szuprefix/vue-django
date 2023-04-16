@@ -74,23 +74,28 @@
             updateQueries(d){
                 this.queries = Object.assign({}, this.baseQueries, this.queries, d)
             },
+            dealResponse(data){
+                data = this.requestMiddleWare.response(data)
+                this.count = data.count
+                let ds = data.results
+                if (this.$attrs.prepare) {
+                    return this.$attrs.prepare(ds, this)
+                }
+                return ds
+            },
             load (queries) {
-                let middleware = {request: d => d, response: d => d , ...this.$attrs.middleware}
-                let d = middleware.request(queries || this.queries)
+                let d = this.requestMiddleWare.request(queries || this.queries)
                 this.loading = '查询中'
-                let func = (this.url instanceof Function) ?  this.url :  d => this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`)
+                let func = (this.url instanceof Function) ? this.url : d => this.$http.get(`${this.url}?${Qs.stringify(d, {
+                    arrayFormat: 'comma',
+                    skipNulls: true
+                })}`)
                 return func(d).then(({data}) => {
-                    data = middleware.response(data)
-                    this.count = data.count
-                    let ds = data.results
-                    if (this.$attrs.prepare) {
-                        return this.$attrs.prepare(ds, this)
-                    }
-                    return ds
+                    return this.dealResponse(data)
                 }).then(data => {
                     this.loading = false
                     this.data = data
-                    this.$emit("loaded", {data, count:this.count})
+                    this.$emit("loaded", {data, count: this.count})
                 }).catch(this.onServerResponseError)
             },
             onSearch(){
@@ -103,28 +108,31 @@
                 this.pageSize = val
             },
             refresh(){
-                this.load()
+                return this.load()
             },
             excelGetAllData(){
                 let promise = Promise.resolve()
-                let page = Math.ceil(this.count/this.maxPageSize)
-                if(page>1) {
-                    promise = this.$confirm(`此次导出记录数预计${this.count},超出最大限制${this.maxPageSize},基于网络性能考虑,程序会尝试分${page}页每次请求${this.maxPageSize}条记录的方式下载数据, 最终合并数据导出. 若期间后台数据有更新的话,则最终下载的数据可能会有重复或缺漏等风险,请注意检查.`,'分页导出提醒', {type:'warning', confirmButtonText:'好的,开始分页导出'})
+                let page = Math.ceil(this.count / this.maxPageSize)
+                if (page > 1) {
+                    promise = this.$confirm(`此次导出记录数预计${this.count},超出最大限制${this.maxPageSize},基于网络性能考虑,程序会尝试分${page}页每次请求${this.maxPageSize}条记录的方式下载数据, 最终合并数据导出. 若期间后台数据有更新的话,则最终下载的数据可能会有重复或缺漏等风险,请注意检查.`, '分页导出提醒', {
+                        type: 'warning',
+                        confirmButtonText: '好的,开始分页导出'
+                    })
                 }
-                let downloadFunc  = (page) => {
+                let downloadFunc = (page) => {
                     let d = Object.assign({}, this.queries, {page, page_size: this.maxPageSize})
                     return this.$http.get(`${this.url}?${Qs.stringify(d, {arrayFormat: 'comma'})}`).then(({data}) => {
-                        return data.results
+                        return this.dealResponse(data)
                     })
                 }
                 let allData = []
-                return promise.then( () => {
+                return promise.then(() => {
                     this.loading = '正在获取数据'
-                    return queueLimit(range(1, page+1),1,(p) => {
-                        if(p>1){
-                            this.loading = `第${p}页`
+                    return queueLimit(range(1, page + 1), 1, (p) => {
+                        if (p > 1) {
+                            this.loading = `第${p}/${page}页`
                         }
-                        return downloadFunc(p).then(table => allData=allData.concat(table))
+                        return downloadFunc(p).then(table => allData = allData.concat(table))
                     })
                 }).then(() => {
                     this.loading = false
@@ -132,10 +140,16 @@
                 }).catch(this.onServerResponseError)
             },
             onSortChange ({order, prop}) {
-                this.updateQueries({ordering: (order == 'descending' ? '-' : '') + prop})
+                let f = this.items.find(a => a.name === prop)
+                if (f && f.sortable === 'custom') {
+                    this.updateQueries({ordering: (order == 'descending' ? '-' : '') + prop})
+                }
             }
         },
         computed: {
+            requestMiddleWare(){
+                return {request: d => d, response: d => d, ...this.$attrs.middleware}
+            },
             tAttrs () {
                 return {
                     excelGetAllData: this.excelGetAllData,

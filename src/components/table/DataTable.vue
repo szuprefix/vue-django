@@ -44,7 +44,7 @@
             value: Array,
             cellWidget: [Function, Object],
             headerWidget: [Function, Object],
-            group: false,
+            group: {type: Boolean, default: () => false},
             options: {
                 type: Object, default: () => {
                     return {}

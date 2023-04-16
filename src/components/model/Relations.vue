@@ -1,6 +1,6 @@
 <template>
     <el-tabs type="border-card" v-if="modelItems.length>0 && !loading" v-model="index">
-        <el-tab-pane lazy v-for="m,i in modelItems" :key="m.key || m.name" style="min-height: 10rem;">
+        <el-tab-pane lazy v-for="(m,i) in modelItems" :key="m.key || m.name" style="min-height: 10rem;">
             <template slot="label"><i :class="`fa fa-${m.icon}`"></i>{{m.label}}</template>
             <component :is="m.view" v-bind="[$props, m]" v-if="m.view"></component>
             <model-table v-else :appModel="m.name" v-bind="[$props, m]"></model-table>
@@ -31,6 +31,11 @@
             normalizeItems () {
                 let items = this.items || this.parent.viewsConfig.relations || []
                 this.modelItems = arrayNormalize(items, {}, (a, i) => {
+                    let ps = a.name.split(':')
+                    a.name = ps[0]
+                    if(ps.length>1) {
+                        a.parentRelationQueryName=ps[1]
+                    }
                     let m = a.model = Model(a.name)
                     a.icon = a.icon || m.config.icon
                     a.label = a.label || m.config.verbose_name

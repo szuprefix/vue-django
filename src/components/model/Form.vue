@@ -9,8 +9,7 @@
             </el-col>
         </el-row>
         <x-form :url="url" :items="formItems" v-model="formValue" ref="form" :options="options.form" :disabled="disabled"
-                :successInfo="successInfo"
-                :method="method" @form-posted="onPosted" :submit="submit">
+                :successInfo="successInfo" :method="method" @form-posted="onPosted" :submit="submit">
             <span slot="submit" v-if="!options.inline"></span>
         </x-form>
         <slot name="bottom" :model="model"></slot>
@@ -54,7 +53,7 @@
                 model: Model(this.appModel, this.defaults, this.$store.state.bus),
                 avairableActions: {
                     'save': {
-                        icon: 'floppy-o',
+                        icon: 'save',
                         title: '保存',
                         label: '',
                         do: this.onSubmit,
@@ -77,7 +76,7 @@
                         show: () => this.mid && this.checkPermission('destroy')
                     },
                     'saveAndAnother': {
-                        icon: 'floppy-o',
+                        icon: 'save',
                         label: '+',
                         title: '保存并新增另一个',
                         do: this.saveAndAnother,

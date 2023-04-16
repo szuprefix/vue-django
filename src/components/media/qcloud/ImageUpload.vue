@@ -15,8 +15,9 @@
                    :on-success="onSuccess"
                    :on-exceed="onExceed"
                    :on-error="onError">
-
-            <i class="el-icon-plus"></i>
+            <slot>
+                <i class="el-icon-plus"></i>
+            </slot>
         </el-upload>
 
         <el-dialog :visible.sync="dialogVisible">
@@ -37,7 +38,7 @@
             fileName: String,
             context: Object,
             bucket: String,
-            region: {type:String, default: 'ap-guangzhou'},
+            region: {type: String, default: 'ap-guangzhou'},
             urls: Array
         },
         data () {
@@ -91,7 +92,7 @@
                     return
                 }
                 sf.url = `https://${response.Location}`
-                this.$emit('success', {response, file, fileList, limit:this.$attrs.limit})
+                this.$emit('success', {response, file, fileList, limit: this.$attrs.limit})
             },
             onRemove(file, fileList) {
                 this.fileList = fileList
@@ -104,7 +105,7 @@
             toggleAdd () {
                 if (this.$attrs.limit === 1) {
 //                    console.debug(this.$attrs.limit, this.fileList.length)
-                    if (this.fileList.length>0) {
+                    if (this.fileList.length > 0) {
                         this.elUploader.classList.add('hidden')
                     } else {
                         this.elUploader.classList.remove('hidden')
@@ -112,7 +113,7 @@
                 }
             },
             onExceed(files, fileList) {
-                this.$message({message:'超出文件数限制.', type:'error'})
+                this.$message({message: '超出文件数限制.', type: 'error'})
             },
             toUrl(file) {
                 var URL = window.URL || window.webkitURL
@@ -121,8 +122,8 @@
             },
             getFileNumber(fn) {
                 let re = /(\d+)\./g
-                let m =re.exec(fn)
-                if(m) {
+                let m = re.exec(fn)
+                if (m) {
                     return m[1]
                 }
             },
@@ -147,9 +148,10 @@
                     number: this.getFileNumber(fn)
                 }
                 return Promise.resolve(ctx).then(ctx => {
-                    if (fnt.includes('${md5}')) {
+                    if (fnt.includes('${md5}') || fnt.includes('${md5short}')) {
                         return getFileMd5Async(file).then(md5 => {
                             ctx.md5 = md5
+                            ctx.md5short = ctx.md5.slice(0,6)
                             return ctx
                         })
                     } else {

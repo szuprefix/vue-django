@@ -49,11 +49,10 @@ export function defaultRuleType(f) {
         return 'array'
     }
     if (f.choices && f.choices.length > 0) {
-        let v = f.choices[0][0]
+        let v = f.choices[0][0] || f.choices[0]['value']
         if(v) {
             return typeof v
         }
-
     }
     let rt = f.model ? 'number' : (['field', 'time', 'datetime'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
     return rt

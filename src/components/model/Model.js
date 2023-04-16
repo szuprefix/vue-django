@@ -70,7 +70,20 @@ export default function (appModel, defaults, eventor) {
             Object.keys(m).forEach((k) => {
                 let f = m[k]
                 let v = dvs[f.name] || f.default
-                r[k] = v !== undefined ? v : (f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null)
+                if(v !== undefined){
+                    r[k] = v
+                } else if (f.type === 'boolean') {
+                    r[k] = true
+                } else if (f.multiple) {
+                    r[k] = []
+                }  else if ( f.type === 'string' ) {
+                    r[k] = ''
+                } else if ( f.type === 'nested object' ) {
+                    r[k] = {}
+                } else {
+                    r[k] = null
+                }
+                // r[k] = v !== undefined ? v : (f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null)
             })
             return r
         },
@@ -86,13 +99,14 @@ export default function (appModel, defaults, eventor) {
             })
         },
         load () {
-            return axios.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((data, restOptions, viewsConfig) => {
+            return Promise.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(rs => {
+                let data = rs[0], restOptions=rs[1]
                 if (!this.id) {
                     data = this.emptyDataFromOptions(restOptions.actions.POST)
                 }
                 this.data = Object.assign({}, this.data, data)
-                return [data, restOptions, viewsConfig]
-            }))
+                return rs
+            })
         },
         save (data) {
             let d = Object.assign({}, this.defaults, this.data, data)
@@ -100,7 +114,7 @@ export default function (appModel, defaults, eventor) {
             if (!this.id) {
                 promise = axios.post(this.getListUrl(), d)
             } else {
-                promise = axios.put(this.getDetailUrl(), d)
+                promise = axios.patch(this.getDetailUrl(), d)
             }
             return promise.then(({data}) => {
                 this.id = data.id
@@ -108,6 +122,13 @@ export default function (appModel, defaults, eventor) {
                 this.emitPosted(this.id)
                 return data
             }) // .catch((error) => this.onErrors(error))
+        },
+        doAction (action, data) {
+            if (!this.id) {
+                return axios.post(`${this.getListUrl()}${action}/`, data)
+            } else {
+                return axios.post(`${this.getDetailUrl()}${action}/`, data)
+            }
         },
         selectOrCreate (d) {
             let url = this.getListUrl()
@@ -182,9 +203,7 @@ export default function (appModel, defaults, eventor) {
             })
         },
         loadOptionsAndViewsConfig () {
-            return axios.all([this.loadOptions(), this.loadViewsConfig()]).then(axios.spread((restOptions, config) => {
-                return [restOptions, config]
-            }))
+            return Promise.all([this.loadOptions(), this.loadViewsConfig()])
         },
         parentMultipleRelationField (parent) {
             if (parent) {

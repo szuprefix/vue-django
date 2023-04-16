@@ -80,6 +80,13 @@
         },
         methods: {
             onSearch () {
+                let f = this.form
+                Object.keys(f).forEach(k => {
+                    if(f[k] ===''){
+                        console.log(k, f[k])
+                        f[k] = null
+                    }
+                })
                 this.$emit('change', {...this.form})
             },
             init () {

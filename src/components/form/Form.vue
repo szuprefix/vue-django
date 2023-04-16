@@ -8,26 +8,27 @@
                   :closable="false"></el-alert>
         <el-row>
             <template v-for="f in formItems">
-                <template v-if="canEdit(f)">
-                    <el-col :xs="f.span.xs" :sm="f.span.sm" :md="f.span.md" :lg="f.span.lg" :xl="f.span.xl"
-                            :key="f.name" v-if="!$attrs.inline && !$attrs.oneColumn && f.widget !== 'hidden'">
+                <template v-if="!f.hidden">
+                    <el-col v-bind="[f.span]" :key="f.name" v-if="!$attrs.inline && !$attrs.oneColumn && f.widget !== 'hidden'">
                         <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions" :error="errors[f.name]"></item>
                     </el-col>
                     <item :field="f" v-model="formValue" v-bind="$attrs.itemOptions" :error="errors[f.name]"
-                          v-else></item>
+                          :key="f.name" v-else></item>
                 </template>
             </template>
             <slot name="submit">
-                <el-col :xs="$attrs.inline?12:24" :sm="$attrs.inline?8:24" :md="$attrs.inline?6:24"
-                        :lg="$attrs.inline?4:24"
-                        :xl="$attrs.inline?3:24" v-if="!$attrs.inline">
-                    <el-form-item>
+                <template v-if="submitName>''">
+                    <el-col :xs="$attrs.inline?12:24" :sm="$attrs.inline?8:24" :md="$attrs.inline?6:24"
+                            :lg="$attrs.inline?4:24"
+                            :xl="$attrs.inline?3:24" v-if="!$attrs.inline">
+                        <el-form-item>
+                            <actions :items="_actions"></actions>
+                        </el-form-item>
+                    </el-col>
+                    <el-form-item v-else>
                         <actions :items="_actions"></actions>
                     </el-form-item>
-                </el-col>
-                <el-form-item v-else>
-                    <actions :items="_actions"></actions>
-                </el-form-item>
+                </template>
             </slot>
         </el-row>
     </el-form>
@@ -64,7 +65,7 @@
                 this.$emit('beforesubmit', this.formValue)
                 this.loading = `正在${this.submitName}`
                 if (this.submit) {
-                    return this.submit()
+                    return this.submit(this)
                 } else {
                     let action = this.method === 'post' ? this.$http.post : this.$http.put
                     return action(this.url, this.formValue).then(({data}) => {
@@ -83,7 +84,7 @@
             },
             onPosted(data){
                 this.loading = false
-                if(data === false){
+                if (data === false) {
                     return
                 }
                 this.$message({message: this.successInfo || `${this.submitName}成功`, type: 'success'})

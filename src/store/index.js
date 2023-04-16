@@ -9,13 +9,14 @@ import user from './modules/user'
 import party from './modules/party'
 import dailyLog from '../utils/dailylog'
 import {UserStorage} from '../utils/user_storage'
+import logo from '../assets/logo.png'
 Vue.use(Vuex)
 const state = {
     bus: new Vue(),
     dailyLog,
     apps,
     system_name: '',
-    logo: require('../assets/logo.png')
+    logo
 }
 
 var store = new Vuex.Store({

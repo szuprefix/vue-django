@@ -6,7 +6,7 @@
         <el-table-column label="" align="right" fixed="right" :min-width="actionsColumnWidth"
                          v-if="actionsColumnWidth>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="topActionItems" :context="scope" :permissionFunction="$attrs.permissionFunction"
+                <actions :items="topActionItems" :context="getTopActionContext" :permissionFunction="$attrs.permissionFunction"
                          :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
@@ -37,6 +37,7 @@
             value: Array,
             cellWidget: [Function, Object],
             headerWidget: [Function, Object],
+            topActionContext: Object,
             group: {type: Boolean, default: false},
             items: Array,
             topActions: {
@@ -71,6 +72,12 @@
         },
         methods: {
             excelFormat(data){
+                let dumpAllFields = this.fields.find(f => f.name==='__dump_all__')
+                if(dumpAllFields){
+                    let fs = Object.keys(data[0])
+                    let ds = data.map(a => Object.values(a))
+                    return [fs].concat(ds)
+                }
                 let ds = data.map((d) => {
                     let rs = []
                     this.fields.forEach(f => {
@@ -137,7 +144,7 @@
             defaultWidget(f){
                 if (f.type == 'boolean') {
                     return TrueFlag
-                } else if (['datetime', 'date'].includes(f.type)) {
+                } else if (['datetime'].includes(f.type)) {
                     return Date2Now
                 } else if (f.choices) {
                     return ChoicesDisplay
@@ -172,6 +179,7 @@
                 }
                 if (f.rows) {
                     f.rows = f.rows.map(i => this.normalizeItem(i))
+                    console.log(f.rows)
                 }
                 return f
             },
@@ -182,6 +190,10 @@
                         action.do({row, column, cell, event})
                     }
                 }
+            },
+            getTopActionContext() {
+                let ctx = {tableData: this.tableData, ...this.topActionContext}
+                return ctx
             }
         },
         computed: {
@@ -197,7 +209,7 @@
                 })
             },
             visiableItems () {
-                return this.tableItems.filter(a => a.hidden !== true)
+                return this.tableItems.filter(a => a.hidden !== true && a.name !== '__dump_all__')
             },
             fields () {
                 return flatten(this.tableItems, 'subColumns')

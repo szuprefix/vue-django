@@ -8,13 +8,25 @@
             value: Object,
             field: Object
         },
-        computed:{
-            localStr (){
+        computed: {
+            val () {
                 let v = this.value[this.field.name]
-               return  v && localTimeStr(v)  || ''
+                if(typeof v === 'string' && !v.includes('-')) {
+                    v = parseInt(v)
+                }
+                if (typeof v === 'number') {
+                    if (v < 10000000000) {
+                        v = v * 1000
+                    }
+                }
+                return v
+            },
+            localStr (){
+                let v = this.val
+                return v && localTimeStr(v) || ''
             },
             now(){
-                let v = this.value[this.field.name]
+                let v = this.val
                 return v && formatTime(v) || ''
             }
         }

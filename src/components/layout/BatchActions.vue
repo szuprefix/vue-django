@@ -1,7 +1,7 @@
 <template>
   <span>
     <el-select v-model="scope" v-if="scopes.select.count>0 && scopes.exclude.count>0" style="width:8rem">
-      <el-option :value="k" :label="v.label" v-for="v, k in scopes" :key="k"></el-option>
+      <el-option :value="k" :label="v.label" v-for="(v, k) in scopes" :key="k"></el-option>
     </el-select>
     <el-button plain :icon="a.icon" v-for="a in items" @click="onCommand(a)" :title="a.notice"
                :disabled="scopes.select.count===0" :type="a.type"
@@ -92,7 +92,7 @@
                     all: {count: ac, label: `全部${ac}条`},
                     exclude: {count: ac - sc, label: `其余${ac - sc}条`}
                 }
-            },
+            }
         },
         watch: {
             context(v) {

@@ -20,7 +20,7 @@
             <el-tooltip v-if="row.$errors && row.$errors[f.name]" effect="dark"
                         :content="row.$errors[f.name].join('\n')" placement="top">
                 <div class="data-table-column__error">
-                    <form-widget v-if="f.useFormWidget" v-model="row" :field="f" :context="row"
+                    <form-widget v-if="f.useFormWidget" :value="row" :field="f" :context="row"
                                  @change="onCellValueChange"></form-widget>
                     <component :is="f.widget" v-model="row[f.name]" :context="context(row, $index)" :field="f"
                                v-else-if="f.widget && typeof f.widget == 'object'"></component>
@@ -30,7 +30,7 @@
                 </div>
             </el-tooltip>
             <template v-else>
-                <form-widget v-if="f.useFormWidget" v-model="row" :field="f" :context="row"
+                <form-widget v-if="f.useFormWidget" :value="row" :field="f" :context="row"
                              @change="onCellValueChange"></form-widget>
                 <component :is="f.widget" v-model="row[f.name]" :context="context(row, $index)" :field="f"
                            v-else-if="f.widget && typeof f.widget == 'object'"></component>
@@ -68,6 +68,7 @@
     .data-table-column__error {
         color: #F56C6C;
     }
+
     .data-table-column__error .empty {
         background-color: #FFdddd;
         display: inline-block;

@@ -1,14 +1,15 @@
 {
   "name": "vue-django",
-  "version": "0.9.9",
+  "version": "0.10.1",
   "description": "个人实验项目, 本框架的目标是借鉴并超越django admin的自动化思想, 实现UI前端的极简快速定制开发",
-  "main": "index.js",
+  "main": "lib/vue-django.umd.min.js",
   "files": [
     "src"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "npmjs": "npm publish --registry=https://registry.npmjs.org"
+    "npmjs": "npm publish --registry=https://registry.npmjs.org",
+    "lib": "vue-cli-service build --target lib --name xyz-element --dest lib packages/index.js"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,8 @@
     "date-fns": "^1.29.0",
     "element-ui": "^2.7.2",
     "js-cookie": "^2.2.0",
+    "lodash": "^4.17.11",
+    "lowdb": "^1.0.0",
     "qs": "^6.4.0",
     "vue": "^2.5.17",
     "vue-router": "^3.0.2",

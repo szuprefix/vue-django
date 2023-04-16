@@ -35,6 +35,9 @@
                 let items = this.field.items || []
                 this.items = arrayNormalize(items, {}, a => {
                     a.value = d[a.name]
+                    if(this.field.defaultLabel && !a.label) {
+                        a.label = a.name
+                    }
                     let sp = a.span
                     a.span = sp && (typeof  sp === 'number' && {xs: sp, sm: sp, md: sp, lg: sp, xl: sp} || sp) || {}
                     a.span = Object.assign({
