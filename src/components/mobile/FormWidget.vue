@@ -70,6 +70,17 @@
             Box
         },
         methods: {
+            normalizeOptions (choices) {
+                let ops = choices.map(a => {
+                    if (typeof a === 'string') {
+                        return {key: a, value: a}
+                    } else if (a instanceof Array) {
+                        return {key: a[0], value: a[1] || a[0]}
+                    }
+                    return {key: a.value, value: a.display_name}
+                })
+                return ops
+            },
             fieldValueChanged(value){
                 if (this.field.onChanged) {
                     this.field.onChanged({form: this.value, field: this.field, value})

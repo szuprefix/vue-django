@@ -17,6 +17,8 @@
         Box
     } from 'vux'
     export default{
+        name: 'MForm',
+        componentName: 'MForm',
         mixins: [FormMixin],
         props: {
             groups: {
