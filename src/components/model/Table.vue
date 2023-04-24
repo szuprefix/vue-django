@@ -192,8 +192,16 @@
                     this.batchActionItems = arrayNormalize(config.batchActions, this.avairableActions, (a) => {
                         if (!a.do) {
                             a.do = this.defaultBatchActionDo(a)
+                            if (!a.show) {
+                                a.show = () => this.checkPermission(a.api || a.name, this.model)
+                            }
                         }
                         return a
+                    }).filter(a => {
+                        if(a.show) {
+                            return a.show()
+                        }
+                        return true
                     })
 
                     let qns = Object.keys(this._baseQueries)

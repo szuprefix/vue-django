@@ -32,9 +32,7 @@
 </template>
 <script>
     import ColumnBind from '../table/ColumnBind.vue'
-    import DataTable from '../table/DataTable.vue'
     import Book from './Book.vue'
-    import EditableLabel from '../widgets/EditableLabel.vue'
     import {SheetUtil, ColumnUtil} from '../../utils/sheets'
     import {uniqWith, isEqual, pick, zip} from 'lodash'
     import {genValidatorFromTableItems} from "../../utils/validators";
@@ -52,7 +50,7 @@
                 importData: null
             }
         },
-        components: {Book, EditableLabel, ColumnBind, DataTable},
+        components: {Book, ColumnBind},
         created () {
 
         },

@@ -14,6 +14,7 @@
         methods: {
             onChange(e) {
                 let f = e.target.files[0]
+                this.$http.post(this.field.action, )
                 this.$emit('input', f)
                 console.log(f)
             }

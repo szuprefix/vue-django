@@ -1,10 +1,10 @@
 <template>
     <el-collapse v-model="activeNames" @change="handleChange">
-        <el-collapse-item :name="b.name" v-for="b,i in value.blocks" :key="i">
+        <el-collapse-item :name="b.name" v-for="(b,i) in value.blocks" :key="i">
             <template slot="title">
                 <action-label v-model="b.name" :actions="actions" :context="b"></action-label>
                 <div v-if="!activeNames.includes(b.name)" class="hide-text sheet-header__columns">
-                    <span v-for="f in normalizeFields(b.fields)">{{f.label}}</span>
+                    <span v-for="f in normalizeFields(b.fields)" :key="f.name">{{f.label}}</span>
                 </div>
             </template>
             <block v-model="value.blocks[i]"></block>
