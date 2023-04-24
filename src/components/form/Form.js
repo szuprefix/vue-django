@@ -82,6 +82,7 @@ export function defaultRules(f) {
     if (f.max_length) {
         rs.push({max: f.max_length, message: `长度最大为${f.max_length}`})
     }
+    console.log(f.name, rs)
     return rs
 }
 export function normalizeItem(i) {
