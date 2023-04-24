@@ -6,7 +6,7 @@
         <el-table-column label="" align="right" fixed="right" :min-width="actionsColumnWidth"
                          v-if="actionsColumnWidth>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="topActionItems" :context="getTopActionContext" :permissionFunction="$attrs.permissionFunction"
+                <actions :items="topActionItems" :context="getTopActionContext()" :permissionFunction="$attrs.permissionFunction"
                          :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
