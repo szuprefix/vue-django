@@ -226,11 +226,11 @@
                 })
             },
             defaultBatchActionDo (action) {
-                return ({selection, scope}) => {
+                return ({selection, scope, confirmResult}) => {
                     let ids = selection.map((a) => a.id)
                     let qd = {...this._baseQueries, ...this.search}
                     return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma'})}`, {
-                        batch_action_ids: ids, ...action.context,
+                        batch_action_ids: ids, ...action.context, ...confirmResult,
                         scope
                     }).catch(this.onServerResponseError)
                 }
