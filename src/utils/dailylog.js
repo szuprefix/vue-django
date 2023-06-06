@@ -2,7 +2,7 @@
  * Created by denishuang on 2020/2/8.
  */
 import {throttle} from 'lodash'
-import axios from 'axios'
+import axios from '@/configs/axios'
 import Qs from 'qs'
 import {parseTime} from './filters'
 let INTERVAL = 5
@@ -89,7 +89,7 @@ export function Performance(app, model, ownerId, target, interval) {
 export function userOnlineTimeCounter(callBack) {
     let seconds = 30
     function action () {
-        axios.post(`/dailylog/user/count/`, {metics: 'online_time', delta:  seconds}).then(callBack)
+        axios.$http.post(`/dailylog/user/count/`, {metics: 'online_time', delta:  seconds}).then(callBack)
     }
     action()
     setInterval(action, seconds * 1000)

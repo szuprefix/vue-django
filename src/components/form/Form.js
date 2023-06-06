@@ -8,6 +8,10 @@ export const defaultProps = {
     value: Object,
     actions: Array,
     items: {type: Array, default: () => []},
+    groups: {
+        type: Array,
+        default: () => []
+    },
     url: String,
     method: {
         type: String, default: 'post'
@@ -45,9 +49,13 @@ export function defaultRuleType(f) {
         return 'array'
     }
     if (f.choices && f.choices.length > 0) {
-        return typeof (f.choices[0][0] || f.choices[0]['value'])
+        let v = f.choices[0][0] || f.choices[0]['value']
+        if(v) {
+            return typeof v
+        }
     }
-    return f.model ? 'number' : (['field', 'time', 'datetime'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
+    let rt = f.model ? 'number' : (['field', 'time', 'datetime'].includes(f.type) ? 'string' : (['integer', 'decimal'].includes(f.type) ? 'number' : f.type))
+    return rt
 }
 
 export function defaultSpan(f) {
@@ -74,6 +82,7 @@ export function defaultRules(f) {
     if (f.max_length) {
         rs.push({max: f.max_length, message: `长度最大为${f.max_length}`})
     }
+    console.log(f.name, rs)
     return rs
 }
 export function normalizeItem(i) {
@@ -101,6 +110,15 @@ export function getItemRules(items) {
     return d
 
 }
+
+export function flatAllGroupItems(gs) {
+    let rs = []
+    gs.forEach(g => {
+        rs = rs.concat(g.items)
+    })
+    return rs
+}
+
 export default  {
     defaultRules,
     defaultRuleType,
