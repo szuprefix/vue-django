@@ -61,3 +61,10 @@
 .clearfix:after {
     clear: both
 }
+
+.el-dropdown-menu__item[type="danger"],.el-dropdown-menu__item[type="danger"]:hover {
+    color: #F56C6C;
+}
+.el-dropdown-menu__item[type="warning"],.el-dropdown-menu__item[type="warning"]:hover {
+    color: #E6A23C;
+}

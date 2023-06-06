@@ -6,7 +6,7 @@
         <el-table-column label="" align="right" fixed="right" :min-width="actionsColumnWidth"
                          v-if="actionsColumnWidth>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="topActionItems" :context="getTopActionContext" :permissionFunction="$attrs.permissionFunction"
+                <actions :items="topActionItems" :context="getTopActionContext()" :permissionFunction="$attrs.permissionFunction"
                          :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
@@ -174,14 +174,24 @@
                 f.widget = f.widget || this.cellWidget || this.defaultWidget(f)
                 f.headerWidget = f.headerWidget || this.headerWidget
                 f.formatter = f.formatter || this.genDefaultFormatter(f)
-                if (f.subColumns) {
-                    f.subColumns = f.subColumns.map(i => this.normalizeItem(i))
-                }
-                if (f.rows) {
-                    f.rows = f.rows.map(i => this.normalizeItem(i))
-                    console.log(f.rows)
-                }
                 return f
+            },
+            normalizeSubItems(items) {
+                items.forEach(f => {
+                    if (f.subColumns) {
+                        f.subColumns = f.subColumns.map(i => this.normalizeItem(i))
+                    }
+                    if (f.rows) {
+                        f.rows = f.rows.map(i => {
+                            let d = this.normalizeItem(i)
+//                            if(templates && templates[d.name]){
+//                                Object.assign(d, templates[d.name])
+//                            }
+                            return d
+                        })
+//                        console.log(f.rows)
+                    }
+                })
             },
             onRowDblClick (row, column, cell, event) {
                 if (this.dblClickAction) {
@@ -204,9 +214,11 @@
                 return this.normalizeActions(this.rowActions)
             },
             tableItems(){
-                return arrayNormalize(this.items, {}, (i) => {
-                    return this.normalizeItem(i)
+                let rs = arrayNormalize(this.items, {}, (i) => {
+                    return this.normalizeItem(i, this.items)
                 })
+                this.normalizeSubItems(rs)
+                return rs
             },
             visiableItems () {
                 return this.tableItems.filter(a => a.hidden !== true && a.name !== '__dump_all__')

@@ -8,7 +8,7 @@
                :key="a.name">{{a.label}}
     </el-button>
     <el-dialog :title="dialog.title" v-if="dialog" :visible.sync="showDialog">
-      <component :is="dialog.component" v-bind="[dialog]" :submit="runCommand(dialog.action)"></component>
+        <!--<component :is="dialog.component" v-bind="[dialog]" :submit="runCommand(dialog.action)"></component>-->
     </el-dialog>
   </span>
 </template>
@@ -40,12 +40,19 @@
             },
             getConfirm(action) {
                 let cfm = action.confirm
-                if (typeof cfm === 'string'){
-                    this.$store.state.bus.$emit('opendrawer', {
-                        component: cfm,
-                        context: {...action.drawer, ...this.context}
-                    })
-                }else if (cfm instanceof Function) {
+                if (typeof cfm === 'string') {
+                    return (action, scope) => {
+                        return new Promise((resolve, reject) => {
+                            this.$store.state.bus.$emit('opendrawer', {
+                                component: cfm,
+                                context: {...action.drawer, ...this.context},
+                                onDone: (result) => {
+                                    resolve(result)
+                                }
+                            })
+                        })
+                    }
+                } else if (cfm instanceof Function) {
                     return cfm
                 } else if (cfm === false) {
                     return (action, scope) => Promise.resolve()
@@ -62,6 +69,7 @@
                 if (action && action.do) {
                     let confirmFunc = this.getConfirm(action)
                     confirmFunc(action, scope).then((confirmResult) => {
+                        console.log(confirmResult)
                         if (typeof action.do === 'function') {
                             return action.do({
                                 action, ...this.context,
@@ -75,7 +83,7 @@
                         }
                         this.$store.state.bus.$emit('opendrawer', {
                             component: action.do,
-                            context: {...action.drawer, ...this.context}
+                            context: {...action.drawer, ...this.context, scope: this.scopes[this.scope]}
                         })
 
                     }).catch(this.onServerResponseError)
