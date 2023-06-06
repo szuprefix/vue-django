@@ -49,7 +49,7 @@ export default{
             if (this.submit) {
                 return this.submit().then(this._submitSuccess)
             } else {
-                let action = this.method === 'post' ? this.$http.post : this.$http.put
+                let action = this.$http[this.method || 'post']
                 return action(this.url, this.value).then(({data}) => {
                     return this._submitSuccess(data)
                 })
