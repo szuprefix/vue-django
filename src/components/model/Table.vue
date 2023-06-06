@@ -146,6 +146,7 @@
             },
             onSearch (qd) {
                 this.search = {...qd}
+                console.log(qd)
                 this.$refs.table.updateQueries({...qd, page: 1})
             },
             onModelPosted ({appModel, id}) {
@@ -185,7 +186,24 @@
                     this.editing = true
                 })
             },
-
+            normalizeItem(a){
+                let orderingFields = get(this.model.options, 'actions.SEARCH.ordering_fields', [])
+                Object.assign(a, {field: this.model.fieldConfigs[a.name]})
+                if (!a.formatter) {
+                    a.formatter = this.genDefaultFormatter(a)
+                }
+                if (!a.useFormWidget) {
+                    a.widget = a.widget || this.defaultWidget(a)
+                }
+                if (orderingFields.includes(a.name)) {
+                    a.sortable = 'custom'
+                }
+                if(a.rows) {
+                    a.rows = a.rows.map(r => this.normalizeItem(r))
+                    console.log(a.rows)
+                }
+                return a
+            },
             normalizeItems(){
                 this.getConfig().then(config => {
 
@@ -205,20 +223,10 @@
                     })
 
                     let qns = Object.keys(this._baseQueries)
-                    let orderingFields = get(this.model.options, 'actions.SEARCH.ordering_fields', [])
-                    let rs = arrayNormalize(config.listItems, this.model.fieldConfigs, (a) => {
-                        Object.assign(a, {field: this.model.fieldConfigs[a.name]})
-                        if (!a.formatter) {
-                            a.formatter = this.genDefaultFormatter(a)
-                        }
-                        if (!a.useFormWidget) {
-                            a.widget = a.widget || this.defaultWidget(a)
-                        }
-                        if (orderingFields.includes(a.name)) {
-                            a.sortable = 'custom'
-                        }
-                        return a
-                    }).filter(a => !qns.includes(a.name))
+
+                    let rs = arrayNormalize(
+                        config.listItems, this.model.fieldConfigs, this.normalizeItem
+                    ).filter(a => !qns.includes(a.name))
                     if (this.batchActionItems.length > 0) {
                         rs = [{type: 'selection'}].concat(rs)
                     }
@@ -229,7 +237,7 @@
                 return ({selection, scope, confirmResult}) => {
                     let ids = selection.map((a) => a.id)
                     let qd = {...this._baseQueries, ...this.search}
-                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma'})}`, {
+                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma', skipNulls: true})}`, {
                         batch_action_ids: ids, ...action.context, ...confirmResult,
                         scope
                     }).catch(this.onServerResponseError)

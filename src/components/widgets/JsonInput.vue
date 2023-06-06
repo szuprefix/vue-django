@@ -1,12 +1,13 @@
 <template>
-    <el-input v-model="valueStr" :autosize="field.autosize || { minRows: 4, maxRows: 10}" type="textarea" @change="onChange"></el-input>
+    <el-input v-model="valueStr" :autosize="field.autosize || { minRows: 4, maxRows: 10}" type="textarea"
+              @change="onChange"></el-input>
 </template>
 <script>
     export default{
         props: {
             value: Object,
-            field:Object,
-            defaultValue : [String, Object, Array]
+            field: Object,
+            defaultValue: [String, Object, Array]
         },
         data () {
             return {
@@ -14,13 +15,23 @@
             }
         },
         created(){
-            this.setValue()
+            this.checkDefaultValue()
         },
         components: {},
         methods: {
+            checkDefaultValue() {
+                let v = this.value
+                if (v instanceof Object) {
+                    v = {...this.field.default, ...this.defaultValue, ...v}
+                    if (JSON.stringify(v) != JSON.stringify(this.value)) {
+                        this.$emit("input", v)
+                    } else {
+                        this.setValue()
+                    }
+                }
+            },
             setValue(){
-                this.valueStr = JSON.stringify(this.value || this.defaultValue, null, 4)
-
+                this.valueStr = JSON.stringify(this.value, null, 4)
             },
             onChange(v){
                 this.$emit("input", JSON.parse(v))
@@ -28,7 +39,8 @@
         },
         watch: {
             value(val){
-                this.setValue()
+                this.checkDefaultValue()
+//                this.setValue()
             }
         }
     }
