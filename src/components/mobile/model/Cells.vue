@@ -9,6 +9,12 @@
                 <template v-if="$scopedSlots.title" v-slot:title="scope">
                     <slot name="title" :data="c"></slot>
                 </template>
+                <template v-if="$scopedSlots.child" v-slot:child="scope">
+                    <slot name="child" :data="c"></slot>
+                </template>
+                <template v-if="$scopedSlots['inline-desc']" v-slot:inline-desc="scope">
+                    <slot name="inline-desc" :data="c"></slot>
+                </template>
             </cell>
         </group>
     </div>

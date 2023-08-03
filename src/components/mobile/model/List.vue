@@ -10,6 +10,13 @@
                 <template v-if="$scopedSlots.title" v-slot:title="scope">
                     <slot name="title" v-bind="scope"></slot>
                 </template>
+                <template v-if="$scopedSlots.child" v-slot:child="scope">
+                    <slot name="child" v-bind="scope"></slot>
+                </template>
+                <template v-if="$scopedSlots['inline-desc']" #inline-desc="scope">
+                    <slot name="inline-desc" v-bind="scope"></slot>
+                </template>
+
             </cells>
         </slot>
         <load-more :tip="tip" :show-loading="loading" v-if="currentPageSize < count"></load-more>

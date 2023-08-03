@@ -28,7 +28,7 @@
     step: '00:30',
     end: '23:59'
   }" :disabled="field.disabled"></el-time-select>
-    <el-input v-model="value[field.name]" :autosize="field.autosize || {minRows: 8, maxRows: 24}"
+    <el-input v-model="value[field.name]" :autosize="field.autosize || {minRows: 4, maxRows: 12}"
               :maxlength="field.max_length"
               :show-word-limit="value[field.name] && value[field.name].length>field.max_length*0.8 || false"
               @change="fieldValueChanged"
