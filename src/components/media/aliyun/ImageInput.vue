@@ -50,7 +50,7 @@
             },
             bucket () {
                 let state= this.$store.state
-                return get(state, 'party.settings.media.qcloud.cos.bucket') || get(state, 'qcloud.cos.bucket')
+                return get(state, 'party.settings.aliyun.oss.bucket') || get(state, 'aliyun.oss.bucket')
             }
         }
     }

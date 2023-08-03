@@ -20,7 +20,7 @@
             this.appModel = `${ps[1]}.${ps[2]}`
             let m = Model(this.appModel)
             m.loadViewsConfig().then(config => {
-                this.config = config.list
+                this.config = config.list || {}
             }).catch(() => {
                 this.config = {}
             })

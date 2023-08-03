@@ -70,15 +70,15 @@ export default function (appModel, defaults, eventor) {
             Object.keys(m).forEach((k) => {
                 let f = m[k]
                 let v = dvs[f.name] || f.default
-                if(v !== undefined){
+                if (v !== undefined) {
                     r[k] = v
                 } else if (f.type === 'boolean') {
                     r[k] = true
                 } else if (f.multiple) {
                     r[k] = []
-                }  else if ( f.type === 'string' ) {
+                } else if (f.type === 'string') {
                     r[k] = ''
-                } else if ( f.type === 'nested object' ) {
+                } else if (f.type === 'nested object') {
                     r[k] = {}
                 } else {
                     r[k] = null
@@ -91,7 +91,7 @@ export default function (appModel, defaults, eventor) {
             let m = this.fieldConfigs
             let dvs = {...this.defaults}
             Object.keys(m).forEach((k) => {
-                if(!(k in r)) {
+                if (!(k in r)) {
                     let f = m[k]
                     let v = dvs[f.name] || f.default
                     r[k] = v !== undefined ? v : (f.type === 'boolean' ? true : f.multiple ? [] : f.type === 'string' ? '' : null)
@@ -100,7 +100,7 @@ export default function (appModel, defaults, eventor) {
         },
         load () {
             return Promise.all([this.loadData(), this.loadOptions(), this.loadViewsConfig()]).then(rs => {
-                let data = rs[0], restOptions=rs[1]
+                let data = rs[0], restOptions = rs[1]
                 if (!this.id) {
                     data = this.emptyDataFromOptions(restOptions.actions.POST)
                 }
@@ -123,11 +123,15 @@ export default function (appModel, defaults, eventor) {
                 return data
             }) // .catch((error) => this.onErrors(error))
         },
-        doAction (action, data) {
+        doAction (action, data, method) {
+            if (!method) {
+                method = 'post'
+            }
+            method = axios[method]
             if (!this.id) {
-                return axios.post(`${this.getListUrl()}${action}/`, data)
+                return method(`${this.getListUrl()}${action}/`, data)
             } else {
-                return axios.post(`${this.getDetailUrl()}${action}/`, data)
+                return method(`${this.getDetailUrl()}${action}/`, data)
             }
         },
         selectOrCreate (d) {
@@ -245,6 +249,9 @@ export default function (appModel, defaults, eventor) {
             }
             return r
         },
+        getOptionDisplayName(f, v) {
+            return this.fieldConfigs[f].choices.find(a => a.value===v).display_name
+        }
     }
     m.init()
     return m
