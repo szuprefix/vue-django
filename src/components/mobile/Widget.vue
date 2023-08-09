@@ -19,7 +19,7 @@
               :ref="field.name"
               v-else-if="field.widget === 'checkbox'"></x-switch>
     <x-number v-bind="[field]" :title="field.label" v-model="value[field.name]"
-              :ref="field.name"
+              :ref="field.name" @input="fieldValueChanged"
               v-else-if="field.widget === 'number'"></x-number>
     <datetime v-bind="[field]" :title="field.label" v-model="value[field.name]"
               :ref="field.name"
