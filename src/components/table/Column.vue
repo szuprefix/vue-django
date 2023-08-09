@@ -5,7 +5,7 @@
     <el-table-column :label="f.label" v-else-if="f.rows">
         <template slot-scope="{row,$index}">
             <div v-for="rf in f.rows" :key="rf.name">
-                <widget :field="rf" :value.sync="row" :context="context(row,$index)"></widget>
+                {{rf.label}}<widget :field="rf" :value.sync="row" :context="context(row,$index)"></widget>
             </div>
         </template>
     </el-table-column>

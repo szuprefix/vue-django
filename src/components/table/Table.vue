@@ -179,17 +179,10 @@
             normalizeSubItems(items) {
                 items.forEach(f => {
                     if (f.subColumns) {
-                        f.subColumns = f.subColumns.map(i => this.normalizeItem(i))
+                        f.subColumns = arrayNormalize(f.subColumns,{}, this.normalizeItem)
                     }
                     if (f.rows) {
-                        f.rows = f.rows.map(i => {
-                            let d = this.normalizeItem(i)
-//                            if(templates && templates[d.name]){
-//                                Object.assign(d, templates[d.name])
-//                            }
-                            return d
-                        })
-//                        console.log(f.rows)
+                        f.rows = arrayNormalize(f.rows,{}, this.normalizeItem)
                     }
                 })
             },
@@ -214,9 +207,7 @@
                 return this.normalizeActions(this.rowActions)
             },
             tableItems(){
-                let rs = arrayNormalize(this.items, {}, (i) => {
-                    return this.normalizeItem(i, this.items)
-                })
+                let rs = arrayNormalize(this.items, {}, this.normalizeItem)
                 this.normalizeSubItems(rs)
                 return rs
             },

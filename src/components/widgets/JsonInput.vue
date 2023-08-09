@@ -34,7 +34,13 @@
                 this.valueStr = JSON.stringify(this.value, null, 4)
             },
             onChange(v){
-                this.$emit("input", JSON.parse(v))
+                let jv
+                try {
+                    jv = JSON.parse(v)
+                    this.$emit("input", jv)
+                } catch(e) {
+                    this.$message({type: 'error', message: 'json格式不正确'})
+                }
             }
         },
         watch: {

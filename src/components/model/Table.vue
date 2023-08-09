@@ -198,10 +198,6 @@
                 if (orderingFields.includes(a.name)) {
                     a.sortable = 'custom'
                 }
-                if(a.rows) {
-                    a.rows = a.rows.map(r => this.normalizeItem(r))
-                    console.log(a.rows)
-                }
                 return a
             },
             normalizeItems(){
@@ -230,7 +226,18 @@
                     if (this.batchActionItems.length > 0) {
                         rs = [{type: 'selection'}].concat(rs)
                     }
+                    this.normalizeSubItems(rs)
                     this.tableItems = rs
+                })
+            },
+            normalizeSubItems(items) {
+                items.forEach(f => {
+                    if (f.subColumns) {
+                        f.subColumns = arrayNormalize(f.subColumns,this.model.fieldConfigs,this.normalizeItem)
+                    }
+                    if (f.rows) {
+                        f.rows = arrayNormalize(f.rows,this.model.fieldConfigs,this.normalizeItem)
+                    }
                 })
             },
             defaultBatchActionDo (action) {
