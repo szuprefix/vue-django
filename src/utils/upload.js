@@ -53,7 +53,7 @@ export function aliOssClient(OSS, signUrl) {
 }
 export function aliUpload(fileName, file, options) {
     return aliOssLoad().then(OSS => {
-        return aliOssClient(OSS, options.signUrl)
+        return aliOssClient(OSS, `${options.signUrl}?name=${fileName}`)
     }).then(client => {
         options = {
             partSize: 100 * 1024,
@@ -124,7 +124,11 @@ export function genFileName(file, nameTemplate) {
 }
 
 export function upload(file, options) {
-    return genFileName(file, options.fileName).then(fileName => awsUpload(fileName, file, options))
+    let func = awsUpload
+    if(options.vendor === 'aliyun') {
+        func = aliUpload
+    }
+    return genFileName(file, options.fileName).then(fileName => func(fileName, file, options))
 }
 
 export default upload

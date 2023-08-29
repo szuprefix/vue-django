@@ -1,10 +1,13 @@
 <template>
-    <image-upload v-bind="[$attrs, $props, field]" :context="context" :bucket="bucket"
-                  :urls="imageUrls" @success="onSuccess" @remove="onRemove">
-    </image-upload>
+    <div>
+        <image-upload v-bind="[$attrs, $props, field]" :context="field.options"
+                      :urls="imageUrls" @success="onSuccess" @remove="onRemove">
+        </image-upload>
+        <el-input v-if="limit === 1" v-model="context[field.name]"></el-input>
+    </div>
 </template>
 <script>
-    import ImageUpload from './qcloud/ImageUpload.vue'
+    import ImageUpload from './ImageUpload.vue'
     import {template, get} from 'lodash'
     export default{
         props: {
@@ -24,7 +27,7 @@
         methods: {
             onSuccess({fileList}) {
                 this.changeFileList(fileList)
-                if(this.field.onSuccess) {
+                if (this.field.onSuccess) {
                     this.field.onSuccess({fileList, ...this.$props})
                 }
             },
@@ -32,12 +35,14 @@
                 this.changeFileList(fileList)
             },
             changeFileList (fileList) {
-                let limit = this.$attrs.limit || this.field.limit
                 let urls = fileList.map(f => f.url)
-                this.$emit('input', limit === 1 ? (urls.length > 0 ? urls[0] : null) : urls)
+                this.$emit('input', this.limit === 1 ? (urls.length > 0 ? urls[0] : null) : urls)
             }
         },
         computed: {
+            limit () {
+                return this.$attrs.limit || this.field.limit
+            },
             imageUrls () {
                 let v = this.value
                 if (!v) {
@@ -47,11 +52,7 @@
                     return [v]
                 }
                 return v
-            },
-            bucket () {
-                let state= this.$store.state
-                return get(state, 'party.settings.media.qcloud.cos.bucket') || get(state, 'qcloud.cos.bucket')
             }
-        }
+        },
     }
 </script>
