@@ -1,6 +1,6 @@
 <template>
     <el-image fit='fill' v-bind="[field, $attrs, $props]" :src="url"
-              v-if="url" style="cursor: pointer" @click="open" v-loading="loading">
+              v-if="url" style="cursor: pointer" @click="open" v-loading="loading" @error="tryProxy=true">
         <div slot="error" class="image-error"  @click="open">
             <i class="el-icon-picture-outline"></i>
         </div>
@@ -20,7 +20,8 @@
         },
         data () {
             return {
-                loading:false
+                loading: false,
+                tryProxy: false
             }
         },
         components: {},
@@ -59,7 +60,7 @@
                 if (!this.isLink(url)) {
                     url = `${this.rootPath}${url}`
                 }
-                if (this.theProxy) {
+                if (url && this.theProxy && this.tryProxy) {
                     url = `${this.theProxy}${url}`
                 }
                 return url

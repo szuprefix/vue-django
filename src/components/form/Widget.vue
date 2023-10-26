@@ -53,7 +53,7 @@
               :show-word-limit="value[field.name] && value[field.name].length>field.max_length*0.8 || false"
               :show-password="field.widget === 'password'"
               :type="['password', 'textarea'].includes(field.widget)?field.widget:'text'"
-              v-on:keyup.enter="field.onEnter || doNothing" :disabled="field.disabled">
+              :disabled="field.disabled">
         <i slot="prefix" v-if="field.icon" :class="`fa fa-${field.icon}`"></i>
         <i slot="suffix" v-if="isLink(value[field.name])" :class="`fa fa-link`" style="cursor: pointer" title="点击跳转" @click="goLink"></i>
     </el-input>

@@ -73,7 +73,7 @@ export function awsUpload(fileName, file, options) {
         let url = data.url
         let hs = {
             'Content-Type': file.type,
-            'x-amz-acl': 'public-read',
+            // 'x-amz-acl': 'public-read',
             // 'Expect': '100-continue'
         }
         let region = data.region
