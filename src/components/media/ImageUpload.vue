@@ -38,6 +38,7 @@
         },
         data () {
             return {
+                urlMap: {},
                 fileList: [],
                 elUploader: undefined,
                 dialogImageUrl: '',
@@ -60,19 +61,31 @@
                 this.dialogVisible = true
             },
             onProgress(event, file, fileList){
-//                console.log(['progress', event, file, fileList])
+                console.log('progress', event, file, fileList)
             },
             onError(err, file, fileList){
-                console.log(['error', err, file, fileList])
+                this.$message(`${file.name}上传失败！错误(${err.code}):${err.msg}`)
+                console.log('error', err, file, fileList)
             },
             onSuccess(response, file, fileList){
-                let sf = fileList.find(f => f.uid === file.uid)
-                if (!sf) {
-                    console.error('file not found:', file.uid)
-                    return
+                if (fileList) {
+                    let sf = fileList.find(f => f.uid === file.uid)
+                    if (!sf) {
+                        console.error('file not found:', file.uid)
+                        return
+                    }
+                    sf.url = response.url
                 }
-                sf.url = response.url
-                this.$emit('success', {response, file, fileList, limit: this.$attrs.limit})
+                let urls = fileList.map(f => {
+//                    console.log('map', f.uid, this.urlMap[f.uid])
+                    return this.urlMap[f.uid] || f.url
+                })
+//                console.log('success', file.uid, this.urlMap, urls)
+                let b = fileList.find(f => !this.urlMap[f.uid])
+                if (!b) {
+                    console.log('all success', fileList)
+                    this.$emit('success', {response, file, fileList, urls, limit: this.$attrs.limit})
+                }
             },
             onRemove(file, fileList) {
                 this.fileList = fileList
@@ -80,6 +93,7 @@
             },
             onChange (file, fileList) {
                 this.fileList = fileList
+//                console.log('change', file, fileList)
             },
             toggleAdd () {
                 if (this.$attrs.limit === 1) {
@@ -101,7 +115,11 @@
             uploadFile (req) {
                 let file = req.file
                 let options = {...this.$store.state.imageUploadOptions, ...this.context}
-                return upload(file, options)
+                return upload(file, options).then(r => {
+                    this.urlMap[file.uid] = r.url
+//                    this.onSuccess(r, file)
+                    return r
+                })
             }
         },
         watch: {

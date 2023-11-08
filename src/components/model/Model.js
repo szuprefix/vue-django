@@ -128,10 +128,13 @@ export default function (appModel, defaults, eventor) {
                 method = 'post'
             }
             method = axios[method]
+            if(action.length>0 && !action.endsWith('/')){
+                action= `${action}/`
+            }
             if (!this.id) {
-                return method(`${this.getListUrl()}${action}/`, data)
+                return method(`${this.getListUrl()}${action}`, data)
             } else {
-                return method(`${this.getDetailUrl()}${action}/`, data)
+                return method(`${this.getDetailUrl()}${action}`, data)
             }
         },
         selectOrCreate (d) {
