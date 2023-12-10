@@ -89,7 +89,8 @@
             },
             onRemove(file, fileList) {
                 this.fileList = fileList
-                this.$emit('remove', {file, fileList})
+                let urls = fileList.map(a => a.url)
+                this.$emit('remove', {file, fileList, urls})
             },
             onChange (file, fileList) {
                 this.fileList = fileList

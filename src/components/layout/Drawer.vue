@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-if="drawer" v-bind="[$attrs]" :size="size" :visible.sync="drawer" @closed="drawer = undefined"
+    <el-drawer v-if="drawer" v-bind="[$attrs]" :title="title" :size="size" :visible.sync="drawer" @closed="drawer = undefined"
                ref="drawer">
         <component :is="drawer.component" v-bind="[drawer.context]" @done="onDialogDone"></component>
     </el-drawer>
@@ -10,6 +10,7 @@
             return {
                 drawer: undefined,
                 size: '30%',
+                title: '',
                 onDone: undefined
             }
         },
@@ -26,6 +27,7 @@
                     import('@/views/' + c + '.vue').then(module => {
                         this.drawer = {component: module.default, context: this.filterContext(context.context)}
                         this.size = context.context.size || '30%'
+                        this.title = context.context.title || context.label
                     })
                 } else {
                     this.drawer = {...context}
