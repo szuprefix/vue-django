@@ -1,5 +1,7 @@
 <template>
     <div>
+        <image-urls-input v-if="limit>1" @new="addUrls" :plugin="field.plugin">
+        </image-urls-input>
         <image-upload v-bind="[$attrs, $props, field]" :context="field.options"
                       :urls="imageUrls" @success="onSuccess" @remove="onRemove">
         </image-upload>
@@ -8,7 +10,8 @@
 </template>
 <script>
     import ImageUpload from './ImageUpload.vue'
-    import {template, get} from 'lodash'
+    import ImageUrlsInput from './ImageUrlsInput.vue'
+    import {template, get, uniq} from 'lodash'
     export default{
         props: {
             value: [String, Array],
@@ -17,26 +20,32 @@
         },
         data () {
             return {
+                urlToAdd: ''
 //                fileName: undefined
             }
         },
         created () {
 //            console.log(this.context)
         },
-        components: {ImageUpload},
+        components: {ImageUpload, ImageUrlsInput},
         methods: {
-            onSuccess({fileList}) {
-                this.changeFileList(fileList)
+            onSuccess({fileList, urls}) {
+                this.changeFileList(urls)
                 if (this.field.onSuccess) {
-                    this.field.onSuccess({fileList, ...this.$props})
+                    this.field.onSuccess({fileList, urls, ...this.$props})
                 }
             },
-            onRemove ({fileList}) {
-                this.changeFileList(fileList)
+            onRemove ({fileList, urls}) {
+                this.changeFileList(urls)
             },
-            changeFileList (fileList) {
-                let urls = fileList.map(f => f.url)
+            changeFileList (urls) {
+                console.log('changeFileList', urls)
+                //let urls = fileList.map(f => f.url)
                 this.$emit('input', this.limit === 1 ? (urls.length > 0 ? urls[0] : null) : urls)
+            },
+            addUrls(urls){
+                console.log('new', urls, this.imageUrls)
+                this.$emit('input', uniq(this.imageUrls.concat(urls)))
             }
         },
         computed: {
