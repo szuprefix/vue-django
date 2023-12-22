@@ -55,7 +55,8 @@
             },
             parent: Object,
             parentMultipleRelationFieldName: String,
-            parentRelationQueryName: String,
+            parentRelationQuery: Object,
+//            parentRelationQueryName: String,
             options: {
                 type: Object,
                 default: () => {
@@ -311,9 +312,10 @@
                 let r = {}
                 if (this.parent) {
                     let parent = this.parent
-                    if (this.parentRelationQueryName) {
-                        r[this.parentRelationQueryName] = parent.id
-                        return r
+                    if (this.parentRelationQuery) {
+                        return this.parentRelationQuery
+//                        r[this.parentRelationQueryName] = parent.id
+//                        return r
                     }
                     let f = this.parentMultipleRelationField
                     if (f) {
@@ -423,6 +425,7 @@
                     topActions,
                     rowActions,
                     topActionContext: {table: this},
+                    rowActionContext: {model: this.model},
 //                    excelFormat: this.excelFormat,
                     permissionFunction: this.checkPermission,
                     dblClickAction: 'edit',

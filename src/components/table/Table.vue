@@ -6,11 +6,11 @@
         <el-table-column label="" align="right" fixed="right" :min-width="actionsColumnWidth"
                          v-if="actionsColumnWidth>0">
             <template slot="header" slot-scope="scope" v-if="topActions">
-                <actions :items="topActionItems" :context="getTopActionContext()" :permissionFunction="$attrs.permissionFunction"
+                <actions :items="topActionItems" :context="getTopActionContext(scope)" :permissionFunction="$attrs.permissionFunction"
                          :map="avairableActions"></actions>
             </template>
             <template slot-scope="scope" v-if="rowActions">
-                <actions :items="rowActionItems" :context="scope" :class="{'hover-show': hoverShow}" trigger="hover"
+                <actions :items="rowActionItems" :context="getRowActionContext(scope)" :class="{'hover-show': hoverShow}" trigger="hover"
                          :map="avairableActions"></actions>
             </template>
         </el-table-column>
@@ -194,8 +194,12 @@
                     }
                 }
             },
-            getTopActionContext() {
-                let ctx = {tableData: this.tableData, ...this.topActionContext}
+            getTopActionContext(scope) {
+                let ctx = {tableData: this.tableData, ...this.topActionContext, ...scope}
+                return ctx
+            },
+            getRowActionContext(scope) {
+                let ctx = {...this.$attrs.rowActionContext, ...scope}
                 return ctx
             }
         },

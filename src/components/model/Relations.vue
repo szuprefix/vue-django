@@ -11,6 +11,8 @@
     import Model from './Model'
     import arrayNormalize from '../../utils/array_normalize'
     import ModelTable from './Table.vue'
+    import Qs from 'qs'
+    import {forEach} from 'lodash'
     export default{
         props: {
             parent: Object,
@@ -31,10 +33,18 @@
             normalizeItems () {
                 let items = this.items || this.parent.viewsConfig.relations || []
                 this.modelItems = arrayNormalize(items, {}, (a, i) => {
-                    let ps = a.name.split(':')
+                    let ps = a.name.split(':', 2)
                     a.name = ps[0]
                     if(ps.length>1) {
-                        a.parentRelationQueryName=ps[1]
+                        let qd = {}
+                        forEach(Qs.parse(ps[1]) , (v, k) => {
+                            qd[k] = this.parent.data[v || 'id']
+                        })
+                        // let pfn=ps.length>2?ps[1]:'id'
+//                        qd[ps[1]] = this.parent.data[pfn]
+                        a.parentRelationQuery=qd
+                        console.log('parentRelationQuery', qd, this.parent)
+//                        a.parentRelationQueryName=ps[1]
                     }
                     let m = a.model = Model(a.name)
                     a.icon = a.icon || m.config.icon
