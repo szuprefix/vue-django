@@ -154,7 +154,8 @@
                 return {
                     excelGetAllData: this.excelGetAllData,
                     topActions: this.$attrs.topActions || ['refresh', 'download'],
-                    avairableActions: this.avairableActions
+                    avairableActions: this.avairableActions,
+                    rowActionContext: this.$attrs.rowActionContext
                 }
             },
 

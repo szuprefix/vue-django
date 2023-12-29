@@ -31,42 +31,42 @@ export function fileFromResponse(response) {
     }
     return new window.File([response.data], `${baseName}.${extName}`, {type: ct})
 }
-
-export function aliOssLoad() {
-    return import('ali-oss').then(module => {
-        return module.default
-    })
-}
-export function aliOssClient(OSS, signUrl) {
-    return window.http.post(signUrl).then(({data}) => {
-        let creds = data.Credentials
-        const client = new OSS({
-            region: data.region,
-            accessKeyId: creds.AccessKeyId,
-            accessKeySecret: creds.AccessKeySecret,
-            stsToken: creds.SecurityToken,
-            bucket: data.bucket
-        })
-
-        return client
-    })
-}
-export function aliUpload(fileName, file, options) {
-    return aliOssLoad().then(OSS => {
-        return aliOssClient(OSS, `${options.signUrl}?name=${fileName}`)
-    }).then(client => {
-        options = {
-            partSize: 100 * 1024,
-            meta: {},
-            ...options
-        }
-        let co = client.options
-        // console.log(co)
-        return client.multipartUpload(fileName, file, options).then(res => {
-            return {fileName, file, url: `https://${co.bucket}.${co.endpoint.hostname}/${res.name}`}
-        })
-    })
-}
+//
+// export function aliOssLoad() {
+//     return import('ali-oss').then(module => {
+//         return module.default
+//     })
+// }
+// export function aliOssClient(OSS, signUrl) {
+//     return window.http.post(signUrl).then(({data}) => {
+//         let creds = data.Credentials
+//         const client = new OSS({
+//             region: data.region,
+//             accessKeyId: creds.AccessKeyId,
+//             accessKeySecret: creds.AccessKeySecret,
+//             stsToken: creds.SecurityToken,
+//             bucket: data.bucket
+//         })
+//
+//         return client
+//     })
+// }
+// export function aliUpload(fileName, file, options) {
+//     return aliOssLoad().then(OSS => {
+//         return aliOssClient(OSS, `${options.signUrl}?name=${fileName}`)
+//     }).then(client => {
+//         options = {
+//             partSize: 100 * 1024,
+//             meta: {},
+//             ...options
+//         }
+//         let co = client.options
+//         // console.log(co)
+//         return client.multipartUpload(fileName, file, options).then(res => {
+//             return {fileName, file, url: `https://${co.bucket}.${co.endpoint.hostname}/${res.name}`}
+//         })
+//     })
+// }
 
 export function awsUpload(fileName, file, options) {
     return window.http.post(`${options.signUrl}?name=${fileName}`).then(({data}) => {
@@ -125,9 +125,9 @@ export function genFileName(file, nameTemplate) {
 
 export function upload(file, options) {
     let func = awsUpload
-    if(options.vendor === 'aliyun') {
-        func = aliUpload
-    }
+    // if(options.vendor === 'aliyun') {
+    //     func = aliUpload
+    // }
     return genFileName(file, options.fileName).then(fileName => func(fileName, file, options))
 }
 

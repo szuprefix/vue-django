@@ -70,6 +70,7 @@
                 if (typeof context === 'function') {
                     context = context()
                 }
+                console.log(context)
                 confirmFunc(action).then(() => {
                     let command = action.do
                     let result

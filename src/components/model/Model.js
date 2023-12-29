@@ -123,15 +123,18 @@ export default function (appModel, defaults, eventor) {
                 return data
             }) // .catch((error) => this.onErrors(error))
         },
-        doAction (action, data, method) {
+        doAction (action, data, method, id) {
             if (!method) {
                 method = 'post'
+            }
+            if (!id) {
+                id = this.id
             }
             method = axios[method]
             if(action.length>0 && !action.endsWith('/')){
                 action= `${action}/`
             }
-            if (!this.id) {
+            if (!id) {
                 return method(`${this.getListUrl()}${action}`, data)
             } else {
                 return method(`${this.getDetailUrl()}${action}`, data)
