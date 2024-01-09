@@ -1,5 +1,6 @@
-import Vue from 'vue'
+// import Vue from 'vue'
 
+import axios from '@/configs/axios'
 const party = {
     state: {
         name: null,
@@ -13,9 +14,9 @@ const party = {
     },
     actions: {
         getPartyInfo ({commit, rootState}){
-            return Vue.http.get("/saas/party/current/").then(({data}) => {
+            return axios.get("/saas/party/current/").then(({data}) => {
                 commit("setParty", data)
-                rootState.bus.$emit('party-ready', data)
+                rootState.bus.emit('party-ready', data)
                 return data
             })
         }

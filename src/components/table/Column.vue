@@ -3,7 +3,7 @@
         <table-column :field="sf" v-for="sf in f.subColumns" :key="sf.name"></table-column>
     </el-table-column>
     <el-table-column :label="f.label" v-else-if="f.rows">
-        <template slot-scope="{row,$index}">
+        <template #default="{row,$index}">
             <div v-for="rf in f.rows" :key="rf.name">
                 {{rf.label}}<widget :field="rf" :value.sync="row" :context="context(row,$index)"></widget>
             </div>
@@ -19,7 +19,7 @@
                      v-bind="f" :class-name="f.type" :key="f.name"
                      v-else>
 
-        <template slot="header">
+        <template #header>
             <component :is="f.headerWidget" v-model="f.name" :field="f" :actions="f.actions" :context="f"
                        @changed="f.headerChange"
                        v-if="f.headerWidget && typeof f.headerWidget == 'object'"></component>
@@ -27,7 +27,7 @@
                   v-html="f.headerWidget(row)"></span>
             <template v-else>{{f.label || f.name}}</template>
         </template>
-        <template slot-scope="{row,$index}">
+        <template #default="{row,$index}">
             <el-tooltip v-if="row.$errors && row.$errors[f.name]" effect="dark"
                         :content="row.$errors[f.name].join('\n')" placement="top">
 

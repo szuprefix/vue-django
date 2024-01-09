@@ -1,14 +1,12 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import {routerMode} from '@/configs/apps'
+import {createRouter, createWebHashHistory} from 'vue-router'
+//import {routerMode} from '@/configs/apps'
 
-Vue.use(Router)
 
 export const constRoutes = [
     {
         path: '/auth/login/',
         meta: {title: '登录', layout: 'main'},
-        component: resolve => require(['../views/auth/login.vue'], resolve)
+        component: () => import('../views/auth/login.vue')
     },
     {
         path: '/auth/change_password/',
@@ -21,8 +19,9 @@ export const constRoutes = [
         component: resolve => require(['../views/unimplemented.vue'], resolve)
     }
 ]
-let router = new Router({
-    mode: routerMode,
+let router = createRouter({
+    //mode: routerMode,
+    history: createWebHashHistory(),
     routes: constRoutes
 })
 

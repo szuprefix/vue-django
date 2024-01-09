@@ -1,8 +1,8 @@
 /**
  * Created by denishuang on 2017/11/16.
  */
-import {formatRelative, subDays, distance_in_words_to_now} from 'date-fns'
-import zh_cn from 'date-fns/locale/zh_cn'
+import {formatRelative, subDays, formatDistance} from 'date-fns'
+import {zhCN} from 'date-fns/locale'
 
 export function dateTime (t) {
     if (typeof t === 'string' && !t.includes('+')) {
@@ -16,7 +16,7 @@ export function date2now (d) {
 }
 
 export function date (d) {
-    return distance_in_words_to_now(d, {locale: zh_cn})
+    return formatDistance(d, {locale: zhCN})
 }
 
 function pluralize (time, label) {

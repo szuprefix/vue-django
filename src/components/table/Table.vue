@@ -9,7 +9,7 @@
                 <actions :items="topActionItems" :context="getTopActionContext()" :permissionFunction="$attrs.permissionFunction"
                          :map="avairableActions"></actions>
             </template>
-            <template slot-scope="scope" v-if="rowActions">
+            <template #default="scope" v-if="rowActions">
                 <actions :items="rowActionItems" :context="scope" :class="{'hover-show': hoverShow}" trigger="hover"
                          :map="avairableActions"></actions>
             </template>
@@ -241,7 +241,7 @@
             },
 
             elListeners () {
-                return {'row-dblclick': this.onRowDblClick, ...this.$listeners}
+                return {'row-dblclick': this.onRowDblClick,} //...this.$listeners
             },
             elAttrs () {
                 return {'span-method': this.spanMethod, ...this.$attrs}

@@ -5,7 +5,7 @@
 import arrayNormalize from '../../utils/array_normalize'
 
 export const defaultProps = {
-    value: Object,
+    modelValue: Object,
     actions: Array,
     items: {type: Array, default: () => []},
     groups: {

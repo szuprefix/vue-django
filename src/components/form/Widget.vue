@@ -1,5 +1,38 @@
+<script setup>
+    const props = defineProps({
+        value: Object,
+        field: Object,
+        context: Object
+    })
+
+
+    function fieldValueChanged(value) {
+        let d = {
+            form: this.value,
+            field: this.field,
+            value,
+            context: this.context
+        }
+        if (this.field.onChanged) {
+            this.field.onChanged(d)
+        }
+        this.$emit('change', d)
+    }
+    function doNothing() {
+        console.log('do nothing')
+    }
+    function isLink(v) {
+        return v && (typeof v === 'string') && (v.startsWith('http://') || v.startsWith('https://'))
+    }
+    function goLink() {
+        window.open(this.value[this.field.name])
+    }
+
+</script>
 <template>
-    <span v-if="field.widget === 'readonly'" style="white-space: pre-wrap"><a v-if="isLink(value[field.name])" :href="value[field.name]" target="_blank">{{value[field.name]}}</a><template v-else>{{value[field.name]}}</template></span>
+    <span v-if="field.widget === 'readonly'" style="white-space: pre-wrap"><a v-if="isLink(value[field.name])"
+                                                                              :href="value[field.name]" target="_blank">{{value[field.name]}}</a><template
+            v-else>{{value[field.name]}}</template></span>
     <span v-else-if="typeof(field.widget) === 'function'" v-html="field.widget(value,field)"></span>
     <el-radio-group v-model="value[field.name]" v-else-if="field.widget === 'radio'" @change="fieldValueChanged"
                     :disabled="field.disabled">
@@ -16,9 +49,10 @@
                @change="fieldValueChanged" v-bind="[field]">
     </el-switch>
     <el-input-number v-model="value[field.name]" v-else-if="field.widget === 'number'" v-bind="[field]"
-                   controls-position="right"  :controls="field.type === 'integer'" @change="fieldValueChanged">
+                     controls-position="right" :controls="field.type === 'integer'" @change="fieldValueChanged">
     </el-input-number>
-    <el-date-picker v-model="value[field.name]" :type="field.widget" :value-format="field.widget === 'date' ? 'yyyy-MM-dd': 'yyyy-MM-ddTHH:mm:ss'"
+    <el-date-picker v-model="value[field.name]" :type="field.widget"
+                    :value-format="field.widget === 'date' ? 'yyyy-MM-dd': 'yyyy-MM-ddTHH:mm:ss'"
                     :placeholder="field.placeholder || field.label" :readonly="field.read_only"
                     v-else-if="['date','datetime'].includes(field.widget)"
                     @change="fieldValueChanged" :disabled="field.disabled">
@@ -55,49 +89,10 @@
               :type="['password', 'textarea'].includes(field.widget)?field.widget:'text'"
               :disabled="field.disabled">
         <i slot="prefix" v-if="field.icon" :class="`fa fa-${field.icon}`"></i>
-        <i slot="suffix" v-if="isLink(value[field.name])" :class="`fa fa-link`" style="cursor: pointer" title="点击跳转" @click="goLink"></i>
+        <i slot="suffix" v-if="isLink(value[field.name])" :class="`fa fa-link`" style="cursor: pointer" title="点击跳转"
+           @click="goLink"></i>
     </el-input>
 </template>
-<script>
-    export default {
-        props: {
-            value: Object,
-            field: Object,
-            context: Object
-        },
-        data() {
-            return {}
-        },
-        created() {
-//                       console.log(this.field)
-        },
-        components: {},
-        methods: {
-            fieldValueChanged(value) {
-                let d = {
-                    form: this.value,
-                    field: this.field,
-                    value,
-                    context: this.context
-                }
-                if (this.field.onChanged) {
-                    this.field.onChanged(d)
-                }
-                this.$emit('change', d)
-            },
-            doNothing(){
-                console.log('do nothing')
-            },
-            isLink(v) {
-                return v && (typeof v === 'string') && (v.startsWith('http://') || v.startsWith('https://'))
-            },
-            goLink() {
-                window.open(this.value[this.field.name])
-            }
-        },
-        computed: {}
-    }
-</script>
 
 <style>
     .related-select {

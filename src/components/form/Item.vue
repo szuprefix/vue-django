@@ -1,3 +1,23 @@
+<script setup>
+    import Widget from './Widget.vue'
+    import { useAttrs, computed, onMounted } from 'vue'
+    const props = defineProps({
+        field: Object,
+        value: Object,
+        options: {
+            type: Object,
+            default: () => {
+                return {}
+            }
+        },
+        error: String
+    })
+    const attrs = useAttrs()
+    const noLabel = computed(() =>{
+        return attrs.noLabel || props.field.noLabel
+    })
+    console.log(props.field.name)
+</script>
 <template>
     <el-form-item :prop="field.name" v-bind="[field, $attrs]" :error="error" :ref="field.name"
                   :style="noLabel && {} || $attrs.itemStyle || {minWidth: '350px'}">
@@ -10,36 +30,8 @@
         </template>
         <template slot="label" v-else><span></span></template>
         <template>
-            <widget v-model="value" :field="field"></widget>
+            <widget v-bind="pros" @update="v => $emit('update', v)"></widget>
         </template>
     </el-form-item>
 </template>
-<script>
-    import Widget from './Widget.vue'
-    export default{
-        props: {
-            field: Object,
-            value: Object,
-            options: {
-                type: Object,
-                default: () => {
-                    return {}
-                }
-            },
-            error: String
-        },
-        data () {
-            return {}
-        },
-        components: {
-            Widget,
-        },
-        methods: {},
-        computed: {
-            noLabel() {
-                return this.$attrs.noLabel || this.field.noLabel
-            }
-        }
-    }
-</script>
 

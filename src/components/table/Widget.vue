@@ -1,6 +1,6 @@
 <template>
-    <form-widget v-if="field.useFormWidget" v-model="value" v-bind="[$attrs,$props]"></form-widget>
-    <component :is="field.widget" v-model="value" v-bind="[$attrs,$props]"
+    <form-widget v-if="field.useFormWidget" v-bind="[$attrs,$props]"></form-widget>
+    <component :is="field.widget" v-bind="[$attrs,$props]"
                v-else-if="field.widget && typeof field.widget == 'object'"></component>
     <span v-else-if="field.widget && typeof field.widget == 'function'"
           v-html="field.widget(value, field)"></span>
@@ -16,7 +16,8 @@
             context: Object
         },
         data () {
-            return {}
+            return {
+            }
         },
         components: {FormWidget},
         methods: {},

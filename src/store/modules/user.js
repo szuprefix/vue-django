@@ -1,7 +1,7 @@
 /**
  * Created by denishuang on 2020/5/15.
  */
-import Vue from 'vue'
+// import Vue from 'vue'
 import {UserStorage} from '../../utils/user_storage'
 import {logout} from '../../utils/auth'
 export default {

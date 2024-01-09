@@ -4,7 +4,7 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-import Vue from 'vue'
+// import Vue from 'vue'
 
 let instance = axios.create()
 
@@ -33,7 +33,7 @@ instance.interceptors.response.use(function (response) {
     }
 })
 
-Vue.prototype.$http = Vue.http = instance
+// Vue.prototype.$http = Vue.http = instance
 
 instance.setBaseURL = (url) => {
     // instance.defaults.baseURL = genBaseUrl(url)
@@ -50,5 +50,10 @@ instance.setBaseURL = (url) => {
 }
 instance.setAuthToken = (token) => {
     instance.defaults.headers['Authorization'] = `Token ${token}`
+}
+export const AxiosPlugin = {
+    install(app) {
+        app.config.globalProperties.$http = instance;
+    },
 }
 export default instance
