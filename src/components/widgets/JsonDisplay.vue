@@ -6,9 +6,16 @@
             <el-col :xs="a.span.xs" :sm="a.span.sm" :md="a.span.md" :lg="a.span.lg" :xl="a.span.xl"
                     :key="a.name">
                 <span class="label">{{a.label}}</span>
-                <span> <template v-if="a.choices">
+                <span>
+                <component :is="a.widget" v-if="a.widget" v-bind="[$attrs, $props]" :field="a"></component>
+                    <template v-else>
+                    <template v-if="a.choices">
                         {{displayChoice(a.choices, a.value)}}
-                    </template><a :href="a.value" target='_blank' v-if="isLink(a.value)">{{a.value}}</a> <template v-else>{{a.value}}</template>&nbsp;</span>
+                    </template>
+                        <a :href="a.value" target='_blank' v-if="isLink(a.value)">{{a.value}}</a>
+                        <template v-else>{{a.value}}</template>&nbsp;
+                    </template>
+                </span>
             </el-col>
         </template>
 
@@ -16,6 +23,7 @@
 </template>
 <script>
     import arrayNormalize from '../../utils/array_normalize'
+    import {get} from 'lodash'
     export default{
         props: {
             value: Object,
@@ -36,7 +44,7 @@
                 let d = this.value
                 let items = this.field.items || []
                 this.items = arrayNormalize(items, {}, a => {
-                    a.value = d[a.name]
+                    a.value = get(d, a.name)
                     let sp = a.span
                     a.span = sp && (typeof  sp === 'number' && {xs: sp, sm: sp, md: sp, lg: sp, xl: sp} || sp) || {}
                     a.span = Object.assign({
@@ -48,7 +56,7 @@
                     }, a.span)
                     return a
                 })
-                console.log(this.items)
+//                console.log(this.items)
             },
             displayChoice(choices, v) {
                 let b = choices.find(a => a.value === v)

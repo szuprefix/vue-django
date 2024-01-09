@@ -245,10 +245,14 @@
                 return ({selection, scope, confirmResult}) => {
                     let ids = selection.map((a) => a.id)
                     let qd = {...this._baseQueries, ...this.search}
-                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma', skipNulls: true})}`, {
+                    if(typeof confirmResult !== 'object'){
+                        confirmResult = {}
+                    }
+                    let pd = {
                         batch_action_ids: ids, ...action.context, ...confirmResult,
                         scope
-                    }).catch(this.onServerResponseError)
+                    }
+                    return this.$http.post(`${this.model.getListUrl()}${action.api || action.name}/?${Qs.stringify(qd, {arrayFormat: 'comma', skipNulls: true})}`, pd).catch(this.onServerResponseError)
                 }
             },
             addToParent ({selection}) {
