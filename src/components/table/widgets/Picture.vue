@@ -53,7 +53,8 @@
                 return this.field.imageRoot || this.$store.state.party.settings.imageRoot || ''
             },
             url () {
-                let url = get(this.context,this.field.name)
+                let d = this.context || this.value
+                let url = get(d,this.field.name)
                 if (this.field.formatter) {
                     url = this.field.formatter(this.value, this.field.name, url)
                 }

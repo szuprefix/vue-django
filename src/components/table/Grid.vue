@@ -1,6 +1,6 @@
 <template>
     <el-row>
-        <el-col :span="8" v-for="row in value" :key="row.id">
+        <el-col :span="span" v-for="row in value" :key="row.id">
             <el-card :body-style="{padding: '0px' }">
                 <template v-for="f in items">
                    <widget :field="f" :value.sync="row" :key="f.name">
@@ -16,6 +16,7 @@
         props: {
             value: Array,
             items: Array,
+            span: {type: Number, default: 8}
         },
         data () {
             return {}
