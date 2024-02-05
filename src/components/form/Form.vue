@@ -30,6 +30,8 @@
                     </el-form-item>
                 </template>
             </slot>
+
+            <slot name="footer"></slot>
         </el-row>
     </el-form>
 </template>

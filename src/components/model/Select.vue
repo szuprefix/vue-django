@@ -42,6 +42,7 @@
                     return {}
                 }
             },
+            context: Object,
             showCreate: {type: Boolean, default: true},
             value: [String, Number, Array],
             showLink: {type: Boolean, default: true}
@@ -60,7 +61,7 @@
         created(){
 //            console.log(this.field)
             this.model.init()
-            this.selectOptionsFields = this.model.config.selectOptionsFields || ['__str__']
+            this.selectOptionsFields = this.field.selectOptionsFields || this.model.config.selectOptionsFields || ['__str__']
 //            Object.assign(this.tableQueries, this.field.baseQueries, this.baseQueries)
             this.loadValueObjects(this.value)
                 .then(this.load)
@@ -120,6 +121,8 @@
             },
             changed(value){
                 this.$emit('input', value)
+                let ctx = {value, options: this.optionList, field: this.field, context: this.context, model: this.model}
+                this.$emit('context', ctx)
             },
             onFilter(search){
                 this.search = search
