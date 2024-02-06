@@ -15,30 +15,29 @@
         </slot>
         <el-row :gutter="40">
             <el-col :span="editZoneSpan">
-                <el-input ref="content" type="textarea" :autosize="{ minRows: 24}" v-model="currentValue"
+                <el-input v-if="!editor" ref="content" type="textarea" :autosize="{ minRows: 24}" v-model="currentValue"
                           :placeholder="contentSample" @change="change"></el-input>
+                <component v-else :is="editor.widget" v-model="currentValue" @change="change" v-bind="[editor.options]"></component>
             </el-col>
             <el-col :span="viewZoneSpan">
                 <div class="flex-right">
                     <el-button type="primary" @click="batchCreate">批量创建</el-button>
                 </div>
-                <el-table stripe border size="mini" :data="records" v-if="loaded">
-                    <el-table-column :prop="f.name" :column-key="f.name" :label="f.label || f.name"
-                                     :min-width="f.min_width" :width="f.width" :class-name="f.type"
-                                     :type="f.type"
-                                     :key="f.name" v-for="f in fieldItems"></el-table-column>
-                    <el-table-column :prop="_result" label="执行结果" v-if="began">
-                        <template slot-scope="{row}">
+                <x-table :value="records" :items="fieldItems">
+                    <template #right>
+                        <el-table-column :prop="_result" label="执行结果" v-if="began">
+                            <template slot-scope="{row}">
 
-                            <el-alert
-                                    :title="row._result.info"
-                                    :type="row._result.status === 'success' ?  'success':'error'"
-                                    v-if="row._result"
-                                    show-icon>
-                            </el-alert>
-                        </template>
-                    </el-table-column>
-                </el-table>
+                                <el-alert
+                                        :title="row._result.info"
+                                        :type="row._result.status === 'success' ?  'success':'error'"
+                                        v-if="row._result"
+                                        show-icon>
+                                </el-alert>
+                            </template>
+                        </el-table-column>
+                    </template>
+                </x-table>
             </el-col>
         </el-row>
     </div>
@@ -47,6 +46,7 @@
     import ForeignKeyTranslater from '../../utils/foreign_key_translater'
     import Model from './Model'
     import {debounce} from 'lodash'
+    import XTable from '../../components/table/Table.vue'
     import Qs from 'qs'
     import arrayNormalize from '../../utils/array_normalize'
     export default{
@@ -66,7 +66,8 @@
                 }
             },
             extractor: Function,
-            pk: {type: String}
+            pk: {type: String},
+            editor: Object
         },
         data () {
             return {
@@ -83,6 +84,7 @@
             }
         },
         components: {
+            XTable
 //            PaperView
         },
         mounted (){

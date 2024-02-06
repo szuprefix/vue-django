@@ -84,6 +84,12 @@
                         do: this.toCreateModel,
                         show: () => this.parentMultipleRelationField && this.checkPermission('partial_update', this.parent) || this.checkPermission('create')
                     },
+                    'batch-create': {
+                        icon: 'plus',
+                        title: '批量创建',
+                        do: this.toCreateModel,
+                        show: () =>  this.checkPermission('create')
+                    },
                     'add': {
                         icon: 'plus-square',
                         label: '添加',
@@ -187,6 +193,14 @@
                     this.editing = true
                 })
             },
+//            toBatchCreateModel(){
+//                import(`@/views${this.model.getListUrl()}batch_create.vue`).catch(() => {
+//                    return import('vue-django/src/components/model/BatchForm.vue')
+//                }).then(m => {
+//                    this.creator = m.default
+//                    this.editing = true
+//                })
+//            },
             normalizeItem(a){
                 let orderingFields = get(this.model.options, 'actions.SEARCH.ordering_fields', [])
                 Object.assign(a, {field: this.model.fieldConfigs[a.name]})

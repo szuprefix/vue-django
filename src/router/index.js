@@ -26,7 +26,7 @@ let router = new Router({
     routes: constRoutes
 })
 
-function import_or_use_template(path, template) {
+export function import_or_use_template(path, template) {
     return () => {
         return import('@/views/' + path + '.vue').catch((e) => {
             let b = e.toString().includes('Cannot find module')

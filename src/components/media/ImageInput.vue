@@ -5,7 +5,7 @@
         <image-upload v-bind="[$attrs, $props, field]" :context="field.options"
                       :urls="imageUrls" @success="onSuccess" @remove="onRemove">
         </image-upload>
-        <el-input v-if="limit === 1" v-model="context[field.name]"></el-input>
+        <el-input v-if="limit === 1" v-model="context[field.name]" clearable></el-input>
     </div>
 </template>
 <script>
