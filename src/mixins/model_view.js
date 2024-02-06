@@ -78,13 +78,15 @@ export default {
             return r
         },
         modelLoad() {
-            return axios.all([this.modelLoadData(), this.modelLoadOptions()]).then(axios.spread((data, rest_options) => {
+            return Promise.all([this.modelLoadData(), this.modelLoadOptions()]).then( rs => {
+                let data=rs[0]
+                let rest_options =rs[1]
                 if (!this.modelId) {
                     data = this.modelEmptyDataFromOptions(rest_options.actions.POST)
                 }
                 this.modelData = Object.assign({}, this.modelData, data)
                 return [data, rest_options]
-            }))
+            })
         },
         modelSave(data){
             let d = data || this.modelData

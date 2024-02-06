@@ -3,14 +3,14 @@
     <span v-else-if="typeof(field.widget) === 'function'" v-html="field.widget(value,field)"></span>
     <el-radio-group v-model="value[field.name]" v-else-if="field.widget === 'radio'" @change="fieldValueChanged"
                     :disabled="field.disabled">
-        <el-radio-button :label="c.value" v-for="c in field.choices" :key="c.value">{{ c.display_name}}
+        <el-radio-button :label="c.value" v-for="c in normalizeChoices(field.choices)" :key="c.value">{{ c.display_name}}
         </el-radio-button>
     </el-radio-group>
     <el-select v-model="value[field.name]" :multiple="field.multiple" filterable allow-create
-               :disabled="field.disabled"
+               :disabled="field.disabled" @context="onContext"
                @change="fieldValueChanged" :placeholder="field.placeholder || `请选择${field.label}`"
                v-else-if="field.widget === 'select'">
-        <el-option :label="c.display_name" :value="c.value" v-for="c in field.choices" :key="c.value"></el-option>
+        <el-option :label="c.display_name" :value="c.value" v-for="c in normalizeChoices(field.choices)" :key="c.value"></el-option>
     </el-select>
     <el-switch v-model="value[field.name]" v-else-if="field.widget === 'switch'"
                @change="fieldValueChanged" v-bind="[field]">
@@ -40,6 +40,7 @@
             v-model="value[field.name]"
             :is="field.widget"
             @change="fieldValueChanged"
+            @context="onContext"
             :placeholder="field.placeholder || field.label"
             :appModel="field.model"
             :field="field"
@@ -84,6 +85,22 @@
                     this.field.onChanged(d)
                 }
                 this.$emit('change', d)
+            },
+            onContext(ctx) {
+
+                if (this.field.onContext) {
+                    this.field.onContext(ctx)
+                }
+            },
+            normalizeChoices(choices) {
+                return choices.map(a => {
+                    if(typeof a === 'string'){
+                        return {value: a, display_name:a}
+                    } else  if (a instanceof Array){
+                        return {value: a[0], display_name: a[1]}
+                    }
+                    return a
+                })
             },
             doNothing(){
                 console.log('do nothing')
