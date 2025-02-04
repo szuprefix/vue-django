@@ -16,7 +16,7 @@
                           :key="f.name" v-else></item>
                 </template>
             </template>
-            <slot name="submit">
+<!--            <slot name="submit">-->
                 <template v-if="submitName>''">
                     <el-col :xs="$attrs.inline?12:24" :sm="$attrs.inline?8:24" :md="$attrs.inline?6:24"
                             :lg="$attrs.inline?4:24"
@@ -29,7 +29,7 @@
                         <actions :items="_actions"></actions>
                     </el-form-item>
                 </template>
-            </slot>
+<!--            </slot>-->
 
             <slot name="footer"></slot>
         </el-row>

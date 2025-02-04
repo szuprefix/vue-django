@@ -94,9 +94,9 @@
             init(){
                 this.mid = this.model.id = this.getId()
 //                this.formValue = this.value
-                this.model.load().then((data, options) => {
+                this.model.load().then(rs => {
                     this.mid = this.model.id
-                    this.formValue = {...this.value, ...data}
+                    this.formValue = {...this.value, ...rs[0]}
                     this.normalizeItems()
                     this.$emit('loaded', this.model)
                 }).catch(this.onServerResponseError)
