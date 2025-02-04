@@ -1,6 +1,6 @@
 <template>
     <div>
-        <q-video v-bind="[field]" :appID="$store.state.party.settings.media.qcloud.vod.appid" :fileID="fileId">
+        <q-video v-bind="[field]" :appID="appid" :fileID="fileId">
         </q-video>
         <el-button>重新上传</el-button>
     </div>
@@ -36,6 +36,9 @@
             fileId () {
                 let ct = this.value
                 return ct.FileId || ct.fileId
+            },
+            appid () {
+              return this.value.appid || this.$store.state.party.settings.media.qcloud.vod.appid
             }
         }
     }
