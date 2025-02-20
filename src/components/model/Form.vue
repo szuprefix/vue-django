@@ -96,7 +96,7 @@
 //                this.formValue = this.value
                 this.model.load().then((data, options) => {
                     this.mid = this.model.id
-                    this.formValue = {...this.value, ...data}
+                    this.formValue = {...this.value, ...this.model.data}
                     this.normalizeItems()
                     this.$emit('loaded', this.model)
                 }).catch(this.onServerResponseError)
@@ -198,7 +198,8 @@
         },
         computed: {
             url () {
-                return this.mid ? this.model.getDetailUrl() : this.model.getListUrl()
+                console.log('url', '', this.$attrs.url)
+                return this.$attrs.url || (this.mid ? this.model.getDetailUrl() : this.model.getListUrl())
             },
             method () {
                 return this.mid ? "put" : "post"
