@@ -5,13 +5,14 @@
                    ref="upload"
                    action="noaction"
                    accept=".mp4,.avi,.mov,.png,.jpg"
-                   multiple="multiple"
+                   :multiple="multiple"
                    :on-preview="handlePreview"
                    :on-remove="handleRemove"
                    :on-change="onChange"
                    :on-progress="onProgress"
                    :on-success="onSuccess"
                    :on-error="onError"
+                   v-bind="[$attrs]"
                    list-type="file">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
             <!--<el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>-->
@@ -46,9 +47,9 @@
             handleRemove(file, fileList) {
 //                console.log(file, fileList);
             },
-            handlePreview(file) {
-//                console.log(file);
-            },
+//             handlePreview(file) {
+// //                console.log(file);
+//             },
             handlePreview(file) {
                 this.previewFile = file
                 this.dialogVisible = true
