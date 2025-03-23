@@ -39,11 +39,10 @@
                 <component :is="field.widget" v-else-if="typeof field.widget == 'object'"
                            :ref="field.name"
                            :placeholder="field.label" v-model="formValue[field.name]" :field="field"></component>
-                <x-input :title="field.label" v-else v-model="formValue[field.name]" :required="field.required"
-                         :placeholder="field.placeholder || field.help_text || `请输入${field.label}`" :equal-with="field.equalWith"
+                <x-input v-bind="[field]" :title="field.label" v-else v-model="formValue[field.name]"
+                         :placeholder="field.placeholder || field.help_text || `请输入${field.label}`"
                          :icon-type="formErrors[field.name]?'error':null"
-                         :ref="field.name" :keyboard="field.keyboard" @on-click-error-icon="showError(field)"
-                         :is-type="field.isType" :mask="field.mask" :max="field.max"
+                         :ref="field.name" @on-click-error-icon="showError(field)"
                          :type="field.widget == 'password'?field.widget:'text'"></x-input>
             </template>
         </group>
