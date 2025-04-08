@@ -2,7 +2,7 @@
  * Created by denishuang on 2020/2/8.
  */
 import {throttle} from 'lodash'
-import {$http} from '@/configs/axios'
+import axios from '@/configs/axios'
 import Qs from 'qs'
 import {parseTime} from './filters'
 let INTERVAL = 5
@@ -21,7 +21,7 @@ function DailyLog() {
             this.delayMethods[`save${it}s`]()
         },
         save () {
-            return $http.post('/dailylog/dailylog/write/', this.m)
+            return axios.post('/dailylog/dailylog/write/', this.m)
         },
         init () {
             for (var i = 1; i <= 3; i++) {
@@ -53,7 +53,7 @@ export function Performance(app, model, ownerId, target, interval) {
         },
         post () {
             let d = {...qd, detail: this.data}
-            return $http.post('/dailylog/performance/write/', d)
+            return axios.post('/dailylog/performance/write/', d)
         },
         save: throttle(function () {
             this.post()
@@ -64,7 +64,7 @@ export function Performance(app, model, ownerId, target, interval) {
             }
         },
         read () {
-            return $http.get(`/dailylog/performance/read/?${Qs.stringify(qd)}`).then(({data}) => {
+            return axios.get(`/dailylog/performance/read/?${Qs.stringify(qd)}`).then(({data}) => {
                 Object.assign(this.data, data.detail, {target})
                 return this.data
             })
@@ -89,7 +89,7 @@ export function Performance(app, model, ownerId, target, interval) {
 export function userOnlineTimeCounter(callBack) {
     let seconds = 30
     function action () {
-        $http.post(`/dailylog/user/count/`, {metics: 'online_time', delta:  seconds}).then(callBack)
+        axios.post(`/dailylog/user/count/`, {metics: 'online_time', delta:  seconds}).then(callBack)
     }
     action()
     setInterval(action, seconds * 1000)
