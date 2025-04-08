@@ -200,7 +200,7 @@ export default function (appModel, defaults, eventor) {
         },
         loadViewsConfig () {
             if (this.viewsConfig) {
-                return Promise.resolve(this.viewConfig)
+                return Promise.resolve(this.viewsConfig)
             }
             return import(`@/views${this.getListUrl()}config.js`).then(m => {
                 return m.default || {}
