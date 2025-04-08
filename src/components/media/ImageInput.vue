@@ -2,7 +2,7 @@
     <div>
         <image-urls-input v-if="limit>1" @new="addUrls" :plugin="field.plugin">
         </image-urls-input>
-        <image-upload v-bind="[$attrs, $props, field]" :context="field.options"
+        <image-upload v-bind="[$attrs, $props, field]" :bucket="bucket"
                       :urls="imageUrls" @success="onSuccess" @remove="onRemove">
         </image-upload>
         <el-input v-if="limit === 1" v-model="context[field.name]" clearable></el-input>
@@ -10,6 +10,7 @@
 </template>
 <script>
     import ImageUpload from './ImageUpload.vue'
+    // import ImageUpload from './qcloud/ImageUpload.vue'
     import ImageUrlsInput from './ImageUrlsInput.vue'
     import {template, get, uniq} from 'lodash'
     export default{
@@ -61,6 +62,10 @@
                     return [v]
                 }
                 return v
+            },
+            bucket () {
+              let state= this.$store.state
+              return get(state, 'party.settings.media.qcloud.cos.bucket') || get(state, 'qcloud.cos.bucket')
             }
         },
     }
