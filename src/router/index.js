@@ -8,17 +8,17 @@ export const constRoutes = [
     {
         path: '/auth/login/',
         meta: {title: '登录', layout: 'main'},
-        component: resolve => require(['../views/auth/login.vue'], resolve)
+        component: () => import('../views/auth/login.vue')
     },
     {
         path: '/auth/change_password/',
         meta: {title: '修改密码'},
-        component: resolve => require(['../views/auth/change_password.vue'], resolve)
+        component: () => import('../views/auth/change_password.vue')
     },
     {
         path: '/unimplement/',
         meta: {title: '功能开发中'},
-        component: resolve => require(['../views/unimplemented.vue'], resolve)
+        component: () => import('../views/unimplemented.vue')
     }
 ]
 let router = new Router({
