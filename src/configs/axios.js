@@ -8,16 +8,16 @@ import Vue from 'vue'
 
 let instance = axios.create()
 
-function genBaseUrl (tpl) {
-    let a = tpl
-    location.pathname.split('/').forEach((s, i) => {
-        a = a.replace('$' + i, s)
-    })
-    if (a.startsWith('//')) {
-        a = a.slice(1)
-    }
-    return a
-}
+// function genBaseUrl (tpl) {
+//     let a = tpl
+//     location.pathname.split('/').forEach((s, i) => {
+//         a = a.replace('$' + i, s)
+//     })
+//     if (a.startsWith('//')) {
+//         a = a.slice(1)
+//     }
+//     return a
+// }
 
 instance.defaults.xsrfCookieName = 'csrftoken'
 instance.defaults.xsrfHeaderName = 'X-CSRFToken'
@@ -44,7 +44,7 @@ instance.setBaseURL = (url) => {
         instance.defaults.baseURL = `${p}${url}`
     }
 
-    if (!Cookies.get('csrftoken')) {
+    if (!Cookies.get(instance.defaults.xsrfCookieName)) {
         instance.get('/csrf_token/')
     }
 }
