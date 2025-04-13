@@ -37,7 +37,7 @@
                :placeholder="field.label" v-model="value[field.name]" :field="field"></component>
     <x-input v-bind="[field]" :title="field.label" v-else v-model="value[field.name]"
              :placeholder="field.placeholder || field.help_text || `请输入${field.label}`"
-             :icon-type="formErrors[field.name]?'error':null"
+             :icon-type="error?'error':null"
              :ref="field.name" @on-click-error-icon="showError(field)"
              :type="field.widget === 'password'?field.widget:'text'"></x-input>
     <!--</div>-->
@@ -62,7 +62,8 @@
         props: {
             value: Object,
             field: Object,
-            context: Object
+            context: Object,
+            error: String,
         },
         data () {
             return {
