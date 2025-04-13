@@ -65,10 +65,13 @@
             context: Object
         },
         data () {
-            return {}
+            return {
+              choices: []
+            }
         },
         created(){
 //           console.log(this.field)
+         this.get_choices()
         },
         components: {
             XInput,
@@ -84,6 +87,17 @@
             PopupPicker
         },
         methods: {
+            async get_choices () {
+              if(this.field.choices instanceof Function){
+                let rs = this.field.choices()
+                if(rs instanceof Promise){
+                  rs = await rs
+                }
+                this.choices = rs
+              }else{
+                this.choices = this.field.choices
+              }
+            },
             normalizeOptions (choices) {
                 let ops = choices.map(a => {
                     if (typeof a === 'string') {
