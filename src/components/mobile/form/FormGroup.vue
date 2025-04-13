@@ -4,7 +4,7 @@
             <template v-if="field.widget === 'readonly'">
                 {{formValue[field.name]}}
             </template>
-            <form-widget :field="field"  v-model="value"></form-widget>
+            <form-widget :field="field"  v-model="value" :error="errors[field.name]"></form-widget>
         </template>
     </group>
 </template>
