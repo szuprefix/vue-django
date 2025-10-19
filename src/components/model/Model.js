@@ -137,7 +137,7 @@ export default function (appModel, defaults, eventor) {
             if (!id) {
                 return method(`${this.getListUrl()}${action}`, data)
             } else {
-                return method(`${this.getDetailUrl()}${action}`, data)
+                return method(`${this.getDetailUrl(id)}${action}`, data)
             }
         },
         selectOrCreate (d) {
