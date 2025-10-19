@@ -7,11 +7,14 @@
         <p slot="popup-header" class="vux-1px-b form-popup-radio-header">
             {{field.help_text || field.placeholder || field.label}}</p>
     </popup-radio>
-    <checker :title="field.label" v-model="value[field.name]" :required="field.required"
-             :ref="field.name" v-else-if="field.widget === 'checker'">
-        <checker-item v-for="c in field.choices" :key="c.value" :value="c.value">{{c.display_name}}
+    <checker  v-bind="[field]" :title="field.label" v-model="value[field.name]" :type="field.wtype"
+             :ref="field.name" v-else-if="field.widget === 'checker'"  @change="fieldValueChanged">
+        <checker-item v-for="c in choices" :key="c.value" :value="c.value">{{c.display_name}}
         </checker-item>
     </checker>
+    <checklist  v-bind="[field]" :title="field.label" v-model="value[field.name]" :options="choices"
+              :ref="field.name" v-else-if="field.widget === 'checklist'"  @change="fieldValueChanged">
+    </checklist>
     <selector v-bind="[field]" :title="field.label" v-model="value[field.name]"
               :ref="field.name" :options="normalizeOptions(field.choices)"
               v-else-if="field.widget === 'select'"></selector>
@@ -50,6 +53,7 @@
         XNumber,
         PopupRadio,
         Checker,
+        Checklist,
         CheckerItem,
         Selector,
         Datetime,
@@ -82,6 +86,7 @@
             PopupRadio,
             Checker,
             CheckerItem,
+            Checklist,
             Selector,
             Datetime,
             XButton,
@@ -89,15 +94,14 @@
         },
         methods: {
             async get_choices () {
-              if(this.field.choices instanceof Function){
-                let rs = this.field.choices()
-                if(rs instanceof Promise){
-                  rs = await rs
+                let rs = this.field.choices
+                if(rs instanceof Function){
+                    rs = this.field.choices()
+                    if(rs instanceof Promise){
+                      rs = await rs
+                    }
                 }
                 this.choices = rs
-              }else{
-                this.choices = this.field.choices
-              }
             },
             normalizeOptions (choices) {
                 let ops = choices.map(a => {

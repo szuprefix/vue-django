@@ -88,9 +88,10 @@ export function Performance(app, model, ownerId, target, interval) {
 
 export function userOnlineTimeCounter(callBack) {
     let delta = 30
+    let m = {metics: {online_time: delta}}
     function action () {
-        $http.post(`/dailylog/user/count/`, {metics: 'online_time', delta}).then(({data}) => {
-            callBack({delta, result:data.detail})
+        $http.post(`/dailylog/user/count/`, m).then(({data}) => {
+            callBack(data.detail)
         })
     }
     action()
