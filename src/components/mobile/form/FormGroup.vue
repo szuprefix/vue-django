@@ -4,26 +4,15 @@
             <template v-if="field.widget === 'readonly'">
                 {{formValue[field.name]}}
             </template>
-            <form-widget :field="field"  v-model="value" :error="errors[field.name]"></form-widget>
+            <form-widget v-else :field="field"  v-model="value" :error="errors[field.name]"></form-widget>
+            <template v-if="errors[field.name]">{{errors[field.name].message}}</template>
         </template>
     </group>
 </template>
 <script>
     import Form from '../../form/Form.js'
     import {
-        Group,
-        Cell,
-        XInput,
-        XTextarea,
-        XSwitch,
-        XNumber,
-        PopupRadio,
-        Checker,
-        CheckerItem,
-        Selector,
-        Datetime,
-        XButton,
-        PopupPicker
+        Group
     } from 'vux'
     import FormWidget from "../Widget";
     export default{
@@ -44,19 +33,6 @@
         components: {
             FormWidget,
             Group,
-            Cell,
-
-            XInput,
-            XTextarea,
-            XSwitch,
-            XNumber,
-            PopupRadio,
-            Checker,
-            CheckerItem,
-            Selector,
-            Datetime,
-            XButton,
-            PopupPicker
         },
         created () {
             this.formValue = this.value
@@ -89,6 +65,7 @@
             },
             onFormError(errors) {
                 this.errors = {...errors}
+                console.log(errors)
                 var fs = this.$refs
                 errors.forEach((f) => {
                     let v = fs[f.field] && fs[f.field][0]
