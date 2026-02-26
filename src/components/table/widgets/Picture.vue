@@ -64,6 +64,7 @@
                 if (url && this.theProxy && this.tryProxy) {
                     url = `${this.theProxy}${url}`
                 }
+                console.log('url', url)
                 return url
             }
         }

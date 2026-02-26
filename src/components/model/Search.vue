@@ -83,7 +83,7 @@
             onSearch () {
                 let f = this.form
                 Object.keys(f).forEach(k => {
-                    if(f[k] ===''){
+                    if(f[k] ==='' || f[k] instanceof Array && f[k].length === 0){
                         console.log(k, f[k])
                         f[k] = null
                     }
