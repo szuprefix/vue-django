@@ -11,7 +11,7 @@ function DailyLog() {
         m: {},
         saveTime: undefined,
         delayMethods: {},
-        log  (app, model, id, metics, subMetics, v, interval) {
+        async log (app, model, id, metics, subMetics, v, interval) {
             let k = `${app}.${model}.${id}.${metics}.${subMetics}`
             let dk = parseTime(new Date(), '{y}-{m}-{d}')
             let dm = this.m[dk] || {}
@@ -87,10 +87,13 @@ export function Performance(app, model, ownerId, target, interval) {
 }
 
 export function userOnlineTimeCounter(callBack) {
-    let seconds = 30
+    let delta = 30
+    let m = {metics: {online_time: delta}}
     function action () {
-        $http.post(`/dailylog/user/count/`, {metics: 'online_time', delta:  seconds}).then(callBack)
+        $http.post(`/dailylog/user/count/`, m).then(({data}) => {
+            callBack(data.detail)
+        })
     }
     action()
-    setInterval(action, seconds * 1000)
+    setInterval(action, delta * 1000)
 }

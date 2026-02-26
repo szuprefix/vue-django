@@ -1,9 +1,6 @@
 /**
  * Created by denishuang on 2023/11/9.
  */
-/**
- * Created by denishuang on 2018/3/12.
- */
 
 let STATUS_MAP = {
     'PENDING': '排队中',

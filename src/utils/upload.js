@@ -4,7 +4,7 @@
 import {getFileMd5Async} from './file_md5'
 import {template} from 'lodash'
 import {format} from 'date-fns'
-import axios from 'axios'
+import axios from '@/configs/axios'
 
 export function getNameParts(fn) {
     let ps = fn.split('.')
@@ -30,6 +30,51 @@ export function fileFromResponse(response) {
         extName = ct.split('/')[1]
     }
     return new window.File([response.data], `${baseName}.${extName}`, {type: ct})
+}
+export function qcloudUpload (fileName, file, options) {
+    let getAuthorization  = (opt, callback) => {
+        let signUrl = template(options.signUrl)(options.context)
+        return axios.post(signUrl).then(({data}) => {
+            let d = {
+                TmpSecretId: data.credentials.tmpSecretId,
+                TmpSecretKey: data.credentials.tmpSecretKey,
+                XCosSecurityToken: data.credentials.sessionToken,
+                // 建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
+                StartTime: data.startTime, // 单位是秒
+                ExpiredTime: data.expiredTime, // SDK 在 ExpiredTime 时间前，不会再次调用 getAuthorization
+            }
+//                    console.debug(d)
+            callback(d)
+        })
+    }
+        return new Promise((resolve, reject) => {
+            import('cos-js-sdk-v5').then(module => {
+                let TcCos = module.default
+                let tcCos = new TcCos({
+                    getAuthorization
+                })
+                tcCos.putObject({
+                    Bucket: options.bucket, /* 必须 */
+                    Region: options.region, /* 存储桶所在地域，必须字段 */
+                    Key: fileName,
+                    Body: file,
+                    onProgress: function (info) {
+                        console.log('tcCos.onProgress', info, req)
+                        req.onProgress(info)
+                    }
+                }, function (err, data) {
+//                        console.log(err || data)
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(data)
+                    }
+                })
+            })
+        }).then(r => {
+            let url = `https://${r.Location}`
+            return {fileName, file, url}
+        })
 }
 //
 // export function aliOssLoad() {
@@ -69,7 +114,7 @@ export function fileFromResponse(response) {
 // }
 
 export function awsUpload(fileName, file, options) {
-    return window.http.post(`${options.signUrl}?name=${fileName}`).then(({data}) => {
+    return axios.post(`${options.signUrl}?name=${fileName}`).then(({data}) => {
         let url = data.url
         let hs = {
             'Content-Type': file.type,
@@ -118,9 +163,9 @@ export function genFileNameContext(file, fnt, context) {
     })
 }
 
-export function genFileName(file, nameTemplate) {
+export function genFileName(file, nameTemplate, context) {
     let fnt = nameTemplate || '${md5}.${extName}'
-    return genFileNameContext(file, fnt).then(ctx => template(fnt)(ctx))
+    return genFileNameContext(file, fnt, context).then(ctx => template(fnt)(ctx))
 }
 
 export function upload(file, options) {
@@ -128,7 +173,10 @@ export function upload(file, options) {
     // if(options.vendor === 'aliyun') {
     //     func = aliUpload
     // }
-    return genFileName(file, options.fileName).then(fileName => func(fileName, file, options))
+    if(options.vendor === 'qcloud') {
+        func = qcloudUpload
+    }
+    return genFileName(file, options.fileName, options.context).then(fileName => func(fileName, file, options))
 }
 
 export default upload

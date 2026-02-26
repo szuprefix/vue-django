@@ -115,7 +115,7 @@
             },
             uploadFile (req) {
                 let file = req.file
-                let options = {...this.$store.state.imageUploadOptions, ...this.context}
+                let options = {...this.$store.state.imageUploadOptions, ...this.$attrs.options, context:this.context}
                 return upload(file, options).then(r => {
                     this.urlMap[file.uid] = r.url
 //                    this.onSuccess(r, file)

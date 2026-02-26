@@ -37,7 +37,7 @@
             signUrl: String,
             fileName: String,
             context: Object,
-            bucket: String,
+            bucket: {type:String, default: ''},
             region: {type: String, default: 'ap-guangzhou'},
             urls: Array
         },

@@ -94,7 +94,7 @@
             init(){
                 this.mid = this.model.id = this.getId()
 //                this.formValue = this.value
-                this.model.load().then((data, options) => {
+                this.model.load().then(rs => {
                     this.mid = this.model.id
                     this.formValue = {...this.value, ...this.model.data}
                     this.normalizeItems()
@@ -198,7 +198,8 @@
         },
         computed: {
             url () {
-                return this.mid ? this.model.getDetailUrl() : this.model.getListUrl()
+                console.log('url', '', this.$attrs.url)
+                return this.$attrs.url || (this.mid ? this.model.getDetailUrl() : this.model.getListUrl())
             },
             method () {
                 return this.mid ? "put" : "post"

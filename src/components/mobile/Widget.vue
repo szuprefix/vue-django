@@ -7,11 +7,14 @@
         <p slot="popup-header" class="vux-1px-b form-popup-radio-header">
             {{field.help_text || field.placeholder || field.label}}</p>
     </popup-radio>
-    <checker :title="field.label" v-model="value[field.name]" :required="field.required"
-             :ref="field.name" v-else-if="field.widget === 'checker'">
-        <checker-item v-for="c in field.choices" :key="c.value" :value="c.value">{{c.display_name}}
+    <checker  v-bind="[field]" :title="field.label" v-model="value[field.name]" :type="field.wtype"
+             :ref="field.name" v-else-if="field.widget === 'checker'"  @change="fieldValueChanged">
+        <checker-item v-for="c in choices" :key="c.value" :value="c.value">{{c.display_name}}
         </checker-item>
     </checker>
+    <checklist  v-bind="[field]" :title="field.label" v-model="value[field.name]" :options="choices"
+              :ref="field.name" v-else-if="field.widget === 'checklist'"  @change="fieldValueChanged">
+    </checklist>
     <selector v-bind="[field]" :title="field.label" v-model="value[field.name]"
               :ref="field.name" :options="normalizeOptions(field.choices)"
               v-else-if="field.widget === 'select'"></selector>
@@ -37,7 +40,7 @@
                :placeholder="field.label" v-model="value[field.name]" :field="field"></component>
     <x-input v-bind="[field]" :title="field.label" v-else v-model="value[field.name]"
              :placeholder="field.placeholder || field.help_text || `请输入${field.label}`"
-             :icon-type="formErrors[field.name]?'error':null"
+             :icon-type="error?'error':null"
              :ref="field.name" @on-click-error-icon="showError(field)"
              :type="field.widget === 'password'?field.widget:'text'"></x-input>
     <!--</div>-->
@@ -50,6 +53,7 @@
         XNumber,
         PopupRadio,
         Checker,
+        Checklist,
         CheckerItem,
         Selector,
         Datetime,
@@ -62,13 +66,17 @@
         props: {
             value: Object,
             field: Object,
-            context: Object
+            context: Object,
+            error: String,
         },
         data () {
-            return {}
+            return {
+              choices: []
+            }
         },
         created(){
 //           console.log(this.field)
+         this.get_choices()
         },
         components: {
             XInput,
@@ -78,12 +86,23 @@
             PopupRadio,
             Checker,
             CheckerItem,
+            Checklist,
             Selector,
             Datetime,
             XButton,
             PopupPicker
         },
         methods: {
+            async get_choices () {
+                let rs = this.field.choices
+                if(rs instanceof Function){
+                    rs = this.field.choices()
+                    if(rs instanceof Promise){
+                      rs = await rs
+                    }
+                }
+                this.choices = rs
+            },
             normalizeOptions (choices) {
                 let ops = choices.map(a => {
                     if (typeof a === 'string') {

@@ -57,15 +57,14 @@ export default function (appModel, defaults, eventor) {
             })
         },
         cacheOptions (options) {
-            this.options = Object.assign({}, this.options, options)
-            this.fieldConfigs = Object.assign({}, this.fieldConfigs, options.actions.LIST, options.actions.POST)
+            this.options = {...this.options, ...options}
+            this.fieldConfigs = {...this.fieldConfigs, ...options.actions.LIST, ...options.actions.POST}
             Object.keys(this.fieldConfigs).forEach((a) => {
                 this.fieldConfigs[a].name = a
             })
         },
         emptyDataFromOptions (m) {
-            let dvs = {}
-            Object.assign(dvs, this.defaults)
+            let dvs = {...this.defaults}
             let r = {}
             Object.keys(m).forEach((k) => {
                 let f = m[k]
@@ -104,12 +103,12 @@ export default function (appModel, defaults, eventor) {
                 if (!this.id) {
                     data = this.emptyDataFromOptions(restOptions.actions.POST)
                 }
-                this.data = Object.assign({}, this.data, data)
+                this.data = {...this.data, ...data}
                 return rs
             })
         },
         save (data) {
-            let d = Object.assign({}, this.defaults, this.data, data)
+            let d = {...this.defaults, ...this.data, ...data}
             let promise
             if (!this.id) {
                 promise = axios.post(this.getListUrl(), d)
@@ -118,7 +117,7 @@ export default function (appModel, defaults, eventor) {
             }
             return promise.then(({data}) => {
                 this.id = data.id
-                this.data = Object.assign({}, this.data, data)
+                this.data = {...this.data, ...data}
                 this.emitPosted(this.id)
                 return data
             }) // .catch((error) => this.onErrors(error))
@@ -137,7 +136,7 @@ export default function (appModel, defaults, eventor) {
             if (!id) {
                 return method(`${this.getListUrl()}${action}`, data)
             } else {
-                return method(`${this.getDetailUrl()}${action}`, data)
+                return method(`${this.getDetailUrl(id)}${action}`, data)
             }
         },
         selectOrCreate (d) {
@@ -200,7 +199,7 @@ export default function (appModel, defaults, eventor) {
         },
         loadViewsConfig () {
             if (this.viewsConfig) {
-                return Promise.resolve(this.viewConfig)
+                return Promise.resolve(this.viewsConfig)
             }
             return import(`@/views${this.getListUrl()}config.js`).then(m => {
                 return m.default || {}
