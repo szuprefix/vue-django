@@ -5,7 +5,12 @@
         <image-upload v-bind="[$attrs, $props, field]" :bucket="bucket"
                       :urls="imageUrls" @success="onSuccess" @remove="onRemove">
         </image-upload>
-        <el-input v-if="limit === 1" v-model="context[field.name]" clearable></el-input>
+        <template v-if="limit === 1">
+            <el-input v-model="context[field.name]" clearable placeholder="图片URL">
+                <component :is="field.plugin" slot="append" v-if="field.plugin" @change="changeFileList"></component>
+            </el-input>
+        </template>
+
     </div>
 </template>
 <script>
@@ -21,7 +26,8 @@
         },
         data () {
             return {
-                urlToAdd: ''
+                urlToAdd: '',
+                togglePlugin:false
 //                fileName: undefined
             }
         },

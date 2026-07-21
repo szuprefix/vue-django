@@ -84,29 +84,6 @@ export default  {
             return error
             // this.server_response_error = error
         },
-        //
-        // resolveRoutePath(path) {
-        //     return path
-        //   // wayky add : 根据isTagsView自动给路由路径处理结尾的 / , tagView 组件的去掉结尾的 /
-        //   if (this.isTagsView) {
-        //     return path
-        //   } else {
-        //     if (path.indexOf('?') !== -1) {
-        //       const p = path.split('?')
-        //       return `${p[0]}/?${p[1]}`
-        //     } else {
-        //       return `${path}/`
-        //     }
-        //   }
-        // },
-        //
-        // resolveCurrentTagLabel(path, title) {
-        //   // wayky add : 根据isTagsView设置当前的Tag标签
-        //   if (this.isTagsView) {
-        //     this.$store.dispatch('setCurrentTagLabel', { path, title})
-        //     // 同时修改
-        //     this.$store.dispatch('updateLabelInVisitedViews', { path, title})
-        //   }
-        // }
+
     }
 }
