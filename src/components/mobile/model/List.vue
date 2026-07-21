@@ -83,6 +83,7 @@
         },
         computed: {
             tip () {
+                console.log(this.currentPageSize, this.count)
                 return this.currentPageSize < this.count ? '加载中' : '没有了'
             }
         },
